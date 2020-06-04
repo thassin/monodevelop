@@ -1,4 +1,7 @@
-test
+MonoDevelop has not been (easily/properly) buildable at Linux for a while, due to missing dependencies of a new editor component. This repository has **"oe"**-prefixed branch added, which is to study possibilities of using the **"Old-Editor"** or **"Original-Editor"** instead of the new one.
+
+---- the original MonoDevelop README continues now ----
+
 **MonoDevelop** is a full-featured integrated development environment (IDE) for mono using Gtk#.
 
 See http://www.monodevelop.com for more info.  
