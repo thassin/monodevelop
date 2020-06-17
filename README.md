@@ -1,4 +1,4 @@
-MonoDevelop has not been (easily/properly) buildable at Linux for a while, due to missing dependencies of a new editor component. This repository has **"oe"**-prefixed branch added, which is to study possibilities of using the **"Old-Editor"** or **"Original-Editor"** instead of the new one.
+MonoDevelop has not been (easily/properly) buildable at Linux for a while, due to missing dependencies of a new editor component. This repository has some **"oe"**-prefixed branches added, which are to study possibilities of using the **"Old-Editor"** or **"Original-Editor"** instead of the new one. The latest **"oe"**-branch is based on commit ef2ed385f1e87e2222bc0af83166c0a344ae94ea dated 2017-03-08.
 
 ---- the original MonoDevelop README continues now ----
 
