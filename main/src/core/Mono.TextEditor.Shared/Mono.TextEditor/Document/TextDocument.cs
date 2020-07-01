@@ -53,7 +53,7 @@ namespace Mono.TextEditor
 		TextSourceVersionProvider versionProvider = new TextSourceVersionProvider ();
 
 		string mimeType;
-		
+
 		bool   readOnly;
 		ReadOnlyCheckDelegate readOnlyCheckDelegate;
 
@@ -249,6 +249,9 @@ namespace Mono.TextEditor
 		public static TextDocument CreateImmutableDocument (string text, bool suppressHighlighting = true)
 		{
 		//	return new TextDocument (text) {
+
+// tommih NOTICE PrimitiveLineSplitter is only for read-only buffers.
+
 			return new TextDocument (false, Encoding.Default, null, new ImmutableText (text), new PrimitiveLineSplitter ()) {
 				SuppressHighlightUpdate = suppressHighlighting,
 				Text = text,
@@ -377,6 +380,7 @@ namespace Mono.TextEditor
 
 		public void ApplyTextChanges (IEnumerable<MonoDevelop.Core.Text.TextChange> changes)
 		{
+Console.WriteLine( "TextDocument.ApplyTextChanges() 1 not implemented!" );
 throw new NotImplementedException();
 		/*	if (changes == null)
 				throw new ArgumentNullException (nameof (changes));
@@ -389,6 +393,7 @@ throw new NotImplementedException();
 
 		public void ApplyTextChanges(IEnumerable<Microsoft.CodeAnalysis.Text.TextChange> changes)
 		{
+Console.WriteLine( "TextDocument.ApplyTextChanges() 2 not implemented!" );
 throw new NotImplementedException();
 		/*	if (changes == null)
 				throw new ArgumentNullException(nameof(changes));
@@ -408,6 +413,7 @@ throw new NotImplementedException();
 				throw new ArgumentException ("startOffset < 0");
 			if (endOffset > Length)
 				throw new ArgumentException ("endOffset > Length");
+
 			return buffer.ToString (startOffset, endOffset - startOffset);
 		}
 
@@ -1161,9 +1167,9 @@ throw new NotImplementedException();
 		public event EventHandler<UndoOperationEventArgs> EndUndo;
 
 #endregion
-		
+
 #region Folding
-		
+
 		SegmentTree<FoldSegment> foldSegmentTree = new SegmentTree<FoldSegment> ();
 		
 		public bool IgnoreFoldings {
@@ -1610,6 +1616,7 @@ throw new NotImplementedException();
 		{
 			if (line == null || type == null)
 				return;
+
 			foreach (var m in GetTextSegmentMarkersAt (line).OfType<DocumentLineTextSegmentMarker> ()) {
 				if (m.Marker.GetType () == type) {
 					RemoveMarker (m);
@@ -1896,7 +1903,7 @@ throw new NotImplementedException();
 			var keys = new List<int> (from pair in virtualTextMarkers where pair.Value == marker select pair.Key);
 			keys.ForEach (key => { virtualTextMarkers.Remove (key); CommitLineUpdate (key); });
 		}
-		
+
 #region Diff
 
 		int[] GetDiffCodes (ref int codeCounter, Dictionary<string, int> codeDictionary, bool includeEol)
@@ -1924,7 +1931,7 @@ throw new NotImplementedException();
 		}
 
 #endregion
-		
+
 #region ContentLoaded
 
 		// The problem: Action to perform on a newly opened text editor, but content didn't get loaded because autosave file exist.
@@ -2054,11 +2061,6 @@ throw new NotImplementedException();
 			return new SnapshotDocument (this);
 		}
 
-		public void CopyTo (int sourceIndex, char [] destination, int destinationIndex, int count)
-		{
-			buffer.CopyTo (sourceIndex, destination, destinationIndex, count); 
-		}
-
 		public ImmutableText GetImmutableText ()
 		{
 			return buffer;
@@ -2067,6 +2069,11 @@ throw new NotImplementedException();
 		public ImmutableText GetImmutableText (int offset, int count)
 		{
 			return buffer.GetText (offset, count);
+		}
+
+		public void CopyTo (int sourceIndex, char [] destination, int destinationIndex, int count)
+		{
+			buffer.CopyTo (sourceIndex, destination, destinationIndex, count); 
 		}
 
 		ITextSource ITextSource.CreateSnapshot ()

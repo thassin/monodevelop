@@ -1065,15 +1065,15 @@ if ( toolsVersion == "15.0" )
 				toolsVersion = "dotnet." + (version >= new Version (15, 0) ? "14.1" : toolsVersion);
 			}
 
-			// tommih 20200604
-			Console.WriteLine();
-			Console.WriteLine( "GetExeLocation :: toolsVersion=" + toolsVersion );
+// tommih 20200604
+Console.WriteLine();
+Console.WriteLine( "GetExeLocation :: toolsVersion=" + toolsVersion );
 
 			var exe = builderDir.Combine (toolsVersion, "MonoDevelop.Projects.Formats.MSBuild.exe");
 
-			// tommih 20200604
-			Console.WriteLine( "GetExeLocation :: exe=" + exe );
-			Console.WriteLine();
+// tommih 20200604
+Console.WriteLine( "GetExeLocation :: exe=" + exe );
+Console.WriteLine();
 
 			if (File.Exists (exe))
 				return exe;
