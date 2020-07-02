@@ -1125,6 +1125,14 @@ namespace MonoDevelop.Projects.MSBuild
 				return await Task.Run (async () => {
 					//always start the remote process explicitly, even if it's using the current runtime and fx
 					//else it won't pick up the assembly redirects from the builder exe
+
+// tommih 20200604
+if ( toolsVersion == "15.0" )
+{
+	Console.WriteLine( "toolsVersion FALLBACK 15.0 => 14.0" );
+	toolsVersion = "14.0";
+}
+
 					var exe = GetExeLocation (runtime, toolsVersion, requiresMicrosoftBuild);
 					RemoteProcessConnection connection = null;
 
@@ -1237,7 +1245,16 @@ namespace MonoDevelop.Projects.MSBuild
 				toolsVersion = "dotnet." + toolsVersion;
 			}
 
+// tommih 20200604
+Console.WriteLine();
+Console.WriteLine( "GetExeLocation :: toolsVersion=" + toolsVersion );
+
 			var exe = builderDir.Combine (toolsVersion, "MonoDevelop.Projects.Formats.MSBuild.exe");
+
+// tommih 20200604
+Console.WriteLine( "GetExeLocation :: exe=" + exe );
+Console.WriteLine();
+
 			if (File.Exists (exe))
 				return exe;
 			
