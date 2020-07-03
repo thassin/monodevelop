@@ -443,6 +443,7 @@ namespace Mono.TextEditor
 
 		void CompleteWindow ()
 		{
+Console.WriteLine( "TextLinkEditMode.CompleteWindow()" );
 			if (window == null)
 				return;
 			TextLink lnk = (TextLink)window.DataProvider;
@@ -455,6 +456,7 @@ namespace Mono.TextEditor
 
 		protected override void HandleKeypress (Gdk.Key key, uint unicodeKey, Gdk.ModifierType modifier)
 		{
+Console.WriteLine( "TextLinkEditMode.HandleKeypress()" );
 			var wnd = window;
 			if (wnd != null) {
 				ListWindowKeyAction action = wnd.ProcessKey (key, modifier);
@@ -470,6 +472,7 @@ namespace Mono.TextEditor
 				if ((action & ListWindowKeyAction.Ignore) == ListWindowKeyAction.Ignore)
 					return;
 			}
+
 			int caretOffset = Editor.Caret.Offset - baseOffset;
 			TextLink link = links.Find (l => l.Links.Any (s => s.Offset <= caretOffset && caretOffset <= s.EndOffset));
 			
@@ -501,11 +504,13 @@ namespace Mono.TextEditor
 				if ((modifier & Gdk.ModifierType.ControlMask) != 0)
 					if (link != null && !link.IsIdentifier)
 						goto default;
+
 				if (wnd != null) {
 					CompleteWindow ();
 				} else {
 					ExitTextLinkMode ();
 				}
+
 				if (key == Gdk.Key.Escape)
 					OnCancel (EventArgs.Empty);
 				return;
@@ -536,6 +541,7 @@ namespace Mono.TextEditor
 
 		void DestroyWindow ()
 		{
+Console.WriteLine( "TextLinkEditMode.DestroyWindow()" );
 			if (window != null) {
 				window.Destroy ();
 				window = null;
@@ -571,7 +577,7 @@ namespace Mono.TextEditor
 				if (!link.PrimaryLink.IsInvalid ()) {
 					int offset = link.PrimaryLink.Offset + baseOffset;
 					if (offset >= 0 && link.PrimaryLink.Length >= 0)
-						link.CurrentText = Editor.Document.GetTextAt (offset, link.PrimaryLink.Length);
+						link.CurrentText = Editor.Document.GetTextAt(offset, link.PrimaryLink.Length);
 				}
 			}
 			UpdateLinkText (link);
@@ -579,7 +585,9 @@ namespace Mono.TextEditor
 
 		public void UpdateLinkText (TextLink link)
 		{
+			// 20200703 tommih :: disable and finally re-enable update...
 			Editor.Document.TextChanged -= UpdateLinksOnTextReplace;
+
 			for (int i = link.Links.Count - 1; i >= 0; i--) {
 				var s = link.Links [i];
 				int offset = s.Offset + baseOffset;
@@ -589,6 +597,7 @@ namespace Mono.TextEditor
 					continue;
 				}
 
+				// 20200703 tommih :: this must be changed for the old editor...
 				if (Editor.Document.GetTextAt (offset, s.Length) != link.CurrentText) {
 					Editor.Replace (offset, s.Length, link.CurrentText);
 					int delta = link.CurrentText.Length - s.Length;
@@ -596,6 +605,8 @@ namespace Mono.TextEditor
 					Editor.Document.CommitLineUpdate (Editor.Document.OffsetToLineNumber (offset));
 				}
 			}
+
+			// 20200703 tommih :: disable and finally re-enable update...
 			Editor.Document.TextChanged += UpdateLinksOnTextReplace;
 		}
 	}

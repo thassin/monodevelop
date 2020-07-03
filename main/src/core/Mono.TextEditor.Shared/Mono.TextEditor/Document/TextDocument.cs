@@ -106,7 +106,7 @@ namespace Mono.TextEditor
 				return buffer.Encoding;
 			}
 			set {
-				buffer.Encoding = value;
+				buffer.Encoding = value ?? MonoDevelop.Core.Text.TextFileUtility.DefaultEncoding;
 			}
 		}
 
@@ -178,11 +178,11 @@ namespace Mono.TextEditor
 			}
 
 			//already up to date
-			if (syntaxModeFileName == fileName && syntaxModeMimeType == mimeType) {
+			if (syntaxModeFileName == this.FileName && syntaxModeMimeType == this.MimeType) {
 				return;
 			}
-			syntaxModeFileName = fileName;
-			syntaxModeMimeType = mimeType;
+			syntaxModeFileName = this.FileName;
+			syntaxModeMimeType = this.MimeType;
 
 			InitializeSyntaxMode ();
 		}
@@ -220,7 +220,7 @@ Console.WriteLine( "debug Initialize :: '" + fileName + "' enc=" + encoding + " 
 
 			textSegmentMarkerTree.InstallListener (this);
 
-			this.diffTracker.SetTrackDocument (this);
+			this.diffTracker.SetTrackDocument(this);
 
 Console.WriteLine( "debug Initialize completed" );
 		}
@@ -234,8 +234,6 @@ Console.WriteLine( "debug Initialize completed" );
 
 // TODO what to do here??? is this needed at all???
 Console.WriteLine( "tommih : TextDocument Disposed" );
-//this.splitter = null;
-//this.buffer = null;
 
 			SyntaxMode = null;
 		}
@@ -330,6 +328,9 @@ ImmutableText buffer = new ImmutableText (text);
 			}
 			set {
 Console.WriteLine( "Text setter called" );
+				var tmp = IsReadOnly;
+				IsReadOnly = false;
+
 				if (value == null)
 					value = "";
 				var args = new TextChangeEventArgs (0, Text, value);
@@ -346,12 +347,13 @@ Console.WriteLine( "Text setter called" );
 				OnTextSet (EventArgs.Empty);
 				CommitUpdateAll ();
 				ClearUndoBuffer ();
-			//	IsReadOnly = tmp;	not needed, no such value
-				IsTextSet = true;	// never used... BUT REQUIRED
+
+				IsReadOnly = tmp;
+				IsTextSet = true;
 			}
 		}
 
-		internal bool IsTextSet { get; set; }	// never used... BUT REQUIRED
+		internal bool IsTextSet { get; set; }
 
 		public void InsertText (int offset, string text)
 		{
@@ -415,8 +417,9 @@ Console.WriteLine( "Text setter called" );
 
 Console.WriteLine( "ReplaceText :: args.TextChanges.Count=" + args.TextChanges.Count );
 
-			// tommih 20200617 : TextChangeEventArgs has been splitted to TextChangeEventArgs + TextChange...
-			if ( args.TextChanges.Count != 1 ) throw new InvalidOperationException("args.TextChanges.Count is not valid : " + args.TextChanges.Count);
+// tommih 20200617 : TextChangeEventArgs has been splitted to TextChangeEventArgs + TextChange...
+if ( args.TextChanges.Count != 1 ) throw new InvalidOperationException("args.TextChanges.Count is not valid : " + args.TextChanges.Count);
+
 			value = args.TextChanges[0].InsertedText.Text;
 
 			cachedText = null;
@@ -432,22 +435,46 @@ Console.WriteLine( "ReplaceText :: args.TextChanges.Count=" + args.TextChanges.C
 				OnEndUndo (new UndoOperationEventArgs (operation));
 		}
 
-		// tommih 20200617 : some new methods here, not implemented yet...
-
-	//	public void ApplyTextChanges (IEnumerable<MonoDevelop.Core.Text.TextChange> changes)
 		public void ApplyTextChanges (IEnumerable<Microsoft.CodeAnalysis.Text.TextChange> changes)
 		{
-Console.WriteLine( "TextDocument.ApplyTextChanges() not implemented!" );
-throw new NotImplementedException();	/* TODO the parameter type has been changed...
+
+Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
+
 			if (changes == null)
 				throw new ArgumentNullException(nameof(changes));
 
-			using (var edit = this.TextBuffer.CreateEdit())
+			// apply the changes in reverse order, to keep the positions from begin corrupted.
+			// TODO is "changes" always ordered like this? ever need to sort it???
+
+			int? prevStart = null;
+			foreach (var change in changes.Reverse())
 			{
-				foreach (var change in changes)
-					edit.Replace(change.Span.Start, change.Span.Length, change.NewText);
-				edit.Apply();
-			}	*/
+				int start = change.Span.Start;
+				int length = change.Span.Length;
+
+				if ( prevStart.HasValue && start >= prevStart.Value ) {
+					Console.WriteLine( "TextDocument.ApplyTextChanges() changes has BAD ordering : prevStart=" + prevStart.Value + " start=" + start );
+				}
+
+				prevStart = start;
+				string oldtext = GetTextAt (start, length);
+
+				string newtext = change.NewText;
+				if ( newtext == null ) newtext = "";
+
+				Console.WriteLine ("TextDocument.ApplyTextChanges() :: s=" + start + " l=" + length + " ot='" + oldtext + "' nt='" + newtext + "' l2=" + newtext.Length);
+
+			/*	if (length > 0) {	// this works but requires 2 operations...
+					RemoveText (start, length);
+				}
+
+				if (newtext.Length > 0) {
+					InsertText (start, newtext);
+				}	*/
+
+				if ( newtext.Length < 1 ) newtext = null;
+				ReplaceText(start, length, newtext);
+			}
 		}
 
 		public string GetTextBetween (int startOffset, int endOffset)
@@ -560,7 +587,7 @@ throw new NotImplementedException();	/* TODO the parameter type has been changed
 	//		// REMOVED...
 	//	}
 
-// if false	//Do we need these?	tommih 20200617 YES THESE ARE NEEDED...
+// ##if false	//Do we need these?	tommih 20200617 YES THESE ARE NEEDED...
 
 		/// <summary>
 		/// Gets the index of the first occurrence of any character in the specified array.
@@ -616,7 +643,7 @@ throw new NotImplementedException();	/* TODO the parameter type has been changed
 			return Text.LastIndexOf (searchText, startIndex, count, comparisonType);
 		}
 
-//#endif	tommih 20200617 YES THESE ARE NEEDED...
+// ##endif	tommih 20200617 YES THESE ARE NEEDED...
 
 		protected virtual void OnTextReplaced (TextChangeEventArgs args)
 		{
@@ -688,6 +715,8 @@ throw new NotImplementedException();	/* TODO the parameter type has been changed
 			DocumentLine line = GetLine (location.Line);
 			return System.Math.Min (Length, line.Offset + System.Math.Max (0, System.Math.Min (line.Length, location.Column - 1)));
 		}
+
+		// 20200703 tommih : the above method(s) from old, the next can be a new one...
 		
 		public DocumentLocation OffsetToLocation (int offset)
 		{
@@ -754,8 +783,10 @@ throw new NotImplementedException();	/* TODO the parameter type has been changed
 
 		internal class UndoOperation
 		{
+// tommih 20200703 property name change "Changes" -> "Args".
+// tommih 20200703 property name change "Changes" -> "Args".
+// tommih 20200703 property name change "Changes" -> "Args".
 			TextChangeEventArgs args;
-
 			public virtual TextChangeEventArgs Args {
 				get {
 					return args;
@@ -836,9 +867,10 @@ Console.WriteLine( "TODO TextDocument.Redo not implemented!" );
 				}
 			}
 
-// tommih 20200702 method name change "Changes" -> "Args".
-// tommih 20200702 method name change "Changes" -> "Args".
-// tommih 20200702 method name change "Changes" -> "Args".
+// tommih 20200703 method name change "Changes" -> "Args".
+// tommih 20200703 method name change "Changes" -> "Args".
+// tommih 20200703 method name change "Changes" -> "Args".
+		//	public virtual Microsoft.VisualStudio.Text.INormalizedTextChangeCollection Changes {
 			public override TextChangeEventArgs Args {
 				get {
 					return null;
@@ -905,9 +937,10 @@ Console.WriteLine( "TODO TextDocument.Redo not implemented!" );
 				}
 			}
 
-// tommih 20200702 method name change "Changes" -> "Args".
-// tommih 20200702 method name change "Changes" -> "Args".
-// tommih 20200702 method name change "Changes" -> "Args".
+// tommih 20200703 method name change "Changes" -> "Args".
+// tommih 20200703 method name change "Changes" -> "Args".
+// tommih 20200703 method name change "Changes" -> "Args".
+		//	public virtual Microsoft.VisualStudio.Text.INormalizedTextChangeCollection Changes {
 			public override TextChangeEventArgs Args {
 				get {
 					return operations.Count > 0 ? operations [operations.Count - 1].Args : null;
@@ -1000,6 +1033,7 @@ Console.WriteLine( "TODO TextDocument.Redo not implemented!" );
 			OptimizeTypedUndo ();
 			if (undoStack.Count > 0 && undoStack.Peek () is KeyboardStackUndo)
 				((KeyboardStackUndo)undoStack.Peek ()).IsClosed = true;
+
 			savePoint = undoStack.ToArray ();
 			this.CommitUpdateAll ();
 			DiffTracker.SetBaseDocument (CreateDocumentSnapshot ());
@@ -1740,7 +1774,7 @@ Console.WriteLine( "TODO TextDocument.Redo not implemented!" );
 
 		public IEnumerable<TextSegmentMarker> GetTextSegmentMarkersAt (DocumentLine line)
 		{
-			return textSegmentMarkerTree.GetSegmentsOverlapping (line.Segment);
+			return GetTextSegmentMarkersAt (line.Segment);
 		}
 
 		internal IEnumerable<TextSegmentMarker> GetVisibleTextSegmentMarkersAt (DocumentLine line)
@@ -1750,29 +1784,38 @@ Console.WriteLine( "TODO TextDocument.Redo not implemented!" );
 					yield return marker;
 		}
 
-	//	int textSegmentCacheOffset = -1, textSegmentCacheLength;
-	//	List<TextSegmentMarker> textSegmentCache;
-	//	int textMarkerCacheOffset = -1;
-	//	List<TextSegmentMarker> textMarkerSegmentCache;
-	//	void ClearTextMarkerCache ()
-	//	{
-	//		textSegmentCacheOffset = textMarkerCacheOffset = -1;
-	//	}
+		int textSegmentCacheOffset = -1, textSegmentCacheLength;
+		List<TextSegmentMarker> textSegmentCache;
+
+		int textMarkerCacheOffset = -1;
+		List<TextSegmentMarker> textMarkerSegmentCache;
+
+		void ClearTextMarkerCache ()
+		{
+			textSegmentCacheOffset = textMarkerCacheOffset = -1;
+		}
 
 		public IEnumerable<TextSegmentMarker> GetTextSegmentMarkersAt (ISegment segment)
 		{
-			return textSegmentMarkerTree.GetSegmentsOverlapping (segment);
+			if (segment.Offset == textSegmentCacheOffset && segment.Length == textSegmentCacheLength)
+				return textSegmentCache;
+			textSegmentCacheOffset = segment.Offset;
+			textSegmentCacheLength = segment.Length;
+			return textSegmentCache = textSegmentMarkerTree.GetSegmentsOverlapping (segment).ToList ();
 		}
 
 		public IEnumerable<TextSegmentMarker> GetTextSegmentMarkersAt (int offset)
 		{
-			return textSegmentMarkerTree.GetSegmentsAt (offset);
+			if (textMarkerCacheOffset == offset)
+				return textMarkerSegmentCache;
+			textMarkerCacheOffset = offset;
+			return textMarkerSegmentCache = textSegmentMarkerTree.GetSegmentsAt (offset).ToList ();
 		}
 		
 
 		public void AddMarker (TextSegmentMarker marker)
 		{
-		//	ClearTextMarkerCache ();
+			ClearTextMarkerCache ();
 			marker.insertId = textSegmentInsertId++;
 			textSegmentMarkerTree.Add (marker);
 			var startLine = OffsetToLineNumber (marker.Offset);
@@ -1787,7 +1830,7 @@ Console.WriteLine( "TODO TextDocument.Redo not implemented!" );
 		/// <param name="marker">Marker.</param>
 		public bool RemoveMarker (TextSegmentMarker marker)
 		{
-		//	ClearTextMarkerCache ();
+			ClearTextMarkerCache ();
 			bool wasRemoved = textSegmentMarkerTree.Remove (marker);
 			if (wasRemoved) {
 				var startLine = OffsetToLineNumber (marker.Offset);
@@ -2189,6 +2232,9 @@ Console.WriteLine( "SnapshotDocument ctor" );
 		{
 			return GetImmutableText (offset, length);
 		}
+
+// 20200703 tommih :: the method below is kind-of-duplicate to CreateDocumentSnapshot().
+// required by ITextDocument (or similar), cannot have "public" definition.
 
 		IReadonlyTextDocument ITextDocument.CreateDocumentSnapshot ()
 		{

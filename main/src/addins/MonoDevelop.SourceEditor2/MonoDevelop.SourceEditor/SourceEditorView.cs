@@ -777,20 +777,14 @@ namespace MonoDevelop.SourceEditor
 				}
 				try {
 					var writeEncoding = encoding;
-				//	var writeBom = hadBom;
 					var writeText = ProcessSaveText (Document.Text);
 					if (writeEncoding == null) {
 						if (this.encoding != null) {
 							writeEncoding = this.encoding;
 						} else { 
 							writeEncoding = Encoding.UTF8;
-							// Disabled. Shows up in the source control as diff, it's atm confusing for the users to see a change without
-							// changed files.
-						//	writeBom = false;
-						//	writeBom =!Mono.TextEditor.Utils.TextFileUtility.IsASCII (writeText);
 						}
 					}
-				//	await MonoDevelop.Core.Text.TextFileUtility.WriteTextAsync (fileName, writeText, writeEncoding, writeBom);
 					MonoDevelop.Core.Text.TextFileUtility.WriteText (fileName, writeText, writeEncoding);
 					this.encoding = writeEncoding;
 				} catch (InvalidEncodingException) {
@@ -800,9 +794,7 @@ namespace MonoDevelop.SourceEditor
 						AlertButton.Cancel,
 						new AlertButton (GettextCatalog.GetString ("Save as Unicode")));
 					if (result != AlertButton.Cancel) {
-					//	hadBom = true;
 						this.encoding = Encoding.UTF8;
-					//	MonoDevelop.Core.Text.TextFileUtility.WriteText (fileName, Document.Text, encoding, hadBom);
 						MonoDevelop.Core.Text.TextFileUtility.WriteText (fileName, Document.Text, encoding);
 					} else {
 						return;
@@ -867,7 +859,6 @@ namespace MonoDevelop.SourceEditor
 		void UpdateTextDocumentEncoding ()
 		{
 			widget.Document.Encoding = encoding;
-		//	widget.Document.UseBOM = hadBom;	no longer needed???
 		}
 
 		class MyExtendingLineMarker : TextLineMarker, IExtendingTextLineMarker
@@ -911,7 +902,7 @@ namespace MonoDevelop.SourceEditor
 				didLoadCleanly = true;
 			} else {
 				if (!reload && AutoSave.AutoSaveExists(fileName)) {
-					widget.ShowAutoSaveWarning (fileName);
+					widget.ShowAutoSaveWarning(fileName);
 					encoding = loadEncoding;
 					didLoadCleanly = false;
 				} else {
@@ -922,10 +913,8 @@ namespace MonoDevelop.SourceEditor
 					if (loadEncoding == null) {
 						text = MonoDevelop.Core.Text.TextFileUtility.ReadAllText(fileName, out loadEncoding);
 					} else {
-						encoding = loadEncoding;
 						text = MonoDevelop.Core.Text.TextFileUtility.ReadAllText(fileName, loadEncoding);
 					}
-				//	this.Document.VsTextDocument.Encoding = loadEncoding;
 					encoding = loadEncoding;
 
 					text = ProcessLoadText(text);
@@ -1003,7 +992,6 @@ namespace MonoDevelop.SourceEditor
 
 		bool warnOverwrite = false;
 		Encoding encoding;
-	//	bool hadBom = true;	// this is no longer needed???
 
 		internal void ReplaceContent (string fileName, string content, Encoding enc)
 		{
@@ -3225,7 +3213,7 @@ namespace MonoDevelop.SourceEditor
 				TextEditor.Options.ZoomChanged += value;
 			}
 			remove {
-				TextEditor.Options.ZoomChanged += value;
+				TextEditor.Options.ZoomChanged -= value;
 			}
 		}
 
