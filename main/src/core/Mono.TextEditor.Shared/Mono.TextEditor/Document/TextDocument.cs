@@ -1284,9 +1284,9 @@ Console.WriteLine( "TODO TextDocument.Redo not implemented!" );
 		public event EventHandler<UndoOperationEventArgs> EndUndo;
 
 #endregion
-		
+
 #region Folding
-		
+
 		SegmentTree<FoldSegment> foldSegmentTree = new SegmentTree<FoldSegment> ();
 		
 		public bool IgnoreFoldings {
@@ -1742,6 +1742,7 @@ Console.WriteLine( "TODO TextDocument.Redo not implemented!" );
 		{
 			if (line == null || type == null)
 				return;
+
 			foreach (var m in GetTextSegmentMarkersAt (line).OfType<DocumentLineTextSegmentMarker> ()) {
 				if (m.Marker.GetType () == type) {
 					RemoveMarker (m);
