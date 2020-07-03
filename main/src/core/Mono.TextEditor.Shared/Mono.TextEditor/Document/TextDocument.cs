@@ -435,17 +435,44 @@ if ( args.TextChanges.Count != 1 ) throw new InvalidOperationException("args.Tex
 
 		public void ApplyTextChanges (IEnumerable<Microsoft.CodeAnalysis.Text.TextChange> changes)
 		{
-Console.WriteLine( "TextDocument.ApplyTextChanges() not implemented!" );
-throw new NotImplementedException();	/* TODO the parameter type has been changed...
+
+Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
+
 			if (changes == null)
 				throw new ArgumentNullException(nameof(changes));
 
-			using (var edit = this.TextBuffer.CreateEdit())
+			// apply the changes in reverse order, to keep the positions from begin corrupted.
+			// TODO is "changes" always ordered like this? ever need to sort it???
+
+			int? prevStart = null;
+			foreach (var change in changes.Reverse())
 			{
-				foreach (var change in changes)
-					edit.Replace(change.Span.Start, change.Span.Length, change.NewText);
-				edit.Apply();
-			}	*/
+				int start = change.Span.Start;
+				int length = change.Span.Length;
+
+				if ( prevStart.HasValue && start >= prevStart.Value ) {
+					Console.WriteLine( "TextDocument.ApplyTextChanges() changes has BAD ordering : prevStart=" + prevStart.Value + " start=" + start );
+				}
+
+				prevStart = start;
+				string oldtext = GetTextAt (start, length);
+
+				string newtext = change.NewText;
+				if ( newtext == null ) newtext = "";
+
+				Console.WriteLine ("TextDocument.ApplyTextChanges() :: s=" + start + " l=" + length + " ot='" + oldtext + "' nt='" + newtext + "' l2=" + newtext.Length);
+
+			/*	if (length > 0) {	// this works but requires 2 operations...
+					RemoveText (start, length);
+				}
+
+				if (newtext.Length > 0) {
+					InsertText (start, newtext);
+				}	*/
+
+				if ( newtext.Length < 1 ) newtext = null;
+				ReplaceText(start, length, newtext);
+			}
 		}
 
 		public string GetTextBetween (int startOffset, int endOffset)
