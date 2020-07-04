@@ -281,6 +281,8 @@ namespace Mono.TextEditor
 				return completeText;
 			}
 			set {
+Console.WriteLine( "Text setter called" );
+
 				if (value == null)
 					value = "";
 				var args = new TextChangeEventArgs (0, Text, value);
@@ -335,6 +337,7 @@ namespace Mono.TextEditor
 				throw new ArgumentOutOfRangeException (nameof (count), "must be > 0, was: " + count);
 			if (IsReadOnly)
 				return;
+
 			InterruptFoldWorker ();
 
 			//int oldLineCount = LineCount;
@@ -359,8 +362,11 @@ namespace Mono.TextEditor
 			
 			OnTextReplacing (args);
 
-			// tommih 20200617 : TextChangeEventArgs has been splitted to TextChangeEventArgs + TextChange...
-			if ( args.TextChanges.Count != 1 ) throw new InvalidOperationException("args.TextChanges.Count is not valid : " + args.TextChanges.Count);
+Console.WriteLine( "ReplaceText :: args.TextChanges.Count=" + args.TextChanges.Count );
+
+// tommih 20200617 : TextChangeEventArgs has been splitted to TextChangeEventArgs + TextChange...
+if ( args.TextChanges.Count != 1 ) throw new InvalidOperationException("args.TextChanges.Count is not valid : " + args.TextChanges.Count);
+
 			value = args.TextChanges[0].InsertedText.Text;
 
 			cachedText = null;
@@ -437,6 +443,7 @@ throw new NotImplementedException();
 				throw new ArgumentException ("count < 0");
 			if (offset + count > Length)
 				throw new ArgumentException ("offset + count is beyond EOF");
+
 			return buffer.ToString (offset, count);
 		}
 		
@@ -495,10 +502,11 @@ throw new NotImplementedException();
 		/// <returns>The first index where the character was found; or -1 if no occurrence was found.</returns>
 		public int IndexOf (char c, int startIndex, int count)
 		{
+			// REPLACED by an old version...
 			return Text.IndexOf (c, startIndex, count);
 		}
 
-//#if false	//Do we need these?	tommih 20200617 YES THESE ARE NEEDED...
+// ##if false	//Do we need these?	tommih 20200617 YES THESE ARE NEEDED...
 
 		/// <summary>
 		/// Gets the index of the first occurrence of any character in the specified array.
@@ -554,7 +562,7 @@ throw new NotImplementedException();
 			return Text.LastIndexOf (searchText, startIndex, count, comparisonType);
 		}
 
-//#endif	tommih 20200617 YES THESE ARE NEEDED...
+// ##endif	tommih 20200617 YES THESE ARE NEEDED...
 
 		protected virtual void OnTextReplaced (TextChangeEventArgs args)
 		{
@@ -626,6 +634,8 @@ throw new NotImplementedException();
 			DocumentLine line = GetLine (location.Line);
 			return System.Math.Min (Length, line.Offset + System.Math.Max (0, System.Math.Min (line.Length, location.Column - 1)));
 		}
+
+		// 20200703 tommih : the above method(s) from old, the next can be a new one...
 		
 		public DocumentLocation OffsetToLocation (int offset)
 		{
@@ -684,7 +694,6 @@ throw new NotImplementedException();
 		internal class UndoOperation
 		{
 			TextChangeEventArgs args;
-
 			public virtual TextChangeEventArgs Args {
 				get {
 					return args;
@@ -758,7 +767,7 @@ throw new NotImplementedException();
 					return operations;
 				}
 			}
-			
+
 			public override TextChangeEventArgs Args {
 				get {
 					return null;
@@ -876,7 +885,7 @@ throw new NotImplementedException();
 					return true;
 				if (savePoint == null)
 					return CanUndo;
-				if (undoStack.Count != savePoint.Length) 
+				if (undoStack.Count != savePoint.Length)
 					return true;
 				UndoOperation[] currentStack = undoStack.ToArray ();
 				for (int i = 0; i < currentStack.Length; i++) {
@@ -917,6 +926,7 @@ throw new NotImplementedException();
 			OptimizeTypedUndo ();
 			if (undoStack.Count > 0 && undoStack.Peek () is KeyboardStackUndo)
 				((KeyboardStackUndo)undoStack.Peek ()).IsClosed = true;
+
 			savePoint = undoStack.ToArray ();
 			this.CommitUpdateAll ();
 			DiffTracker.SetBaseDocument (CreateDocumentSnapshot ());
@@ -2045,6 +2055,7 @@ throw new NotImplementedException();
 		//	public SnapshotDocument (TextDocument doc) : base (doc.useBOM, doc.encoding, doc.fileName, CreateBufferFromTextDocument(doc))
 			public SnapshotDocument (TextDocument doc) : base (doc.UseBOM, doc.Encoding, doc.fileName, doc.buffer, new LazyLineSplitter (doc.LineCount))
 			{
+Console.WriteLine( "SnapshotDocument ctor" );
 				this.version = doc.Version;
 				((LazyLineSplitter)splitter).src = this;
 				fileName = doc.fileName;
@@ -2061,6 +2072,11 @@ throw new NotImplementedException();
 			return new SnapshotDocument (this);
 		}
 
+		public void CopyTo (int sourceIndex, char [] destination, int destinationIndex, int count)
+		{
+			buffer.CopyTo (sourceIndex, destination, destinationIndex, count); 
+		}
+
 		public ImmutableText GetImmutableText ()
 		{
 			return buffer;
@@ -2069,11 +2085,6 @@ throw new NotImplementedException();
 		public ImmutableText GetImmutableText (int offset, int count)
 		{
 			return buffer.GetText (offset, count);
-		}
-
-		public void CopyTo (int sourceIndex, char [] destination, int destinationIndex, int count)
-		{
-			buffer.CopyTo (sourceIndex, destination, destinationIndex, count); 
 		}
 
 		ITextSource ITextSource.CreateSnapshot ()
@@ -2085,6 +2096,9 @@ throw new NotImplementedException();
 		{
 			return GetImmutableText (offset, length);
 		}
+
+// 20200703 tommih :: the method below is kind-of-duplicate to CreateDocumentSnapshot().
+// required by ITextDocument (or similar), cannot have "public" definition.
 
 		IReadonlyTextDocument ITextDocument.CreateDocumentSnapshot ()
 		{

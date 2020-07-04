@@ -845,8 +845,10 @@ namespace MonoDevelop.SourceEditor
 				widget.RemoveMessageBar ();
 				WorkbenchWindow.ShowNotification = false;
 			}
+
 			// Look for a mime type for which there is a syntax mode
 			UpdateMimeType (fileName);
+
 			string text = null;
 			bool didLoadCleanly;
 			if (!reload && AutoSave.AutoSaveExists (fileName)) {
@@ -888,9 +890,9 @@ namespace MonoDevelop.SourceEditor
 			UpdateTextDocumentEncoding ();
 
 			document.TextChanged += OnTextReplaced;
-			return TaskUtil.Default<object> ();
+			return TaskUtil.Default<object>();
 		}
-		
+
 		void HandleTextEditorVAdjustmentChanged (object sender, EventArgs e)
 		{
 			widget.TextEditor.TextArea.SizeAllocated -= HandleTextEditorVAdjustmentChanged;
@@ -2040,9 +2042,9 @@ namespace MonoDevelop.SourceEditor
 					segment.IsCollapsed = false;
 				}
 				if (segment.FoldingType == FoldingType.TypeMember || segment.FoldingType == FoldingType.Comment)
-                    segment.IsCollapsed = toggle;
-                widget.TextEditor.Document.InformFoldChanged(new FoldSegmentEventArgs(segment));
-            }
+					segment.IsCollapsed = toggle;
+				widget.TextEditor.Document.InformFoldChanged(new FoldSegmentEventArgs(segment));
+			}
 
 			widget.TextEditor.Caret.MoveCaretBeforeFoldings ();
 			Document.RequestUpdate (new UpdateAll ());
@@ -2905,13 +2907,13 @@ namespace MonoDevelop.SourceEditor
 		}
 
 		IndentationTracker ITextEditorImpl.IndentationTracker {
-            get {
-                return TextEditor.GetTextEditorData().IndentationTracker;
-            }
-            set {
-                TextEditor.GetTextEditorData().IndentationTracker = value;
-            }
-        }
+			get {
+				return TextEditor.GetTextEditorData().IndentationTracker;
+			}
+			set {
+				TextEditor.GetTextEditorData().IndentationTracker = value;
+			}
+		}
 
 		void ITextEditorImpl.SetSelectionSurroundingProvider (SelectionSurroundingProvider surroundingProvider)
 		{
