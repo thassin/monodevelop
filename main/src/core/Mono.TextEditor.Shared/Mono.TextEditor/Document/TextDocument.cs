@@ -265,6 +265,8 @@ namespace Mono.TextEditor
 				return completeText;
 			}
 			set {
+Console.WriteLine( "Text setter called" );
+
 				if (value == null)
 					value = "";
 				var args = new TextChangeEventArgs (0, Text, value);
@@ -319,6 +321,7 @@ namespace Mono.TextEditor
 				throw new ArgumentOutOfRangeException (nameof (count), "must be > 0, was: " + count);
 			if (IsReadOnly)
 				return;
+
 			InterruptFoldWorker ();
 
 			//int oldLineCount = LineCount;
@@ -342,6 +345,7 @@ namespace Mono.TextEditor
 				EnsureSegmentIsUnfolded (offset, value.Length);
 			
 			OnTextReplacing (args);
+
 			value = args.InsertedText.Text;
 
 			cachedText = null;
@@ -391,6 +395,7 @@ namespace Mono.TextEditor
 				throw new ArgumentException ("count < 0");
 			if (offset + count > Length)
 				throw new ArgumentException ("offset + count is beyond EOF");
+
 			return buffer.ToString (offset, count);
 		}
 		
@@ -634,7 +639,6 @@ namespace Mono.TextEditor
 		internal class UndoOperation
 		{
 			TextChangeEventArgs args;
-
 			public virtual TextChangeEventArgs Args {
 				get {
 					return args;
@@ -700,7 +704,7 @@ namespace Mono.TextEditor
 					return operations;
 				}
 			}
-			
+
 			public override TextChangeEventArgs Args {
 				get {
 					return null;
@@ -859,6 +863,7 @@ namespace Mono.TextEditor
 			OptimizeTypedUndo ();
 			if (undoStack.Count > 0 && undoStack.Peek () is KeyboardStackUndo)
 				((KeyboardStackUndo)undoStack.Peek ()).IsClosed = true;
+
 			savePoint = undoStack.ToArray ();
 			this.CommitUpdateAll ();
 			DiffTracker.SetBaseDocument (CreateDocumentSnapshot ());
@@ -1909,6 +1914,7 @@ namespace Mono.TextEditor
 
 			public SnapshotDocument (TextDocument doc) : base (doc.buffer, new LazyLineSplitter (doc.LineCount))
 			{
+Console.WriteLine( "SnapshotDocument ctor" );
 				this.version = doc.Version;
 				((LazyLineSplitter)splitter).src = this;
 				fileName = doc.fileName;
@@ -1925,6 +1931,11 @@ namespace Mono.TextEditor
 			return new SnapshotDocument (this);
 		}
 
+		public void CopyTo (int sourceIndex, char [] destination, int destinationIndex, int count)
+		{
+			buffer.CopyTo (sourceIndex, destination, destinationIndex, count); 
+		}
+
 		public ImmutableText GetImmutableText ()
 		{
 			return buffer;
@@ -1933,11 +1944,6 @@ namespace Mono.TextEditor
 		public ImmutableText GetImmutableText (int offset, int count)
 		{
 			return buffer.GetText (offset, count);
-		}
-
-		public void CopyTo (int sourceIndex, char [] destination, int destinationIndex, int count)
-		{
-			buffer.CopyTo (sourceIndex, destination, destinationIndex, count); 
 		}
 
 		ITextSource ITextSource.CreateSnapshot ()

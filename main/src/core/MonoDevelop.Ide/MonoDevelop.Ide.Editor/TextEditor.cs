@@ -1406,7 +1406,7 @@ namespace MonoDevelop.Ide.Editor
 				projectedProviders.ForEach ((obj) => {
 					textEditorImpl.RemoveTooltipProvider (obj);
 					obj.Dispose ();
-                });
+				});
 
 				projectedProviders = new List<ProjectedTooltipProvider> ();
 				foreach (var projection in projections) {
