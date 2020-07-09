@@ -10,8 +10,6 @@
     <TestRunnerCommand>..\..\build\bin\mdtool.exe</TestRunnerCommand>
     <TestRunnerArgs>run-md-tests</TestRunnerArgs>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\msbuild\MonoDevelop-Public.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,49 +39,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Test.cs" />
-    <Compile Include="MonoDevelop.Core\BacktrackingStringMatcherTests.cs" />
-    <Compile Include="MonoDevelop.Core\BaseCredentialsProviderTests.cs" />
-    <Compile Include="MonoDevelop.Core\CoreExtensionsTests.cs" />
-    <Compile Include="MonoDevelop.Core\FilePathTests.cs" />
-    <Compile Include="MonoDevelop.Core\FileServiceTests.cs" />
-    <Compile Include="MonoDevelop.Core\LaneStringMatcherTests.cs" />
-    <Compile Include="MonoDevelop.Core\LoggingServiceTests.cs" />
-    <Compile Include="MonoDevelop.Core\MonoExecutionParametersTests.cs" />
-    <Compile Include="MonoDevelop.Core\RemoteProcessConnectionTests.cs" />
-    <Compile Include="MonoDevelop.Core\RuntimeTests.cs" />
-    <Compile Include="MonoDevelop.Core\StringParserServiceTests.cs" />
-    <Compile Include="MonoDevelop.Core.Assemblies\SystemAssemblyServiceTests.cs" />
-    <Compile Include="MonoDevelop.Projects\FileServiceTests.cs" />
-    <Compile Include="MonoDevelop.Projects\FlavorMigration.cs" />
-    <Compile Include="MonoDevelop.Projects\GetSourceFilesAsyncTests.cs" />
-    <Compile Include="MonoDevelop.Projects\ItemMetadataTests.cs" />
-    <Compile Include="MonoDevelop.Projects\LocalCopyTests.cs" />
-    <Compile Include="MonoDevelop.Projects\MakefileTests.cs" />
-    <Compile Include="MonoDevelop.Projects\MdsTests.cs" />
-    <Compile Include="MonoDevelop.Projects\MSBuildGlobTests.cs" />
-    <Compile Include="MonoDevelop.Projects\MSBuildLoggerTests.cs" />
-    <Compile Include="MonoDevelop.Projects\MSBuildProjectServiceTests.cs" />
-    <Compile Include="MonoDevelop.Projects\MSBuildProjectTests.cs" />
-    <Compile Include="MonoDevelop.Projects\MSBuildSearchPathTests.cs" />
-    <Compile Include="MonoDevelop.Projects\MSBuildTests.cs" />
-    <Compile Include="MonoDevelop.Projects\ProjectCapabilityTests.cs" />
-    <Compile Include="MonoDevelop.Projects\ProjectReevaluationTests.cs" />
-    <Compile Include="MonoDevelop.Projects\ProjectTests.cs" />
-    <Compile Include="MonoDevelop.Projects\PropertyBagTests.cs" />
-    <Compile Include="MonoDevelop.Projects\RunConfigurations.cs" />
-    <Compile Include="MonoDevelop.Projects\SdkVersionTests.cs" />
-    <Compile Include="MonoDevelop.Projects\SharedAssetsProjectTests.cs" />
-    <Compile Include="MonoDevelop.Projects\SolutionFolderTests.cs" />
-    <Compile Include="MonoDevelop.Projects\SolutionTests.cs" />
-    <Compile Include="MonoDevelop.Projects\StringTagTests.cs" />
-    <Compile Include="MonoDevelop.Projects\TestProjectsChecks.cs" />
-    <Compile Include="MonoDevelop.Projects\TextFileTests.cs" />
-    <Compile Include="MonoDevelop.Projects\TextFormatterTests.cs" />
-    <Compile Include="MonoDevelop.Projects\WebProjectTests.cs" />
-    <Compile Include="MonoDevelop.Projects\WorkspaceTests.cs" />
-    <Compile Include="MonoDevelop.Projects\ConfigurationMergingTests.cs" />
-    <Compile Include="MonoDevelop.Projects\TestLanguageProject.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MonoDevelop.Core\" />

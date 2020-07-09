@@ -45,61 +45,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ProjectTemplateTests.cs" />
-    <Compile Include="FileTransferTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Projects\NewProjectDialogTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Projects\TestableNewProjectDialogController.cs" />
-    <Compile Include="MonoDevelop.Ide.Projects\DummyNewProjectDialogBackend.cs" />
-    <Compile Include="MonoDevelop.Ide\KeyBindingSetTests.cs" />
-    <Compile Include="MonoDevelop.Ide\TypeSystemServiceTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\Commands\CodeCommentTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\Commands\SortSelectedLinesTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\DiffTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\ReadonlyTextDocumentTestBase.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\RegexTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\SimpleBracketMatcherTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\StackMatchExpressionTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\SyntaxHighlightingTest.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\SyntaxHighlightingTest_TextMate.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\TestCSharpHighlighting.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\Tests\MonoTextEditorImplementationTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\Tests\SimpleReadonlyDocument_Tests.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\Tests\StringTextSource_Tests.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\TestYamlHighlighting.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\TextDocumentTestBase.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\TextEditorProjectionTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\TextEditorTestBase.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\TextMateDocumentIndentEngineTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\TextMateFoldingTextEditorExtensionTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Editor\TextSourceTestBase.cs" />
-    <Compile Include="MonoDevelop.Ide.FindInFiles\ColorizationTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Gui\CompletionListWindowTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Gui\LogViewTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Gui\SearchPopupWindowTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Templates\FileTemplateParserTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Templates\FileTemplateSnippets.cs" />
-    <Compile Include="MonoDevelop.Ide.Templates\FileTemplateTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Templates\FinalProjectConfigurationTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Templates\NewFileDialogTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Templates\ProjectCreateInformationTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Templates\ProjectTemplateCategorizerTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Templates\TemplateConditionEvaluatorTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Templates\TemplateWizardProviderTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Templates\TestableProjectTemplateCategorizer.cs" />
-    <Compile Include="MonoDevelop.Ide.Templates\TestableTemplateWizard.cs" />
-    <Compile Include="MonoDevelop.Ide.Templates\TestableTemplateWizardProvider.cs" />
-    <Compile Include="MonoDevelop.Ide.Templates\TestableWizardPage.cs" />
-    <Compile Include="MonoDevelop.Components.PropertyGrid\EditorManagerTests.cs" />
-    <Compile Include="MonoDevelop.SourceEditor\DebugTooltipTests.cs" />
-    <Compile Include="MonoDevelop.SourceEditor\JSonIndentEngineTests.cs" />
-    <Compile Include="MonoDevelop.SourceEditor\SourceEditorTests.cs" />
-    <Compile Include="IdeTestBase.cs" />
-    <Compile Include="MonoDevelop.Ide\UserPreferencesTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Projects\ResourcesTests.cs" />
-    <Compile Include="MonoDevelop.Ide.Gui\TestViewContent.cs" />
-    <Compile Include="MonoDevelop.Ide.Gui\TestWorkbenchWindow.cs" />
-    <Compile Include="MonoDevelop.Ide.Gui\TestDocument.cs" />
-    <Compile Include="TypeSystemServiceTestExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

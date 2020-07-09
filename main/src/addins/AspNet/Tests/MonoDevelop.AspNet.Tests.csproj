@@ -61,24 +61,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Razor\Dom\RazorCodeBlockParsingTests.cs" />
-    <Compile Include="Razor\Dom\RazorCodeFragmentsParsingTests.cs" />
-    <Compile Include="Razor\Dom\RazorCommentParsingTests.cs" />
-    <Compile Include="Razor\Dom\RazorDirectivesParsingTests.cs" />
-    <Compile Include="Razor\Dom\RazorExplicitExpressionsParsingTests.cs" />
-    <Compile Include="Razor\Dom\RazorImplicitExpressionsParsingTests.cs" />
-    <Compile Include="Razor\Dom\RazorParsingTests.cs" />
-    <Compile Include="Razor\Dom\RazorStatementsParsingTests.cs" />
-    <Compile Include="Razor\RazorCompletionTesting.cs" />
-    <Compile Include="WebForms\WebFormsTesting.cs" />
-    <Compile Include="WebForms\WebFormsParsingTests.cs" />
-    <Compile Include="WebForms\WebFormsCompletionTests.cs" />
-    <Compile Include="Razor\RazorCompletionTests.cs" />
-    <Compile Include="Html\HtmlParsingTests.cs" />
-    <Compile Include="Html\HtmlImplicitClosingTests.cs" />
-    <Compile Include="Razor\Dom\RazorDocumentTrackerTests.cs" />
-    <Compile Include="Razor\RazorParserTests.cs" />
-    <Compile Include="WebForms\WebFormsSyntaxModeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\core\MonoDevelop.Core\MonoDevelop.Core.csproj">

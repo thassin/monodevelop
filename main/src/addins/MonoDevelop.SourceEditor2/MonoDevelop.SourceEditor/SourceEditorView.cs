@@ -702,7 +702,8 @@ namespace MonoDevelop.SourceEditor
 			if (widget.HasMessageBar)
 				return;
 			if (encoding != null) {
-				this.Document.VsTextDocument.Encoding = encoding;
+				this.encoding = encoding;
+				UpdateTextDocumentEncoding ();
 			}
 			if (ContentName != fileName) {
 				FileService.RequestFileEdit ((FilePath) fileName);
@@ -785,10 +786,11 @@ namespace MonoDevelop.SourceEditor
 						AlertButton.Cancel,
 						new AlertButton (GettextCatalog.GetString ("Save as Unicode")));
 					if (result != AlertButton.Cancel) {
-						this.Document.VsTextDocument.Encoding = Encoding.UTF8;
+					//	this.Document.VsTextDocument.Encoding = Encoding.UTF8;
+						this.encoding = Encoding.UTF8;
+						UpdateTextDocumentEncoding ();
 						MonoDevelop.Core.Text.TextFileUtility.WriteText (fileName, Document);
-					}
-					else {
+					} else {
 						return;
 					}
 				}
@@ -848,6 +850,11 @@ namespace MonoDevelop.SourceEditor
 			return text;
 		}
 
+		void UpdateTextDocumentEncoding ()
+		{
+			widget.Document.Encoding = encoding;
+		}
+
 		class MyExtendingLineMarker : TextLineMarker, IExtendingTextLineMarker
 		{
 			public bool IsSpaceAbove {
@@ -888,7 +895,10 @@ namespace MonoDevelop.SourceEditor
 				widget.RemoveMessageBar ();
 				WorkbenchWindow.ShowNotification = false;
 			}
+
 			// Look for a mime type for which there is a syntax mode
+			UpdateMimeType (fileName);
+
 			bool didLoadCleanly;
 
 			if (this.loadedInCtor) {
@@ -897,7 +907,8 @@ namespace MonoDevelop.SourceEditor
 			} else {
 				if (!reload && AutoSave.AutoSaveExists(fileName)) {
 					widget.ShowAutoSaveWarning(fileName);
-					this.Document.VsTextDocument.Encoding = loadEncoding ?? Encoding.UTF8;
+				//	this.Document.VsTextDocument.Encoding = loadEncoding ?? Encoding.UTF8;
+					encoding = loadEncoding ?? Encoding.UTF8;
 					didLoadCleanly = false;
 				} else {
 
@@ -909,7 +920,8 @@ namespace MonoDevelop.SourceEditor
 					} else {
 						text = MonoDevelop.Core.Text.TextFileUtility.ReadAllText(fileName, loadEncoding);
 					}
-					this.Document.VsTextDocument.Encoding = loadEncoding;
+				//	this.Document.VsTextDocument.Encoding = loadEncoding;
+					encoding = loadEncoding;
 
 					text = ProcessLoadText(text);
 					document.IsTextSet = false;
@@ -939,6 +951,8 @@ namespace MonoDevelop.SourceEditor
 			if (didLoadCleanly) {
 				widget.EnsureCorrectEolMarker (fileName);
 			}
+
+			UpdateTextDocumentEncoding ();
 
 			document.TextChanged += OnTextReplaced;
 			//document.AddMarker (5, new MyExtendingLineMarker ());
@@ -988,6 +1002,7 @@ namespace MonoDevelop.SourceEditor
 		}
 
 		bool warnOverwrite = false;
+		Encoding encoding;
 
 		internal void ReplaceContent (string fileName, string content, Encoding enc)
 		{
@@ -1000,13 +1015,16 @@ namespace MonoDevelop.SourceEditor
 			
 			Document.ReplaceText (0, Document.Length, content);
 			Document.DiffTracker.Reset ();
+			encoding = enc;
 			ContentName = fileName;
 			UpdateExecutionLocation ();
 			UpdateBreakpoints ();
 			UpdatePinnedWatches ();
 			LoadExtensions ();
 			IsDirty = false;
-			this.Document.VsTextDocument.Encoding = enc;
+
+			UpdateTextDocumentEncoding ();
+
 			InformLoadComplete ();
 		}
 	
@@ -1016,7 +1034,7 @@ namespace MonoDevelop.SourceEditor
 		}
 		
 		public Encoding SourceEncoding {
-			get { return this.Document.VsTextDocument.Encoding; }
+			get { return encoding; }
 		}
 
 		public override void Dispose ()

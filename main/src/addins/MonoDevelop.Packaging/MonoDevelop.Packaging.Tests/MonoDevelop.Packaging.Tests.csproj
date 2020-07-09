@@ -39,11 +39,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MonoDevelop.Packaging.Tests\ProjectTemplateTests.cs" />
-    <Compile Include="MonoDevelop.Packaging.Tests\AddPlatformImplementationTests.cs" />
-    <Compile Include="MonoDevelop.Packaging.Tests\TestableAddPlatformImplementationViewModel.cs" />
-    <Compile Include="MonoDevelop.Packaging.Tests\TestableCrossPlatformLibraryTemplateWizard.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\core\MonoDevelop.Ide\MonoDevelop.Ide.csproj">
