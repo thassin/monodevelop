@@ -106,7 +106,6 @@ type FsiDocumentContext() =
         member x.Replace(offset, count, text) =
             completionWidget.Replace(offset, count, text)
         member x.GtkStyle = completionWidget.GtkStyle
-
         member x.ZoomLevel = completionWidget.ZoomLevel
         member x.CreateCodeCompletionContext triggerOffset =
             completionWidget.CreateCodeCompletionContext triggerOffset

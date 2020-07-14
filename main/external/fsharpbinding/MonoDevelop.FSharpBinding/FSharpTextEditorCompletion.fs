@@ -9,9 +9,11 @@ open System.Collections.Generic
 open System.Text.RegularExpressions
 open System.Threading.Tasks
 open Microsoft.CodeAnalysis.Text
+open Microsoft.CodeAnalysis.Features
 open Microsoft.FSharp.Compiler.SourceCodeServices
 open MonoDevelop
 open MonoDevelop.Core
+open MonoDevelop.Core.Text
 open MonoDevelop.FSharp.Shared
 open MonoDevelop.Ide
 open MonoDevelop.Ide.CodeCompletion
@@ -90,8 +92,6 @@ type FsiMemberCompletionData(displayText, completionText, icon) =
                            DisplayFlags = DisplayFlags.DescriptionHasMarkup,
                            Icon = icon)
 
-    let emptyTooltip = TooltipInformation()
-
     override x.CreateTooltipInformation (_smartWrap, cancel) =
         match FSharpInteractivePad.Fsi with
         | Some pad ->
@@ -108,11 +108,11 @@ type FsiMemberCompletionData(displayText, completionText, icon) =
                             let! tooltipInfo = SymbolTooltips.getTooltipInformationFromTip (signature, xmldoc, footer)
                             return tooltipInfo
                         | MonoDevelop.FSharp.Shared.ToolTips.EmptyTip ->
-                            return emptyTooltip
+                            return TooltipInformation()
                     }
                 Async.StartAsTask(computation, cancellationToken = cancel)
-            | _ -> Task.FromResult emptyTooltip
-        | _ -> Task.FromResult emptyTooltip
+            | _ -> Task.FromResult (TooltipInformation())
+        | _ -> Task.FromResult (TooltipInformation())
 
 module Completion = 
     type Context = { 
@@ -187,9 +187,9 @@ module Completion =
         else
             None
 
-    let (|OtherIdentifier|_|) context =
-        if Regex.IsMatch(context.lineToCaret, "\s?(let!?|Some|override|member|for)\s+[^=:]+$", RegexOptions.Compiled) then
-             Some OtherIdentifier
+    let (|LetIdentifier|_|) context =
+        if Regex.IsMatch(context.lineToCaret, "\s?(let!?|override|member|for)\s+[^=:]+$", RegexOptions.Compiled) then
+             Some LetIdentifier
         else
             None
 
@@ -573,7 +573,7 @@ module Completion =
                 | FunctionIdentifier -> 
                     return CompletionDataList()
                 | ModuleOrTypeIdentifier
-                | OtherIdentifier ->
+                | LetIdentifier ->
                     return getModifiers completionContext
                 | _ ->
                     if documentContext :? FsiDocumentContext then
@@ -590,7 +590,7 @@ module Completion =
         }
 
 type FSharpParameterHintingData (symbol:FSharpSymbolUse) =
-    inherit ParameterHintingData ()
+    inherit ParameterHintingData (null)
 
     let getTooltipInformation symbol paramIndex =
         async {
@@ -616,7 +616,7 @@ type FSharpParameterHintingData (symbol:FSharpSymbolUse) =
         Async.StartAsTask(getTooltipInformation symbol (Math.Max(paramIndex, 0)), cancellationToken = cancel)
 
 type FsiParameterHintingData (tooltip: MonoDevelop.FSharp.Shared.ParameterTooltip) =
-    inherit ParameterHintingData ()
+    inherit ParameterHintingData (null)
 
     override x.ParameterCount =
        match tooltip with
@@ -708,7 +708,7 @@ module ParameterHinting =
                             |> Array.map (fun meth -> FsiParameterHintingData (meth) :> ParameterHintingData)
                             |> ResizeArray.ofArray
                         if hintingData.Count > 0 then
-                            return ParameterHintingResult(hintingData, ApplicableSpan = new TextSpan(startOffset, 0))
+                            return ParameterHintingResult(hintingData, startOffset)
                         else
                             return ParameterHintingResult.Empty
                     | _ -> return ParameterHintingResult.Empty
@@ -735,7 +735,7 @@ module ParameterHinting =
                     |> List.map (fun meth -> FSharpParameterHintingData (meth) :> ParameterHintingData)
                     |> ResizeArray.ofList
 
-                return ParameterHintingResult(hintingData, ApplicableSpan = new TextSpan(startOffset, 0))
+                return ParameterHintingResult(hintingData, startOffset)
             | _ -> LoggingService.logWarning "FSharpTextEditorCompletion: Getting Parameter Info: no methods found"
                    return ParameterHintingResult.Empty
         with

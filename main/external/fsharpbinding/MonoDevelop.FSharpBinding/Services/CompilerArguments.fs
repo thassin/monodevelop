@@ -289,15 +289,13 @@ module CompilerArguments =
           | _ -> "--debug+"
       | false, _ -> "--debug-"
 
-  let getSharedAssetFilesFromReferences (project:DotNetProject) =
-      project.References
-      |> Seq.filter (fun r -> r.ExtendedProperties.Contains("MSBuild.SharedAssetsProject"))
-      |> Seq.collect (fun r -> (r.ResolveProject project.ParentSolution).Files)
-      |> Seq.map (fun f -> f.FilePath)
-      |> Set.ofSeq
-
-  let getCompiledFiles project =
-      let sharedAssetFiles = getSharedAssetFilesFromReferences project
+  let getCompiledFiles (project:DotNetProject) =
+      let sharedAssetFiles = 
+          project.References
+          |> Seq.filter (fun r -> r.ExtendedProperties.Contains("MSBuild.SharedAssetsProject"))
+          |> Seq.collect (fun r -> (r.ResolveProject project.ParentSolution).Files)
+          |> Seq.map (fun f -> f.FilePath)
+          |> Set.ofSeq
 
       project.Files
       // Shared Asset files need to be referenced first
@@ -319,9 +317,7 @@ module CompilerArguments =
     [
        yield "--simpleresolution"
        yield "--noframework"
-       let outputFile = project.GetOutputFileName(configSelector).ToString()
-       if not (String.IsNullOrWhiteSpace outputFile) then 
-           yield "--out:" + outputFile
+       yield "--out:" + project.GetOutputFileName(configSelector).ToString()
        if Project.isPortable project || Project.isDotNetCoreProject project then
            yield "--targetprofile:netcore"
        if not (String.IsNullOrWhiteSpace fsconfig.PlatformTarget) then
@@ -332,8 +328,7 @@ module CompilerArguments =
        yield if fsconfig.HasDefineSymbol "DEBUG" then  "--debug+" else  "--debug-"
        yield if fsconfig.Optimize then "--optimize+" else "--optimize-"
        yield if fsconfig.GenerateTailCalls then "--tailcalls+" else "--tailcalls-"
-       if not (String.IsNullOrWhiteSpace fsconfig.DebugType) then
-           yield sprintf "--debug:%s" fsconfig.DebugType
+
        yield match project.CompileTarget with
              | CompileTarget.Library -> "--target:library"
              | CompileTarget.Module -> "--target:module"

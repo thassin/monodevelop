@@ -3,7 +3,6 @@
 open System
 open System.IO
 open MonoDevelop.Core
-open MonoDevelop.Core.Serialization
 open MonoDevelop.Projects
 open MonoDevelop.Projects.MSBuild
 open System.Xml
@@ -47,63 +46,29 @@ type FSharpProject() as self =
         |> Seq.tryFind (fun i -> i.UnevaluatedValue.Equals(".NETPortable"))
         |> Option.isSome
 
-    let directoryNameFromBuildItem (item:MSBuildItem) =
-        let itemInclude = item.Include.Replace('\\', Path.DirectorySeparatorChar)
-        Path.GetDirectoryName itemInclude
-
-    let normalizePath (path:string) =
-        path.Replace(Path.DirectorySeparatorChar, '\\')
-
     let fixProjectFormatForVisualStudio (project:MSBuildProject) =
         // Merge ItemGroups into one group ordered by folder name
         // so that VS for Windows can load it.
-        let sharedAssetFiles = CompilerArguments.getSharedAssetFilesFromReferences self
         let projectPath = project.FileName.ParentDirectory |> string
-        let projectFiles =
-            self.Files
-            |> Seq.filter(fun f -> f.BuildAction <> "Folder" && 
-                                   f.BuildAction <> "Reference" &&
-                                   not (sharedAssetFiles.Contains f.FilePath) && 
-                                   f.Include <> null && 
-                                   (not f.IsImported))
-            |> Seq.mapi(fun i f -> i, f)
-            |> List.ofSeq
 
         let absolutePath path = MSBuildProjectService.FromMSBuildPath(projectPath, path)
 
-        let itemGroupsContainingFilesCount =
-            project.ItemGroups
-            |> Seq.map(fun group ->
-                group.Items
-                |> Seq.filter(fun item ->
-                    projectFiles |> List.exists(fun (_i,f) -> f.Include = item.Include)))
-            |> Seq.choose Seq.tryHead
-            |> Seq.length
+        let directoryNameFromBuildItem (item:MSBuildItem) =
+            let itemInclude = item.Include.Replace('\\', Path.DirectorySeparatorChar)
+            Path.GetDirectoryName itemInclude
 
-        let allBuildItems =
-            project.GetAllItems()
-            |> Seq.filter(fun f -> f.Name <> "Folder" && 
-                                   f.Name <> "Reference" && 
-                                   f.Include <> null && 
-                                   (not f.IsImported))
-            |> Array.ofSeq
-            |> Array.sortBy(fun item ->
-                let res =
-                    projectFiles
-                    |> List.tryFind(fun(_i,f) -> f.Include = normalizePath item.Include)
-                match res with
-                | Some (i,_f) -> i
-                | None -> Int32.MaxValue)
+        let msbuildItemExistsAsFile (item:MSBuildItem) =
+           let itemPath = absolutePath item.Include
+           item.Name <> "ProjectReference" && File.Exists itemPath
 
-
-        let msbuildItems =
-            allBuildItems
-            |> Array.map (fun item -> item.Include, item)
-
-        let msbuildItemsInProjectFiles =
-            msbuildItems
-            |> List.ofSeq
-            |> List.map snd
+        let groups = project.ItemGroups |> List.ofSeq
+        let itemGroups =
+            groups
+            |> List.map  (fun group ->
+                group, group.Items
+                       |> Seq.filter msbuildItemExistsAsFile
+                       |> List.ofSeq)
+            |> List.filter (fun (_, items) -> items.Length > 0)
 
         let isParentDirectory folderName fileName =
             if String.isEmpty folderName then
@@ -118,6 +83,7 @@ type FSharpProject() as self =
                     | _ -> isParentDirRec dir.Parent
                 isParentDirRec absoluteFile.Directory
 
+        let unsorted = itemGroups |> List.collect snd
         let rec splitFilesByParent (items:MSBuildItem list) parentFolder list1 list2 =
             match items with
             | h :: t ->
@@ -129,7 +95,7 @@ type FSharpProject() as self =
 
         let rec orderFiles items acc lastFolder =
             match items with
-            | h :: t ->
+            | h :: t -> 
                 let newFolder = directoryNameFromBuildItem h
                 if newFolder = lastFolder then
                     orderFiles t (h::acc) newFolder
@@ -138,50 +104,29 @@ type FSharpProject() as self =
                     orderFiles childrenFirst (h::acc) newFolder
             | [] -> acc |> List.rev
 
-        let msbuildIncludes =
-            msbuildItemsInProjectFiles
-            |> List.map(fun item -> item.Name, normalizePath item.Include)
-            |> Set.ofList
+        let sortedItems = orderFiles unsorted [] ""
+        let needsSort = 
+            match itemGroups with
+            | [_single, items] when items = sortedItems -> false
+            | _ -> true
 
-        // Add any items that are projectFiles but not yet msbuild items to the unsorted list
-        // This is to fix a race condition that sometimes occurs - See #57689
-        let buildItems =
-            projectFiles
-            |> List.filter(fun (_i, file) -> not (msbuildIncludes.Contains (file.BuildAction, normalizePath file.Include)))
-            |> List.fold(fun state (_i, file) ->
-                             (new MSBuildItem(file.BuildAction, Include=file.Include)) :: state) msbuildItemsInProjectFiles
-
-        let sortedItems =
-            orderFiles buildItems [] ""
-            |> List.distinctBy(fun i -> normalizePath i.Include)
-
-        let getItemByInclude includePath =
-            allBuildItems |> Array.tryFind(fun item -> item.Include = includePath)
-
-        let removeItemByInclude includePath =
-            getItemByInclude includePath
-            |> Option.iter(fun msbuildItem -> project.RemoveItem(msbuildItem, true))
-            // Remove duplicate that differs only by path separator
-            getItemByInclude (normalizePath includePath)
-            |> Option.iter(fun msbuildItem -> project.RemoveItem(msbuildItem, true))
-
-        if itemGroupsContainingFilesCount > 1 || msbuildItemsInProjectFiles <> sortedItems then
+        if needsSort && sortedItems.Length > 0 then
             let newGroup = project.AddNewItemGroup()
 
             for item in sortedItems do
-                removeItemByInclude item.Include
+                project.RemoveItem(item, true)
                 newGroup.AddItem item
 
-    [<ItemProperty ("TargetProfile", DefaultValue = "mscorlib")>]
+    [<ProjectPathItemProperty ("TargetProfile", DefaultValue = "mscorlib")>]
     member val TargetProfile = "mscorlib" with get, set
 
-    [<ItemProperty ("TargetFSharpCoreVersion", DefaultValue = "")>]
+    [<ProjectPathItemProperty ("TargetFSharpCoreVersion", DefaultValue = "")>]
     member val TargetFSharpCoreVersion = String.Empty with get, set
 
-    [<ItemProperty ("UseStandardResourceNames", DefaultValue = false)>]
-    member val UseStandardResourceNames = true with get, set 
-
     override x.IsPortableLibrary = initialisedAsPortable
+
+    override x.OnInitialize() =
+        base.OnInitialize()
 
     override x.OnReadProject(progress, project) =
         initialisedAsPortable <- isPortable project
@@ -216,10 +161,9 @@ type FSharpProject() as self =
     override x.OnWriteProject(monitor, msproject) =
         base.OnWriteProject(monitor, msproject)
         fixProjectFormatForVisualStudio msproject
+        //Fix pcl netcore and TargetFSharpCoreVersion
         let globalGroup = msproject.GetGlobalPropertyGroup()
-
         maybe {
-            //Fix pcl netcore and TargetFSharpCoreVersion
             let! targetFrameworkProfile = x.TargetFramework.Id.Profile |> Option.ofString
             let! fsharpcoreversion, netcore = profileMap |> Map.tryFind targetFrameworkProfile
             do globalGroup.SetValue ("TargetFSharpCoreVersion", fsharpcoreversion, "", true)
@@ -356,4 +300,3 @@ type FSharpProject() as self =
         //Should only be done on solution close
         //langServ.ClearLanguageServiceRootCachesAndCollectAndFinalizeAllTransients()
         base.OnDispose ()
-

@@ -3,7 +3,6 @@
   <PropertyGroup>
     <RootDirectory>$(MSBuildThisFileDirectory)</RootDirectory>
     <PackagesDirectory>$(RootDirectory)packages</PackagesDirectory>
-    <ReferencesVSEditor>$(RootDirectory)\msbuild\ReferencesVSEditor.props</ReferencesVSEditor>
   </PropertyGroup>
 
 </Project>

@@ -2,7 +2,6 @@ namespace MonoDevelop.FSharp
 
 open System
 open System.Collections.Generic
-open MonoDevelop
 open MonoDevelop.Core
 open MonoDevelop.Ide.Editor
 open MonoDevelop.UnitTesting
@@ -11,12 +10,9 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 
 module unitTestGatherer =
     let hasAttributeNamed (att:FSharpAttribute) (unitTestMarkers: IUnitTestMarkers[]) (filter:  string -> IUnitTestMarkers -> bool) =
-        let attributeName = att.AttributeType.TryFullName
-        match attributeName with
-        | Some name ->
-            unitTestMarkers
-            |> Seq.exists (filter name)
-        | None -> false
+        let attributeName = att.AttributeType.FullName
+        unitTestMarkers
+        |> Seq.exists (filter attributeName)
 
     let createTestCase (tc:FSharpAttribute) =
         let sb = Text.StringBuilder()
@@ -113,60 +109,56 @@ module unitTestGatherer =
 type FSharpUnitTestTextEditorExtension() =
     inherit AbstractUnitTestTextEditorExtension()
 
-    let emptyResult = ResizeArray<UnitTestLocation>() :> IList<_>
     override x.GatherUnitTests (unitTestMarkers, cancellationToken) =
+        let tests = ResizeArray<UnitTestLocation>()
+
         if x.DocumentContext = null || 
             x.DocumentContext.ParsedDocument = null || 
             not (unitTestGatherer.hasNUnitReference x.DocumentContext.Project) then
-                Threading.Tasks.Task.FromResult emptyResult
+                Threading.Tasks.Task.FromResult (tests :> IList<_>)
         else
         Async.StartAsTask (
             cancellationToken = cancellationToken,
             computation = async {
-                match x.DocumentContext.TryGetAst() with
-                | Some ast ->
+                match x.DocumentContext.ParsedDocument.Ast with
+                | :? ParseAndCheckResults as ast ->
                     let! symbols = ast.GetAllUsesOfAllSymbolsInFile()
-                    return unitTestGatherer.gatherUnitTests (unitTestMarkers, x.Editor, symbols) :> IList<_>
-                | None -> return emptyResult })
-
-module nunitSourceCodeLocationFinder =
-    let tryFindTest fixtureNamespace fixtureTypeName testName (topmostEntity:FSharpEntity) = 
-        let matchesType (ent:FSharpEntity) =
-            let matchesNamespace() = 
-                match topmostEntity.Namespace with
-                | Some ns -> ns = fixtureNamespace
-                | None -> fixtureNamespace = null
-
-            ent.DisplayName = fixtureTypeName && matchesNamespace()
-
-        let rec getEntityAndNestedEntities (entity:FSharpEntity) =
-            seq { yield entity
-                  for child in entity.NestedEntities do
-                      yield! getEntityAndNestedEntities child }
-
-        getEntityAndNestedEntities topmostEntity
-        |> Seq.filter matchesType
-        |> Seq.collect (fun e -> e.MembersFunctionsAndValues)
-        |> Seq.tryFind (fun m -> m.CompiledName = testName)
-
-open nunitSourceCodeLocationFinder
+                    tests.AddRange (unitTestGatherer.gatherUnitTests (unitTestMarkers, x.Editor, symbols))
+                | _ -> ()
+                return tests :> IList<_>})
 
 type FSharpNUnitSourceCodeLocationFinder() =
     inherit NUnitSourceCodeLocationFinder()
 
     override x.GetSourceCodeLocationAsync(_project, fixtureNamespace, fixtureTypeName, testName, token) =
-        let tryFindTest' = tryFindTest fixtureNamespace fixtureTypeName testName 
         let computation =
             async {
+                let idx = testName.IndexOf("<") //reasons
+                let testName =
+                    if idx > - 1 then
+                        testName.Substring(0, idx)
+                    else
+                        testName
+
+                let matchesType (entity:FSharpEntity) =
+                    let matchesNamespace() = 
+                        match entity.Namespace with
+                        | Some ns -> ns = fixtureNamespace
+                        | _ -> fixtureNamespace = null
+
+                    entity.DisplayName = fixtureTypeName && matchesNamespace()
+
                 let symbol = 
                     Search.getAllFSharpProjects()
                     |> Seq.filter unitTestGatherer.hasNUnitReference
                     |> Seq.map languageService.GetCachedProjectCheckResult
-                    |> Seq.choose id
-                    |> Seq.filter (fun c -> not c.HasCriticalErrors)
+                    |> Seq.choose (fun c -> c)
+                    |> Seq.filter (fun c -> not c.HasCriticalErrors)       
                     |> Seq.collect (fun c -> c.AssemblySignature.Entities)
-                    |> Seq.tryPick tryFindTest'
-
+                    |> Seq.filter matchesType
+                    |> Seq.collect (fun e -> e.MembersFunctionsAndValues)
+                    |> Seq.tryFind (fun m -> m.CompiledName = testName)
+                             
                 match symbol with
                 | Some sym ->
                     let location = sym.ImplementationLocation

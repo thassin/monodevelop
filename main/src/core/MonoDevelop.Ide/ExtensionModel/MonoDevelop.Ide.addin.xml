@@ -1,9 +1,5 @@
 <ExtensionModel>
 	<Runtime>
-		<Import assembly="Microsoft.VisualStudio.CoreUtility.dll" />
-		<Import assembly="Microsoft.VisualStudio.Text.Data.dll" />
-		<Import assembly="Microsoft.VisualStudio.Text.Logic.dll" />
-		<Import assembly="Microsoft.VisualStudio.Text.UI.dll" />
 	</Runtime>
 	
 	<!-- Extension ponts -->
@@ -393,10 +389,6 @@
 
 	<Extension path = "/MonoDevelop/ProjectModel/ProjectModelExtensions">
 		<Class class = "MonoDevelop.Ide.GettingStarted.GettingStartedProjectExtension"/>
-	</Extension>
-
-	<Extension path="/MonoDevelop/Ide/TypeService/PlatformMefHostServices">
-		<Assembly file="Microsoft.VisualStudio.Text.Logic.dll"/>
 	</Extension>
 
 	<Extension path="/MonoDevelop/Ide/Composition">
