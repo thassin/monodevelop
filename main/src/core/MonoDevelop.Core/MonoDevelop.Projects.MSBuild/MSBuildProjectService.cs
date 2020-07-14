@@ -1271,12 +1271,12 @@ if ( toolsVersion == "15.0" )
 
 // tommih 20200604
 Console.WriteLine();
-Console.WriteLine( "GetExeLocation :: toolsVersion=" + toolsVersion );
+Console.WriteLine( "GetExeLocationInBundle :: toolsVersion=" + toolsVersion );
 
 			var exe = builderDir.Combine (toolsVersion, "MonoDevelop.Projects.Formats.MSBuild.exe");
 
 // tommih 20200604
-Console.WriteLine( "GetExeLocation :: exe=" + exe );
+Console.WriteLine( "GetExeLocationInBundle :: exe=" + exe );
 Console.WriteLine();
 
 			if (File.Exists (exe))
@@ -1352,6 +1352,9 @@ Console.WriteLine();
 
 		static void UpdateMSBuildExeConfigFile (TargetRuntime runtime, string sourceConfigFile, string destinationConfigFile, string mdResolverConfig, string binDir)
 		{
+
+Console.WriteLine( "UpdateMSBuildExeConfigFile :: " + runtime.Id + " / " + runtime.Version + " : " + runtime.DisplayRuntimeName );
+
 			// Creates an MSBuild config file with the search paths registered by add-ins.
 
 			var doc = XDocument.Load (sourceConfigFile);
@@ -1411,6 +1414,9 @@ Console.WriteLine();
 
 		static void SetMSBuildConfigProperty (XElement elem, string name, string value, bool append = false, bool insertBefore = false)
 		{
+
+Console.WriteLine( "SetMSBuildConfigProperty :: " + name + " => " + value );
+
 			var prop = elem.Elements ("property").FirstOrDefault (p => p.Attribute ("name")?.Value == name);
 			if (prop != null) {
 				var val = prop.Attribute ("value")?.Value;

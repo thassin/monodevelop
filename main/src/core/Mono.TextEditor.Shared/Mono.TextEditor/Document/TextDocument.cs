@@ -774,9 +774,9 @@ Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
 
 		internal class UndoOperation
 		{
-// tommih 20200703 property name change "Changes" -> "Args".
-// tommih 20200703 property name change "Changes" -> "Args".
-// tommih 20200703 property name change "Changes" -> "Args".
+// tommih 20200703 property name change "Changes" -> "Args" and revert the old type.
+// tommih 20200703 property name change "Changes" -> "Args" and revert the old type.
+// tommih 20200703 property name change "Changes" -> "Args" and revert the old type.
 			TextChangeEventArgs args;
 			public virtual TextChangeEventArgs Args {
 				get {
@@ -858,9 +858,9 @@ Console.WriteLine( "TODO TextDocument.Redo not implemented!" );
 				}
 			}
 
-// tommih 20200703 method name change "Changes" -> "Args".
-// tommih 20200703 method name change "Changes" -> "Args".
-// tommih 20200703 method name change "Changes" -> "Args".
+// tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
+// tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
+// tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
 		//	public virtual Microsoft.VisualStudio.Text.INormalizedTextChangeCollection Changes {
 			public override TextChangeEventArgs Args {
 				get {
