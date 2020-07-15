@@ -16,7 +16,6 @@ main/src/addins/CSharpBinding/MonoDevelop.CSharp.Completion/CSharpCompletionData
 
 main/src/addins/CSharpBinding/MonoDevelop.CSharp.Tooltips/QuickInfoProvider.cs
 
-
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.CodeCompletion/CompletionPresenterSession.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.CodeCompletion/RoslynCompletionData.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.CodeCompletion/SignatureHelpParameterHintingData.cs
@@ -112,6 +111,7 @@ main/src/addins/CSharpBinding/MonoDevelop.CSharp.Completion/RoslynCompletionCate
 main/src/addins/CSharpBinding/MonoDevelop.CSharp.Completion/RoslynCompletionData.cs
 main/src/addins/CSharpBinding/MonoDevelop.CSharp.Completion/RoslynParameterHintingFactory.cs
 main/src/addins/CSharpBinding/MonoDevelop.CSharp.Completion/RoslynSymbolCompletionData.cs
+
 main/src/addins/CSharpBinding/MonoDevelop.CSharp.Features/Completion		<directory>
 main/src/addins/CSharpBinding/MonoDevelop.CSharp.Features/ParameterHinting	<directory>
 
