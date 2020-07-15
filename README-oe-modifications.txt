@@ -83,5 +83,7 @@ $ mono ./main/build/bin/MonoDevelop.exe --no-redirect
 
 $ mono ./main/build/bin/MonoDevelop.exe 
 
-	NOTICE! the process seems to hang and keep running after closing the app.
+	 known problems:
+	^^^^^^^^^^^^^^^^^
+*) win10 wsl : the process seems to hang and keep running after closing the app.
 
