@@ -35,6 +35,19 @@ main/src/addins/MonoDevelop.SourceEditor2/MonoDevelop.SourceEditor/SourceEditorV
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/TextEditor.cs
 	remove a TextView property related to the new editor.
 
+main/src/core/MonoDevelop.Core/MonoDevelop.Core.Assemblies/TargetRuntime.cs
+	add a delay to app startup, allowing addins to load before app starting.
+
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.csproj
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/CompositionManager.cs
+	removed some source files.
+
+main/src/addins/MonoDevelop.SourceEditor2/packages.config
+main/src/core/MonoDevelop.Ide/ExtensionModel/MonoDevelop.Ide.addin.xml
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.csproj
+main/src/core/MonoDevelop.Ide/packages.config
+	remove unused packages.
+
 ##############################################################################################
 
 	 how to build:
