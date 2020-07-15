@@ -20,6 +20,8 @@ main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.CodeCompletion/CompletionPresenter
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.CodeCompletion/RoslynCompletionData.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.CodeCompletion/SignatureHelpParameterHintingData.cs
 
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/CompositionManager.cs
+
 main/tests/MonoDevelop.CSharpBinding.Tests/Features/Completion/DelegateCompletionProviderTests.cs
 
 
@@ -67,12 +69,14 @@ main/src/addins/CSharpBinding/MonoDevelop.CSharp.Tooltips/LanguageItemTooltipPro
 
 main/src/addins/MonoDevelop.SourceEditor2/MonoDevelop.SourceEditor.csproj
 main/src/addins/MonoDevelop.SourceEditor2/MonoDevelop.SourceEditor/SourceEditorView.cs
+main/src/addins/MonoDevelop.SourceEditor2/packages.config
 
 main/src/core/Mono.TextEditor.Shared/Mono.TextEditor/Actions/MiscActions.cs
 main/src/core/Mono.TextEditor.Shared/Mono.TextEditor/Document/TextDocument.cs
 main/src/core/Mono.TextEditor.Shared/Mono.TextEditor/TextLinkEditMode.cs
 
 main/src/core/MonoDevelop.Core/MonoDevelop.Core.csproj
+main/src/core/MonoDevelop.Core/MonoDevelop.Core.Assemblies/TargetRuntime.cs
 main/src/core/MonoDevelop.Core/MonoDevelop.Projects.MSBuild/MSBuildProjectService.cs
 main/src/core/MonoDevelop.Core/MonoDevelop.Projects.MSBuild/RemoteBuildEngineManager.cs
 main/src/core/MonoDevelop.Core/packages.config
@@ -90,7 +94,9 @@ main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/TextEditor.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.TypeSystem/MonoDevelopSourceText.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.TypeSystem/MonoDevelopSourceTextContainer.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.TypeSystem/MonoDevelopTextLoader.cs
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.TypeSystem/MonoDevelopWorkspace.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.csproj
+main/src/core/MonoDevelop.Ide/packages.config
 
 main/src/core/MonoDevelop.TextEditor.Tests/MonoDevelop.TextEditor.Tests.csproj
 
