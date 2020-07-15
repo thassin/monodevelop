@@ -23,16 +23,16 @@ main/src/core/Mono.TextEditor.Shared/Mono.TextEditor/Document/TextDocument.cs
 	remove the Microsoft.VisualStudio... references and revert the ones providing the old editor.
 	TODO the method ApplyTextChanges() not yet implemented (use cases unknown so far).
 
-main/src/core/Mono.TextEditor.Shared/Mono.TextEditor/TextLinkEditMode.cs 
+main/src/core/Mono.TextEditor.Shared/Mono.TextEditor/TextLinkEditMode.cs
 	revert the code related to old editor.
 
 main/src/addins/MonoDevelop.SourceEditor2/MonoDevelop.SourceEditor.csproj 
 	remove the Microsoft.VisualStudio... references and project items.
 
-main/src/addins/MonoDevelop.SourceEditor2/MonoDevelop.SourceEditor/SourceEditorView.cs 
+main/src/addins/MonoDevelop.SourceEditor2/MonoDevelop.SourceEditor/SourceEditorView.cs
 	revert the code related to old editor.
 
-main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/TextEditor.cs 
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/TextEditor.cs
 	remove a TextView property related to the new editor.
 
 main/src/addins/AspNet/Tests/MonoDevelop.AspNet.Tests.csproj
@@ -41,6 +41,19 @@ main/tests/Ide.Tests/MonoDevelop.Ide.Tests.csproj
 main/tests/MonoDevelop.CSharpBinding.Tests/MonoDevelop.CSharpBinding.Tests.csproj
 main/tests/MonoDevelop.Core.Tests/MonoDevelop.Core.Tests.csproj
 	remove files from these test projects (build errors, tests are not needed/wanted right now).
+
+main/src/core/MonoDevelop.Core/MonoDevelop.Core.Assemblies/TargetRuntime.cs
+	add a delay to app startup, allowing addins to load before app starting.
+
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.csproj
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/CompositionManager.cs
+	removed some source files.
+
+main/src/addins/MonoDevelop.SourceEditor2/packages.config
+main/src/core/MonoDevelop.Ide/ExtensionModel/MonoDevelop.Ide.addin.xml
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.csproj
+main/src/core/MonoDevelop.Ide/packages.config
+	remove unused packages.
 
 ##############################################################################################
 
