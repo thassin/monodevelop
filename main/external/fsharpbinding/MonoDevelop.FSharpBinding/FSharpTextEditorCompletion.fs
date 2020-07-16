@@ -590,7 +590,8 @@ module Completion =
         }
 
 type FSharpParameterHintingData (symbol:FSharpSymbolUse) =
-    inherit ParameterHintingData ()
+//oe    inherit ParameterHintingData ()
+    inherit ParameterHintingData (null)
 
     let getTooltipInformation symbol paramIndex =
         async {
@@ -616,7 +617,8 @@ type FSharpParameterHintingData (symbol:FSharpSymbolUse) =
         Async.StartAsTask(getTooltipInformation symbol (Math.Max(paramIndex, 0)), cancellationToken = cancel)
 
 type FsiParameterHintingData (tooltip: MonoDevelop.FSharp.Shared.ParameterTooltip) =
-    inherit ParameterHintingData ()
+//oe    inherit ParameterHintingData ()
+    inherit ParameterHintingData (null)
 
     override x.ParameterCount =
        match tooltip with
@@ -708,7 +710,8 @@ module ParameterHinting =
                             |> Array.map (fun meth -> FsiParameterHintingData (meth) :> ParameterHintingData)
                             |> ResizeArray.ofArray
                         if hintingData.Count > 0 then
-                            return ParameterHintingResult(hintingData, ApplicableSpan = new TextSpan(startOffset, 0))
+                    //oe        return ParameterHintingResult(hintingData, ApplicableSpan = new TextSpan(startOffset, 0))
+                            return ParameterHintingResult(hintingData, startOffset)
                         else
                             return ParameterHintingResult.Empty
                     | _ -> return ParameterHintingResult.Empty
@@ -735,7 +738,8 @@ module ParameterHinting =
                     |> List.map (fun meth -> FSharpParameterHintingData (meth) :> ParameterHintingData)
                     |> ResizeArray.ofList
 
-                return ParameterHintingResult(hintingData, ApplicableSpan = new TextSpan(startOffset, 0))
+        //oe        return ParameterHintingResult(hintingData, ApplicableSpan = new TextSpan(startOffset, 0))
+                return ParameterHintingResult(hintingData, startOffset)
             | _ -> LoggingService.logWarning "FSharpTextEditorCompletion: Getting Parameter Info: no methods found"
                    return ParameterHintingResult.Empty
         with

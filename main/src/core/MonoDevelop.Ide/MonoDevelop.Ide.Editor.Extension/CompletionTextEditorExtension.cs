@@ -40,34 +40,10 @@ using Gtk;
 
 namespace MonoDevelop.Ide.Editor.Extension
 {
-	public enum SignatureHelpTriggerReason
-	{
-		InvokeSignatureHelpCommand,
-		TypeCharCommand,
-		RetriggerCommand
-	}
 
-	public struct SignatureHelpTriggerInfo
-	{
-		public char? TriggerCharacter {
-			get;
-		}
-
-		public SignatureHelpTriggerReason TriggerReason {
-			get;
-		}
-
-		public SignatureHelpTriggerInfo (SignatureHelpTriggerReason triggerReason, char? triggerCharacter = null)
-		{
-			TriggerReason = triggerReason;
-			TriggerCharacter = triggerCharacter;
-		}
-
-		internal Microsoft.CodeAnalysis.SignatureHelp.SignatureHelpTriggerInfo ToRoslyn()
-		{
-			return new Microsoft.CodeAnalysis.SignatureHelp.SignatureHelpTriggerInfo ((Microsoft.CodeAnalysis.SignatureHelp.SignatureHelpTriggerReason)TriggerReason, TriggerCharacter);
-		}
-	}
+// REMOVED...
+//	public enum SignatureHelpTriggerReason
+//	public struct SignatureHelpTriggerInfo
 
 	public class CompletionTextEditorExtension : TextEditorExtension
 	{
@@ -299,7 +275,8 @@ namespace MonoDevelop.Ide.Editor.Extension
 				var newparameterHintingSrc = new CancellationTokenSource ();
 				var token = newparameterHintingSrc.Token;
 				try {
-					var task = HandleParameterCompletionAsync (ctx, new SignatureHelpTriggerInfo (SignatureHelpTriggerReason.TypeCharCommand, descriptor.KeyChar), token);
+				//oe	var task = HandleParameterCompletionAsync (ctx, new SignatureHelpTriggerInfo (SignatureHelpTriggerReason.TypeCharCommand, descriptor.KeyChar), token);
+					var task = HandleParameterCompletionAsync (ctx, descriptor.KeyChar, token);
 					if (task != null) {
 						parameterHintingSrc.Cancel ();
 						parameterHintingSrc = newparameterHintingSrc;
@@ -525,10 +502,8 @@ namespace MonoDevelop.Ide.Editor.Extension
 			return Task.FromResult (ParameterHintingResult.Empty);
 		}
 
-		public virtual Task<ParameterHintingResult> HandleParameterCompletionAsync (CodeCompletionContext completionContext, SignatureHelpTriggerInfo triggerInfo, CancellationToken token = default (CancellationToken))
-		{
-			return HandleParameterCompletionAsync (completionContext, triggerInfo.TriggerCharacter.HasValue ? triggerInfo.TriggerCharacter.Value : '\0', token);
-		}
+	// REMOVED...
+	//	public virtual Task<ParameterHintingResult> HandleParameterCompletionAsync (CodeCompletionContext completionContext, SignatureHelpTriggerInfo triggerInfo, CancellationToken token = default (CancellationToken))
 
 		// return false if completion can't be shown
 		public virtual bool GetCompletionCommandOffset (out int cpos, out int wlen)
@@ -605,7 +580,8 @@ namespace MonoDevelop.Ide.Editor.Extension
 			parameterHintingSrc = new CancellationTokenSource ();
 
 			try {
-				return await HandleParameterCompletionAsync (completionContext, new SignatureHelpTriggerInfo (SignatureHelpTriggerReason.InvokeSignatureHelpCommand), parameterHintingSrc.Token);
+			//oe	return await HandleParameterCompletionAsync (completionContext, new SignatureHelpTriggerInfo (SignatureHelpTriggerReason.InvokeSignatureHelpCommand), parameterHintingSrc.Token);
+				return await HandleParameterCompletionAsync (completionContext, Editor.GetCharAt (pos - 1), parameterHintingSrc.Token);
 			} catch (TaskCanceledException) {
 			} catch (AggregateException) {
 			}
@@ -614,10 +590,13 @@ namespace MonoDevelop.Ide.Editor.Extension
 
 		public virtual async Task<int> GuessBestMethodOverload (ParameterHintingResult provider, int currentOverload, System.Threading.CancellationToken token)
 		{
-			if (provider.SelectedItemIndex.HasValue)
-				return provider.SelectedItemIndex.Value;
+		// oe TODO fix this later... no SelectedItemIndex available???
+		//	if (provider.SelectedItemIndex.HasValue)
+		//		return provider.SelectedItemIndex.Value;
+
 			var currentHintingData = provider [currentOverload];
-			int cparam = await GetCurrentParameterIndex (provider.ParameterListStart, token).ConfigureAwait (false);
+		//oe	int cparam = await GetCurrentParameterIndex (provider.ParameterListStart, token).ConfigureAwait (false);
+			int cparam = await GetCurrentParameterIndex (provider.StartOffset, token).ConfigureAwait (false);
 			if (cparam > currentHintingData.ParameterCount && !currentHintingData.IsParameterListAllowed) {
 				// Look for an overload which has more parameters
 				int bestOverload = -1;

@@ -90,41 +90,6 @@
     <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Features\ParameterHinting\ParameterHintingTests.cs" />
-    <Compile Include="Features\InspectionActionTestBase.cs" />
-    <Compile Include="Features\IndentationTests\AlignmentTests.cs" />
-    <Compile Include="Features\IndentationTests\BlockTest.cs" />
-    <Compile Include="Features\IndentationTests\CommentTests.cs" />
-    <Compile Include="Features\IndentationTests\GeneralTests.cs" />
-    <Compile Include="Features\IndentationTests\Helper.cs" />
-    <Compile Include="Features\IndentationTests\PreProcessorTests.cs" />
-    <Compile Include="Features\IndentationTests\StringTests.cs" />
-    <Compile Include="Features\IndentationTests\TextPasteIndentEngineTests.cs" />
-    <Compile Include="Features\TestBase.cs" />
-    <Compile Include="Features\Util.cs" />
-    <Compile Include="Features\Completion\CastCompletionProviderTests.cs" />
-    <Compile Include="Features\Completion\EnumMemberCompletionProviderTests.cs" />
-    <Compile Include="Features\Completion\DelegateCompletionProviderTests.cs" />
-    <Compile Include="Features\Completion\EventSenderCompletionProviderTests.cs" />
-    <Compile Include="Features\Completion\RegexCompletionProviderTests.cs" />
-    <Compile Include="Features\Completion\FormatItemCompletionProviderTests.cs" />
-    <Compile Include="Features\Completion\AbstractCSharpCompletionProviderTests.cs" />
-    <Compile Include="Features\Completion\ProtocolMemberCompletionTests.cs" />
-    <Compile Include="MonoDevelop.CSharpBinding\CSharpCompletionTextEditorTests.cs" />
-    <Compile Include="MonoDevelop.CSharpBinding\CSharpProjectPropertiesTests.cs" />
-    <Compile Include="MonoDevelop.CSharpBinding\CSharpTextEditorIndentationTests.cs" />
-    <Compile Include="MonoDevelop.CSharpBinding\FindMemberVisitorTests.cs" />
-    <Compile Include="MonoDevelop.CSharpBinding\FoldingParserTests.cs" />
-    <Compile Include="MonoDevelop.CSharpBinding\MonodevelopWorkspaceTests.cs" />
-    <Compile Include="MonoDevelop.CSharpBinding\NamedArgumentCompletionTests.cs" />
-    <Compile Include="MonoDevelop.CSharpBinding\OnTheFlyFormatterTests.cs" />
-    <Compile Include="MonoDevelop.CSharpBinding\TypeSystemServiceTestExtensions.cs" />
-    <Compile Include="MonoDevelop.CSharpBinding\UnitTesteditorIntegrationTests.cs" />
-    <Compile Include="MonoDevelop.CSharpBinding.Refactoring\CSharpFindReferencesProviderTests.cs" />
-    <Compile Include="MonoDevelop.CSharpBinding.Refactoring\GenerateNewMemberTests.cs" />
-    <Compile Include="MonoDevelop.CSharpBinding\PolicyTests.cs" />
-    <Compile Include="MonoDevelop.CSharpBinding\CSharpAutoInsertBracketHandlerTests.cs" />
-    <Compile Include="MonoDevelop.CSharpBinding\ExpandSelectionHandlerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\addins\CSharpBinding\CSharpBinding.csproj">

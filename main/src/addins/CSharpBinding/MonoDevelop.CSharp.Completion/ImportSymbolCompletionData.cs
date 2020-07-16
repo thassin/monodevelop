@@ -23,6 +23,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using MonoDevelop.Ide.CodeCompletion;
 using Microsoft.CodeAnalysis;
 using MonoDevelop.Core;
@@ -33,13 +34,15 @@ using Microsoft.CodeAnalysis.Completion;
 
 namespace MonoDevelop.CSharp.Completion
 {
-	class ImportSymbolCompletionData : CompletionData
+//oe	class ImportSymbolCompletionData : CompletionData
+	class ImportSymbolCompletionData : RoslynSymbolCompletionData
 	{
 		CSharpCompletionTextEditorExtension completionExt;
 		ISymbol type;
 		bool useFullName;
 
-		public ISymbol Symbol { get { return type; } }
+	// REMOVED...
+	//	public ISymbol Symbol { get { return type; } }
 
 		public override IconId Icon {
 			get {
@@ -51,7 +54,8 @@ namespace MonoDevelop.CSharp.Completion
 
         public override int PriorityGroup { get { return int.MinValue; } }
 
-		public ImportSymbolCompletionData (CSharpCompletionTextEditorExtension ext, ISymbol type, bool useFullName) 
+	//oe	public ImportSymbolCompletionData (CSharpCompletionTextEditorExtension ext, ISymbol type, bool useFullName) 
+		public ImportSymbolCompletionData (CSharpCompletionTextEditorExtension ext, RoslynCodeCompletionFactory factory, ISymbol type, bool useFullName) : base (null, factory, type)
 		{
 			this.completionExt = ext;
 			this.useFullName = useFullName;
@@ -99,7 +103,7 @@ namespace MonoDevelop.CSharp.Completion
 			return GetDefaultDisplaySelection (displayDescription, isSelected);
 		}
 
-		#region IActionCompletionData implementation
+#region IActionCompletionData implementation
 
 		public override void InsertCompletionText (CompletionListWindow window, ref KeyActions ka, MonoDevelop.Ide.Editor.Extension.KeyDescriptor descriptor)
 		{
@@ -162,7 +166,9 @@ namespace MonoDevelop.CSharp.Completion
 			}
 			return result;
 		}
-		#endregion
+
+#endregion
+
 	}
 }
 

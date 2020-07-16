@@ -33,6 +33,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using ICSharpCode.NRefactory6.CSharp;
+using ICSharpCode.NRefactory6.CSharp.Completion;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -57,7 +58,7 @@ using MonoDevelop.Ide.TypeSystem;
 using MonoDevelop.Refactoring;
 using Microsoft.CodeAnalysis.Completion;
 using Microsoft.CodeAnalysis.Host.Mef;
-using Microsoft.VisualStudio.Platform;
+//using Microsoft.VisualStudio.Platform;
 
 namespace MonoDevelop.CSharp.Completion
 {
@@ -78,6 +79,9 @@ namespace MonoDevelop.CSharp.Completion
 		*/
 		SyntaxTree unit;
 		static readonly SyntaxTree emptyUnit = CSharpSyntaxTree.ParseText ("");
+
+		// oe add...
+		List<CompletionContextHandler> additionalContextHandlers = new List<CompletionContextHandler> ();
 
 		SyntaxTree Unit {
 			get {
@@ -149,6 +153,19 @@ namespace MonoDevelop.CSharp.Completion
 			return doc.WithFrozenPartialSemanticsAsync (token);
 		}
 
+		// oe add...
+		public CSharpCompletionTextEditorExtension ()
+		{
+			try {
+				foreach (var node in AddinManager.GetExtensionNodes<InstanceExtensionNode> ("/MonoDevelop/CSharp/Completion/ContextHandler")) {
+					var handler = (CompletionContextHandler)node.CreateInstance ();
+					additionalContextHandlers.Add (handler);
+				}
+			} catch (Exception e) {
+				LoggingService.LogError ("Error while creating c# completion text editor extension.", e);
+			}
+		}
+
 		bool addEventHandlersInInitialization = true;
 
 		/// <summary>
@@ -161,9 +178,8 @@ namespace MonoDevelop.CSharp.Completion
 			Initialize (doc.Editor, doc);
 		}
 
-		public CSharpCompletionTextEditorExtension ()
-		{
-		}
+	// REMOVED as a duplicate...
+	//	public CSharpCompletionTextEditorExtension ()
 
 		protected override void Initialize ()
 		{
@@ -305,8 +321,8 @@ namespace MonoDevelop.CSharp.Completion
 			CSharpCompletionDataList List { get; set; }
 		}
 
-
-		internal void AddImportCompletionData (CSharpSyntaxContext ctx, CompletionDataList result, SemanticModel semanticModel, int position, CancellationToken cancellationToken = default (CancellationToken))
+	//	internal void AddImportCompletionData (CSharpSyntaxContext ctx, CompletionDataList result, SemanticModel semanticModel, int position, CancellationToken cancellationToken = default (CancellationToken))
+		internal void AddImportCompletionData (CompletionResult completionResult, CSharpCompletionDataList result, RoslynCodeCompletionFactory factory, SemanticModel semanticModel, int position, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			if (result.Count == 0)
 				return;
@@ -323,12 +339,15 @@ namespace MonoDevelop.CSharp.Completion
 			ITypeSymbol extensionType = null;
 
 			if (extensionMethodImport) {
-				var memberAccess = ctx.TargetToken.Parent as MemberAccessExpressionSyntax;
+			//oe	var memberAccess = ctx.TargetToken.Parent as MemberAccessExpressionSyntax;
+				var memberAccess = completionResult.SyntaxContext.TargetToken.Parent as MemberAccessExpressionSyntax;
 				if (memberAccess != null) {
-					var symbolInfo = ctx.SemanticModel.GetSymbolInfo (memberAccess.Expression);
+				//oe	var symbolInfo = ctx.SemanticModel.GetSymbolInfo (memberAccess.Expression);
+					var symbolInfo = completionResult.SyntaxContext.SemanticModel.GetSymbolInfo (memberAccess.Expression);
 					if (symbolInfo.Symbol.Kind == SymbolKind.NamedType)
 						return;
-					extensionType = ctx.SemanticModel.GetTypeInfo (memberAccess.Expression).Type;
+				//oe	extensionType = ctx.SemanticModel.GetTypeInfo (memberAccess.Expression).Type;
+					extensionType = completionResult.SyntaxContext.SemanticModel.GetTypeInfo (memberAccess.Expression).Type;
 					if (extensionType == null) {
 						return;
 					}
@@ -395,7 +414,8 @@ namespace MonoDevelop.CSharp.Completion
 									if (!extMethodDict.TryGetValue (type.ContainingNamespace, out importSymbolList)) {
 										extMethodDict.Add (type.ContainingNamespace, importSymbolList = new List<ImportSymbolCompletionData> ());
 									}
-									var newData = new ImportSymbolCompletionData (this, reducedMethod, false);
+								//oe	var newData = new ImportSymbolCompletionData (this, reducedMethod, false);
+									var newData = new ImportSymbolCompletionData (this, factory, reducedMethod, false);
 									var existingItem = importSymbolList.FirstOrDefault (data => data.Symbol.Name == extMethod.Name);
 									if (existingItem != null) {
 										existingItem.AddOverload (newData);
@@ -406,92 +426,74 @@ namespace MonoDevelop.CSharp.Completion
 								}
 							}
 						} else {
-							result.Add (new ImportSymbolCompletionData (this, type, false));
+						//oe	result.Add (new ImportSymbolCompletionData (this, type, false));
+							result.Add (new ImportSymbolCompletionData (this, factory, type, false));
 						}
 					}
 				}
 			}
 		}
 
-		static ICompletionDataList EmptyCompletionDataList = new CompletionDataList ();
+	// REMOVED...
+	//	static ICompletionDataList EmptyCompletionDataList = new CompletionDataList ();
+	//	async Task<ICompletionDataList> InternalHandleCodeCompletion (CodeCompletionContext completionContext, CompletionTriggerInfo triggerInfo, int triggerWordLength, CancellationToken token, bool forceSymbolCompletion = false)
 
-		async Task<ICompletionDataList> InternalHandleCodeCompletion (CodeCompletionContext completionContext, CompletionTriggerInfo triggerInfo, int triggerWordLength, CancellationToken token, bool forceSymbolCompletion = false)
+		// oe add...
+		Task<ICompletionDataList> InternalHandleCodeCompletion (CodeCompletionContext completionContext, CompletionTriggerInfo triggerInfo, int triggerWordLength, CancellationToken token, bool forceSymbolCompletion = false)
 		{
+			if (Editor.EditMode == MonoDevelop.Ide.Editor.EditMode.CursorInsertion)
+				return Task.FromResult ((ICompletionDataList)null);
+
+//			var data = Editor;
+//			if (data.CurrentMode is TextLinkEditMode) {
+//				if (((TextLinkEditMode)data.CurrentMode).TextLinkMode == TextLinkMode.EditIdentifier)
+//					return null;
+//			}
+
+			var offset = Editor.CaretOffset;
+			var list = new CSharpCompletionDataList ();
+			list.TriggerWordLength = triggerWordLength;
 			var analysisDocument = DocumentContext.AnalysisDocument;
 			if (analysisDocument == null)
-				return EmptyCompletionDataList;
+				return Task.FromResult ((ICompletionDataList)null);
+			return Task.Run (async delegate {
+				try {
+					
+					var partialDoc = await analysisDocument.WithFrozenPartialSemanticsAsync (token).ConfigureAwait (false);
+					var semanticModel = await partialDoc.GetSemanticModelAsync (token).ConfigureAwait (false);
 
+					var roslynCodeCompletionFactory = new RoslynCodeCompletionFactory (this, semanticModel);
+					foreach (var extHandler in additionalContextHandlers.OfType<IExtensionContextHandler> ())
+						extHandler.Init (roslynCodeCompletionFactory);
+					var engine = new CompletionEngine(MonoDevelop.Ide.TypeSystem.TypeSystemService.Workspace, roslynCodeCompletionFactory);
+					var ctx = new ICSharpCode.NRefactory6.CSharp.CompletionContext (partialDoc, offset, semanticModel);
+					ctx.AdditionalContextHandlers = additionalContextHandlers;
 
-			var cs = DocumentContext.RoslynWorkspace.Services.GetLanguageServices (LanguageNames.CSharp).GetService<CompletionService> ();
-			SourceText sourceText;
-			if (!analysisDocument.TryGetText (out sourceText))
-				return EmptyCompletionDataList;
+					var completionResult = await engine.GetCompletionDataAsync (ctx, triggerInfo, token).ConfigureAwait (false);
+					if (completionResult == CompletionResult.Empty)
+						return null;
 
-			CompletionTriggerKind kind;
-			switch (triggerInfo.CompletionTriggerReason) {
-			case CompletionTriggerReason.CharTyped:
-				kind = CompletionTriggerKind.Insertion;
-				break;
-			case CompletionTriggerReason.CompletionCommand:
-				kind = CompletionTriggerKind.InvokeAndCommitIfUnique;
-				break;
-			case CompletionTriggerReason.BackspaceOrDeleteCommand:
-				kind = CompletionTriggerKind.Deletion;
-				break;
-			case CompletionTriggerReason.RetriggerCommand:
-				kind = CompletionTriggerKind.InvokeAndCommitIfUnique;
-				break;
-			default:
-				kind = CompletionTriggerKind.Insertion;
-				break;
-			}
-			var triggerSnapshot = Editor.GetPlatformTextBuffer ().CurrentSnapshot;
-			var trigger = new CompletionTrigger(kind, triggerInfo.TriggerCharacter.HasValue ? triggerInfo.TriggerCharacter.Value : '\0');
-			if (triggerInfo.CompletionTriggerReason == CompletionTriggerReason.CharTyped) {
-				if (!cs.ShouldTriggerCompletion (sourceText, completionContext.TriggerOffset, trigger, null)) {
-					return EmptyCompletionDataList;
+					list.AddRange (completionResult.Data);
+
+					if (forceSymbolCompletion || (IdeApp.Preferences.AddImportedItemsToCompletionList.Value && list.OfType<RoslynSymbolCompletionData> ().Any (cd => (cd.GetType () == typeof (RoslynSymbolCompletionData)) && (cd.Symbol is ITypeSymbol || cd.Symbol is IMethodSymbol)))) {
+						AddImportCompletionData (completionResult, list, roslynCodeCompletionFactory, semanticModel, offset, token);
+					}
+
+					list.AutoCompleteEmptyMatch = completionResult.AutoCompleteEmptyMatch;
+					// list.AutoCompleteEmptyMatchOnCurlyBrace = completionResult.AutoCompleteEmptyMatchOnCurlyBracket;
+					list.AutoSelect = completionResult.AutoSelect;
+					list.DefaultCompletionString = completionResult.DefaultCompletionString;
+					// list.CloseOnSquareBrackets = completionResult.CloseOnSquareBrackets;
+					list.AutoCompleteUniqueMatch = triggerInfo.CompletionTriggerReason == CompletionTriggerReason.CompletionCommand;
+				} catch (OperationCanceledException) {
+					return null;
+				} catch (AggregateException e) {
+					e.Flatten ().Handle (f => f is OperationCanceledException);
+				} catch (Exception e) {
+					LoggingService.LogError ("Error while getting C# recommendations", e); 
 				}
-			}
-			var completionList = await cs.GetCompletionsAsync (analysisDocument, Editor.CaretOffset, trigger, cancellationToken: token);
-			if (completionList == null)
-				return EmptyCompletionDataList;
-
-			var result = new CompletionDataList ();
-			result.TriggerWordLength = triggerWordLength;
-			CSharpCompletionData defaultCompletionData = null;
-			foreach (var item in completionList.Items) {
-				if (string.IsNullOrEmpty (item.DisplayText))
-					continue;
-				var data = new CSharpCompletionData (analysisDocument, triggerSnapshot, cs, item);
-				result.Add (data);
-				if (item.Rules.MatchPriority > 0) {
-					if (defaultCompletionData == null || defaultCompletionData.Rules.MatchPriority < item.Rules.MatchPriority)
-						defaultCompletionData = data;
-				}
-			}
-
-			result.AutoCompleteUniqueMatch = (triggerInfo.CompletionTriggerReason == CompletionTriggerReason.CompletionCommand);
-
-			var partialDoc = await analysisDocument.WithFrozenPartialSemanticsAsync (token).ConfigureAwait (false);
-			var semanticModel = await partialDoc.GetSemanticModelAsync (token).ConfigureAwait (false);
-			var syntaxContext = CSharpSyntaxContext.CreateContext (DocumentContext.RoslynWorkspace, semanticModel, completionContext.TriggerOffset, token);
-
-			if (forceSymbolCompletion || !syntaxContext.LeftToken.IsKind (SyntaxKind.DotToken)) {
-				AddImportCompletionData (syntaxContext, result, semanticModel, completionContext.TriggerOffset, token);
-			}
-
-			if (defaultCompletionData != null)
-				result.DefaultCompletionString = defaultCompletionData.DisplayText;
-
-			if (completionList.SuggestionModeItem != null) {
-				result.DefaultCompletionString = completionList.SuggestionModeItem.DisplayText;
-				result.AutoSelect = false;
-			}
-
-			if (triggerInfo.TriggerCharacter == '_' && triggerWordLength == 1)
-				result.AutoSelect = false;
-
-			return result;
+				return (ICompletionDataList)list;
+			});
 		}
 
 		static bool HasAllUsedParameters (MonoDevelop.Ide.CodeCompletion.ParameterHintingData provider, string [] list)
@@ -518,7 +520,8 @@ namespace MonoDevelop.CSharp.Completion
 			var analysisDocument = DocumentContext.AnalysisDocument;
 			if (analysisDocument == null)
 				return -1;
-			var result = await ICSharpCode.NRefactory6.CSharp.ParameterUtil.GetCurrentParameterIndex (analysisDocument, provider.ApplicableSpan.Start, Editor.CaretOffset);
+		//oe	var result = await ICSharpCode.NRefactory6.CSharp.ParameterUtil.GetCurrentParameterIndex (analysisDocument, provider.ApplicableSpan.Start, Editor.CaretOffset);
+			var result = await ICSharpCode.NRefactory6.CSharp.ParameterUtil.GetCurrentParameterIndex (analysisDocument, provider.StartOffset, Editor.CaretOffset);
 			var cparam = result.ParameterIndex;
 			var list = result.UsedNamespaceParameters;
 			if (cparam > provider [currentOverload].ParameterCount && !provider [currentOverload].IsParameterListAllowed || !HasAllUsedParameters (provider [currentOverload], list)) {
@@ -669,65 +672,50 @@ namespace MonoDevelop.CSharp.Completion
 			if (completionContext == null)
 				throw new ArgumentNullException (nameof (completionContext));
 			char ch = completionContext.TriggerOffset > 0 ? Editor.GetCharAt (completionContext.TriggerOffset - 1) : '\0';
-			var info = new Ide.Editor.Extension.SignatureHelpTriggerInfo (Ide.Editor.Extension.SignatureHelpTriggerReason.InvokeSignatureHelpCommand, ch);
-			return InternalHandleParameterCompletionCommand (completionContext, info, default (CancellationToken));
+		//oe	var info = new Ide.Editor.Extension.SignatureHelpTriggerInfo (Ide.Editor.Extension.SignatureHelpTriggerReason.InvokeSignatureHelpCommand, ch);
+		//oe	return InternalHandleParameterCompletionCommand (completionContext, info, default (CancellationToken));
+			return InternalHandleParameterCompletionCommand (completionContext, ch, true, default(CancellationToken));
 		}
 
-		public override Task<MonoDevelop.Ide.CodeCompletion.ParameterHintingResult> HandleParameterCompletionAsync (CodeCompletionContext completionContext, Ide.Editor.Extension.SignatureHelpTriggerInfo triggerInfo, CancellationToken token = default (CancellationToken))
+	//oe	public override Task<MonoDevelop.Ide.CodeCompletion.ParameterHintingResult> HandleParameterCompletionAsync (CodeCompletionContext completionContext, Ide.Editor.Extension.SignatureHelpTriggerInfo triggerInfo, CancellationToken token = default (CancellationToken))
+		public override Task<MonoDevelop.Ide.CodeCompletion.ParameterHintingResult> HandleParameterCompletionAsync (CodeCompletionContext completionContext, char completionChar, CancellationToken token = default (CancellationToken))
 		{
-			return InternalHandleParameterCompletionCommand (completionContext, triggerInfo, token);
+		//oe	return InternalHandleParameterCompletionCommand (completionContext, triggerInfo, token);
+			return InternalHandleParameterCompletionCommand (completionContext, completionChar, false, token);
 		}
 
-		internal static Lazy<ISignatureHelpProvider []> signatureProviders = new Lazy<ISignatureHelpProvider []> (() => {
-			var workspace = TypeSystemService.Workspace;
-			var mefExporter = (IMefHostExportProvider)workspace.Services.HostServices;
-			var helpProviders = mefExporter.GetExports<ISignatureHelpProvider, LanguageMetadata> ()
-				.FilterToSpecificLanguage (LanguageNames.CSharp);
+	// REMOVED...
+	//	internal static Lazy<ISignatureHelpProvider []> signatureProviders = new Lazy<ISignatureHelpProvider []> (() => {
+	//	readonly static Task<MonoDevelop.Ide.CodeCompletion.ParameterHintingResult> emptyParameterHintingResultTask = Task.FromResult (ParameterHintingResult.Empty);
 
-			return helpProviders.ToArray ();
-		});
-		readonly static Task<MonoDevelop.Ide.CodeCompletion.ParameterHintingResult> emptyParameterHintingResultTask = Task.FromResult (ParameterHintingResult.Empty);
-
-		public Task<MonoDevelop.Ide.CodeCompletion.ParameterHintingResult> InternalHandleParameterCompletionCommand (CodeCompletionContext completionContext, Ide.Editor.Extension.SignatureHelpTriggerInfo triggerInfo, CancellationToken token = default (CancellationToken))
+	//oe	public Task<MonoDevelop.Ide.CodeCompletion.ParameterHintingResult> InternalHandleParameterCompletionCommand (CodeCompletionContext completionContext, Ide.Editor.Extension.SignatureHelpTriggerInfo triggerInfo, CancellationToken token = default (CancellationToken))
+		public Task<MonoDevelop.Ide.CodeCompletion.ParameterHintingResult> InternalHandleParameterCompletionCommand (CodeCompletionContext completionContext, char completionChar, bool force, CancellationToken token = default(CancellationToken))
 		{
 			var data = Editor;
-			bool force = triggerInfo.TriggerReason != Ide.Editor.Extension.SignatureHelpTriggerReason.InvokeSignatureHelpCommand;
-			List<ISignatureHelpProvider> providers;
-			if (!force) {
-				if (triggerInfo.TriggerReason == Ide.Editor.Extension.SignatureHelpTriggerReason.TypeCharCommand) {
-					providers = signatureProviders.Value.Where (provider => provider.IsTriggerCharacter (triggerInfo.TriggerCharacter.Value)).ToList ();
-				} else if (triggerInfo.TriggerReason == Ide.Editor.Extension.SignatureHelpTriggerReason.RetriggerCommand) {
-					providers = signatureProviders.Value.Where (provider => provider.IsRetriggerCharacter (triggerInfo.TriggerCharacter.Value)).ToList ();
-				} else {
-					providers = signatureProviders.Value.ToList ();
-				}
-				if (providers.Count == 0)
-					return emptyParameterHintingResultTask;
-			} else
-				providers = signatureProviders.Value.ToList ();
-
+	// oe replace the rest of this method...
+			if (!force && completionChar != '(' && completionChar != '<' && completionChar != '[' && completionChar != ',')
+				return null;
 			if (Editor.EditMode != EditMode.Edit)
-				return emptyParameterHintingResultTask;
+				return null;
 			var offset = Editor.CaretOffset;
 			try {
 				var analysisDocument = DocumentContext.AnalysisDocument;
 				if (analysisDocument == null)
-					return emptyParameterHintingResultTask;
-				var result = new RoslynParameterHintingEngine ().GetParameterDataProviderAsync (
-					providers,
-					analysisDocument,
-					offset,
-					triggerInfo.ToRoslyn (),
-					token
-				);
-				return result;
+					return null;
+				return Task.Run (async delegate {
+					var partialDoc = await analysisDocument.WithFrozenPartialSemanticsAsync (token);
+					var semanticModel = await partialDoc.GetSemanticModelAsync ();
+					var engine = new ParameterHintingEngine (MonoDevelop.Ide.TypeSystem.TypeSystemService.Workspace, new RoslynParameterHintingFactory ());
+					var result = await engine.GetParameterDataProviderAsync (analysisDocument, semanticModel, offset, token);
+					return new MonoDevelop.Ide.CodeCompletion.ParameterHintingResult (result.OfType<MonoDevelop.Ide.CodeCompletion.ParameterHintingData> ().ToList (), result.StartOffset);
+				}, token);
 			} catch (Exception e) {
-				LoggingService.LogError ("Unexpected parameter completion exception." + Environment.NewLine +
-					"FileName: " + DocumentContext.Name + Environment.NewLine +
-					"Position: line=" + completionContext.TriggerLine + " col=" + completionContext.TriggerLineOffset + Environment.NewLine +
-					"Line text: " + Editor.GetLineText (completionContext.TriggerLine),
+				LoggingService.LogError ("Unexpected parameter completion exception." + Environment.NewLine + 
+					"FileName: " + DocumentContext.Name + Environment.NewLine + 
+					"Position: line=" + completionContext.TriggerLine + " col=" + completionContext.TriggerLineOffset + Environment.NewLine + 
+					"Line text: " + Editor.GetLineText (completionContext.TriggerLine), 
 					e);
-				return emptyParameterHintingResultTask;
+				return null;
 			}
 		}
 
@@ -748,6 +736,7 @@ namespace MonoDevelop.CSharp.Completion
 		//			}
 		//			return result;
 		//		}
+
 		public override async Task<int> GetCurrentParameterIndex (int startOffset, CancellationToken token)
 		{
 			var analysisDocument = DocumentContext.AnalysisDocument;
@@ -758,6 +747,10 @@ namespace MonoDevelop.CSharp.Completion
 			var result = await ParameterUtil.GetCurrentParameterIndex (partialDoc, startOffset, caretOffset, token).ConfigureAwait (false);
 			return result.ParameterIndex;
 		}
+
+// NOTICE all of the code below is in comments...
+// NOTICE all of the code below is in comments...
+// NOTICE all of the code below is in comments...
 
 		/*
 				#region ICompletionDataFactory implementation
@@ -1350,6 +1343,9 @@ namespace MonoDevelop.CSharp.Completion
 				#endregion
 		*/
 
+// end-of-code-in-comments...
+// end-of-code-in-comments...
+// end-of-code-in-comments...
 
 		#region IDebuggerExpressionResolver implementation
 

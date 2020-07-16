@@ -40,82 +40,82 @@ using MonoDevelop.Ide.Editor;
 using MonoDevelop.Core;
 using System.IO;
 using MonoDevelop.Ide.Editor.Highlighting;
-using Microsoft.VisualStudio.Platform;
-using Microsoft.VisualStudio.Text.Tagging;
 
 namespace Mono.TextEditor
 {
 	class TextDocument : ITextDocument, IDisposable
 	{
-		public Microsoft.VisualStudio.Text.ITextDocument VsTextDocument { get; }
-		public Microsoft.VisualStudio.Text.ITextBuffer TextBuffer { get { return this.VsTextDocument.TextBuffer; } }
-		Microsoft.VisualStudio.Text.ITextSnapshot currentSnapshot;
-
-		bool lineEndingMismatch;
-
-		//HACK ImmutableText buffer;
-		//HACK readonly ILineSplitter splitter;
+		ImmutableText buffer;
+		ILineSplitter splitter;
 
 		ISyntaxHighlighting syntaxMode = null;
 
-		//HACK TextSourceVersionProvider versionProvider = new TextSourceVersionProvider ();
+		TextSourceVersionProvider versionProvider = new TextSourceVersionProvider ();
 
 		bool   readOnly;
 		ReadOnlyCheckDelegate readOnlyCheckDelegate;
 
+		string mimeType;
 		public string MimeType {
 			get {
-				var snapshot = this.TextBuffer.CurrentSnapshot;
-				return PlatformCatalog.Instance.MimeToContentTypeRegistryService.GetMimeType(snapshot.ContentType) ?? snapshot.ContentType.TypeName;
+				return mimeType;
 			}
 			set {
-				var newContentType = value != null ? GetContentTypeFromMimeType(value) : PlatformCatalog.Instance.ContentTypeRegistryService.UnknownContentType;
-
-				if (this.TextBuffer.CurrentSnapshot.ContentType != newContentType) {
-					this.TextBuffer.ChangeContentType(newContentType, null);
+				if (mimeType != value) {
+					mimeType = value;
+					UpdateSyntaxMode ();
+					OnMimeTypeChanged (EventArgs.Empty);
 				}
 			}
 		}
 
-		private static Microsoft.VisualStudio.Utilities.IContentType GetContentTypeFromMimeType(string mimeType)
-		{
-			Microsoft.VisualStudio.Utilities.IContentType contentType = PlatformCatalog.Instance.MimeToContentTypeRegistryService.GetContentType(mimeType);
-			if (contentType == null)
-			{
-				// fallback 1: see if there is a content tyhpe with the same name
-				contentType = PlatformCatalog.Instance.ContentTypeRegistryService.GetContentType(mimeType);
-				if (contentType == null)
-				{
-					// No joy, create a content type that, by default, derives from text. This is strictly an error
-					// (there should be mappings between any mime type and any content type).
-					contentType = PlatformCatalog.Instance.ContentTypeRegistryService.AddContentType(mimeType, new string[] { "text" });
-				}
-			}
-
-			return contentType;
-		}
+	// REMOVED...
+	//	private static Microsoft.VisualStudio.Utilities.IContentType GetContentTypeFromMimeType(string mimeType)
 
 		public event EventHandler MimeTypeChanged;
 
+		protected virtual void OnMimeTypeChanged (EventArgs e)
+		{
+			EventHandler handler = this.MimeTypeChanged;
+			if (handler != null)
+				handler (this, e);
+		}
+
+		FilePath fileName;
 		public FilePath FileName {
 			get {
-				return this.VsTextDocument.FilePath;
+				return fileName;
 			}
 			set {
-				if (value != this.FileName)
-				{
-					this.VsTextDocument.Rename(value);
+				if (fileName != value) {
+					fileName = value;
+					UpdateSyntaxMode ();
+					OnFileNameChanged (EventArgs.Empty);
 				}
 			}
 		}
 
 		public event EventHandler FileNameChanged;
+
+		protected virtual void OnFileNameChanged (EventArgs e)
+		{
+			EventHandler handler = this.FileNameChanged;
+			if (handler != null)
+				handler (this, e);
+		}
+
 		public System.Text.Encoding Encoding {
 			get {
-				return this.VsTextDocument.Encoding;
+				return buffer.Encoding;
 			}
 			set {
-				this.VsTextDocument.Encoding = value ?? MonoDevelop.Core.Text.TextFileUtility.DefaultEncoding;
+				buffer.Encoding = value ?? MonoDevelop.Core.Text.TextFileUtility.DefaultEncoding;
+			}
+		}
+
+		internal ILineSplitter Splitter {
+			get {
+				return splitter;
 			}
 		}
 
@@ -166,7 +166,7 @@ namespace Mono.TextEditor
 				SyntaxMode = new SyntaxHighlighting (def, this);
 			} else {
 #if false
-				SyntaxMode = TagBasedSyntaxHighlighting.CreateSyntaxHighlighting(this.TextBuffer);
+		is_not_used	SyntaxMode = TagBasedSyntaxHighlighting.CreateSyntaxHighlighting(this.TextBuffer);
 #else
 				SyntaxMode = DefaultSyntaxHighlighting.Instance;
 #endif
@@ -185,11 +185,10 @@ namespace Mono.TextEditor
 				return;
 			}
 			syntaxModeFileName = this.FileName;
-			syntaxModeMimeType = MimeType;
+			syntaxModeMimeType = this.MimeType;
 
 			InitializeSyntaxMode ();
 		}
-
 
 		internal event EventHandler<SyntaxModeChangeEventArgs> SyntaxModeChanged;
 
@@ -200,92 +199,50 @@ namespace Mono.TextEditor
 
 		public bool HasLineEndingMismatchOnTextSet {
 			get {
-				return lineEndingMismatch;
+				return splitter.LineEndingMismatch;
 			}
 			set {
-				lineEndingMismatch = value;
+				splitter.LineEndingMismatch = value;
 			}
 		}
 
-		protected void Initialize()
+		protected void Initialize(Encoding encoding, string fileName, ImmutableText buffer, ILineSplitter splitter)
 		{
-			this.currentSnapshot = this.TextBuffer.CurrentSnapshot;
+Console.WriteLine( "debug Initialize :: '" + fileName + "' enc=" + encoding + " len=" +  buffer.Length);
 
-			this.TextBuffer.Properties.AddProperty(typeof(ITextDocument), this);
-			this.TextBuffer.Changed += this.OnTextBufferChanged;
-			this.TextBuffer.ContentTypeChanged += this.OnTextBufferContentTypeChanged;
+			this.buffer = buffer;
+			this.splitter = splitter;
 
-			this.VsTextDocument.FileActionOccurred += this.OnTextDocumentFileActionOccured;
+			this.Encoding = encoding;
+			this.fileName = fileName;
+
+			TextChanging += HandleSplitterLineSegmentTreeLineRemoved;
 
 			foldSegmentTree.tree.NodeRemoved += HandleFoldSegmentTreetreeNodeRemoved;
+
 			this.diffTracker.SetTrackDocument(this);
+
+Console.WriteLine( "debug Initialize completed" );
 		}
 
 		public void Dispose()
 		{
-			this.TextBuffer.Changed -= this.OnTextBufferChanged;
-			this.TextBuffer.ContentTypeChanged -= this.OnTextBufferContentTypeChanged;
-			this.TextBuffer.Properties.RemoveProperty(typeof(ITextDocument));
-			this.VsTextDocument.FileActionOccurred -= this.OnTextDocumentFileActionOccured;
+		// REMOVED new-editor stuff...
+		//	this.TextBuffer.Changed -= this.OnTextBufferChanged;
+		//	this.TextBuffer.ContentTypeChanged -= this.OnTextBufferContentTypeChanged;
+		//	this.TextBuffer.Properties.RemoveProperty(typeof(ITextDocument));
+		//	this.VsTextDocument.FileActionOccurred -= this.OnTextDocumentFileActionOccured;
+
+// TODO what to do here??? is this needed at all???
+Console.WriteLine( "tommih : TextDocument Disposed" );
+
 			SyntaxMode = null;
 		}
 
-		void OnTextBufferChanged(object sender, Microsoft.VisualStudio.Text.TextContentChangedEventArgs args)
-		{
-			if (args.Changes == null)
-				return;
-			cachedText = null;
-			var changes = new List<TextChange> ();
-			foreach (var change in args.Changes) {
-				changes.Add (new TextChange (change.OldPosition, change.NewPosition, change.OldText, change.NewText));
-				EnsureSegmentIsUnfolded(change.OldPosition, change.NewLength);
-			}
-			bool endUndo = false;
-			UndoOperation operation = null;
-			var textChange = new TextChangeEventArgs(changes);
-
-			InterruptFoldWorker();
-			TextChanging?.Invoke(this, textChange);           
-			// After TextChanging notification has been sent, we can update the cached snapshot
-			this.currentSnapshot = args.After;
-
-			if (!isInUndo) {
-				operation = new UndoOperation(args);
-				if (currentAtomicOperation != null) {
-					currentAtomicOperation.Add(operation);
-				} else {
-					OnBeginUndo();
-					undoStack.Push(operation);
-					endUndo = true;
-				}
-				redoStack.Clear();
-			}
-
-			foldSegmentTree.UpdateOnTextReplace(this, textChange);
-			ClearTextMarkerCache ();
-			textSegmentMarkerTree.UpdateOnTextReplace (this, textChange);
-			ClearLineCache ();
-			TextChanged?.Invoke(this, textChange);
-			if (endUndo)
-				OnEndUndo(new UndoOperationEventArgs(operation));
-		}
-
-		void OnTextBufferContentTypeChanged(object sender, Microsoft.VisualStudio.Text.ContentTypeChangedEventArgs args)
-		{
-			this.currentSnapshot = this.TextBuffer.CurrentSnapshot; // Changing the content type changes the snapshot even though there are no text changes.
-
-			UpdateSyntaxMode();
-			this.MimeTypeChanged?.Invoke(this, EventArgs.Empty);
-		}
-
-		void OnTextDocumentFileActionOccured(object sender, Microsoft.VisualStudio.Text.TextDocumentFileActionEventArgs args)
-		{
-			if (args.FileActionType == Microsoft.VisualStudio.Text.FileActionTypes.DocumentRenamed)
-			{
-				this.UpdateSyntaxMode();
-				this.FileNameChanged?.Invoke(this, EventArgs.Empty);
-			}
-		}
+	// REMOVED...
+	//	void OnTextBufferChanged(object sender, Microsoft.VisualStudio.Text.TextContentChangedEventArgs args)
+	//	void OnTextBufferContentTypeChanged(object sender, Microsoft.VisualStudio.Text.ContentTypeChangedEventArgs args)
+	//	void OnTextDocumentFileActionOccured(object sender, Microsoft.VisualStudio.Text.TextDocumentFileActionEventArgs args)
 
 		void HandleFoldSegmentTreetreeNodeRemoved (object sender, RedBlackTree<FoldSegment>.RedBlackTreeNodeEventArgs e)
 		{
@@ -295,27 +252,54 @@ namespace Mono.TextEditor
 
 		public TextDocument (string fileName, string mimeType)
 		{
-			var contentType = GetContentTypeFromMimeType (mimeType);
+Console.WriteLine( "debug TextDocument ctor1 :: " + fileName + " : " + mimeType );
+
 			Encoding enc;
 			var text = TextFileUtility.GetText (fileName, out enc);
-			var buffer = PlatformCatalog.Instance.TextBufferFactoryService.CreateTextBuffer (text ?? string.Empty,
-			                                                                                 PlatformCatalog.Instance.TextBufferFactoryService.InertContentType);
-			
-			this.VsTextDocument = PlatformCatalog.Instance.TextDocumentFactoryService.CreateTextDocument (buffer, fileName);
-			this.VsTextDocument.Encoding = enc;
 
-			this.Initialize();
+ImmutableText buffer = new ImmutableText (text);
+ILineSplitter splitter = new LineSplitter();
+
+			this.Initialize( enc, fileName, buffer, splitter );
+
+Text = text;	// must set the Text property...
+
 		}
 
 		public TextDocument (string text = null)
 		{
-			var buffer = PlatformCatalog.Instance.TextBufferFactoryService.CreateTextBuffer(text ?? string.Empty,
-																							PlatformCatalog.Instance.TextBufferFactoryService.InertContentType);
+string info = "<null>";
+if ( text != null ) info = "len=" + text.Length;
+Console.WriteLine( "debug TextDocument ctor2 :: " + info );
 
-			this.VsTextDocument = PlatformCatalog.Instance.TextDocumentFactoryService.CreateTextDocument(buffer, string.Empty);
-			this.VsTextDocument.Encoding = MonoDevelop.Core.Text.TextFileUtility.DefaultEncoding;
+// TODO how to detect the encoding from string???
+Encoding enc = MonoDevelop.Core.Text.TextFileUtility.DefaultEncoding;
+string fileName = null;
 
-			this.Initialize();
+ImmutableText buffer = new ImmutableText (text);
+splitter = new LineSplitter();
+
+			this.Initialize( enc, fileName, buffer, splitter ); // PURA POIS VAAN... ????
+
+Text = text;	// must set the Text property...
+
+		}
+
+		public TextDocument (string text, ILineSplitter splitter)
+		{
+Console.WriteLine( "debug TextDocument ctor3 SNAPSHOT :: len=" + text.Length );
+
+// TODO how to detect the encoding from string???
+Encoding enc = MonoDevelop.Core.Text.TextFileUtility.DefaultEncoding;
+string fileName = null;
+
+ImmutableText buffer = new ImmutableText (text);
+
+			this.Initialize( enc, fileName, buffer, splitter ); // PURA POIS VAAN... ????
+
+// this constructor is used only for "snapshot document" generation.
+// -> the Text property must NOT be set here!!!
+
 		}
 
 		public static TextDocument CreateImmutableDocument (string text, bool suppressHighlighting = true)
@@ -327,11 +311,11 @@ namespace Mono.TextEditor
 			};
 		}
 
-		#region Buffer implementation
+#region Buffer implementation
 
 		public int Length {
 			get {
-				return this.currentSnapshot.Length;
+				return buffer.Length;
 			}
 		}
 
@@ -343,16 +327,34 @@ namespace Mono.TextEditor
 			get {
 				string completeText = cachedText != null ? (cachedText.Target as string) : null;
 				if (completeText == null) {
-					completeText = this.currentSnapshot.GetText ();
+					completeText = buffer.ToString();
 					cachedText = new WeakReference(completeText);
 				}
 				return completeText;
 			}
 			set {
+Console.WriteLine( "Text setter called" );
 				var tmp = IsReadOnly;
 				IsReadOnly = false;
-				this.ReplaceText(0, this.currentSnapshot.Length, value);
+
+				if (value == null)
+					value = "";
+				var args = new TextChangeEventArgs (0, Text, value);
+				textSegmentMarkerTree.Clear ();
+				OnTextReplacing (args);
+				cachedText = null;
+				buffer = new ImmutableText (value);
+				extendingTextMarkers = new List<TextLineMarker> ();
+				splitter.Initalize (value, out longestLineAtTextSet);
+				ClearFoldSegments ();
+				OnTextReplaced (args);
+				versionProvider = new TextSourceVersionProvider ();
+				buffer.Version = Version;
+				OnTextSet (EventArgs.Empty);
+				CommitUpdateAll ();
+
 				ClearUndoBuffer ();
+
 				IsReadOnly = tmp;
 				IsTextSet = true;
 			}
@@ -396,21 +398,89 @@ namespace Mono.TextEditor
 			if (IsReadOnly)
 				return;
 
-			if (value == null)
-				value = string.Empty;
-			this.TextBuffer.Replace(new Microsoft.VisualStudio.Text.Span(offset, count), value);
+			InterruptFoldWorker ();
+
+			//int oldLineCount = LineCount;
+			var args = new TextChangeEventArgs (offset, count > 0 ? GetTextAt (offset, count) : "", value);
+
+			UndoOperation operation = null;
+			bool endUndo = false;
+			if (!isInUndo) {
+				operation = new UndoOperation (args);
+				if (currentAtomicOperation != null) {
+					currentAtomicOperation.Add (operation);
+				} else {
+					OnBeginUndo ();
+					undoStack.Push (operation);
+					endUndo = true;
+				}
+				redoStack.Clear ();
+			}
+
+			if (value != null)
+				EnsureSegmentIsUnfolded (offset, value.Length);
+			
+			OnTextReplacing (args);
+
+Console.WriteLine( "ReplaceText :: args.TextChanges.Count=" + args.TextChanges.Count );
+
+// tommih 20200617 : TextChangeEventArgs has been splitted to TextChangeEventArgs + TextChange...
+if ( args.TextChanges.Count != 1 ) throw new InvalidOperationException("args.TextChanges.Count is not valid : " + args.TextChanges.Count);
+
+			value = args.TextChanges[0].InsertedText.Text;
+
+			cachedText = null;
+			buffer = buffer.RemoveText(offset, count);
+			if (!string.IsNullOrEmpty (value))
+				buffer = buffer.InsertText (offset, value);
+			foldSegmentTree.UpdateOnTextReplace (this, args);
+			splitter.TextReplaced (this, args);
+			versionProvider.AppendChange (args);
+			buffer.Version = Version;
+			OnTextReplaced (args);
+			if (endUndo)
+				OnEndUndo (new UndoOperationEventArgs (operation));
 		}
 
 		public void ApplyTextChanges (IEnumerable<Microsoft.CodeAnalysis.Text.TextChange> changes)
 		{
+
+Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
+
 			if (changes == null)
 				throw new ArgumentNullException(nameof(changes));
 
-			using (var edit = this.TextBuffer.CreateEdit())
+			// apply the changes in reverse order, to keep the positions from begin corrupted.
+			// TODO is "changes" always ordered like this? ever need to sort it???
+
+			int? prevStart = null;
+			foreach (var change in changes.Reverse())
 			{
-				foreach (var change in changes)
-					edit.Replace(change.Span.Start, change.Span.Length, change.NewText);
-				edit.Apply();
+				int start = change.Span.Start;
+				int length = change.Span.Length;
+
+				if ( prevStart.HasValue && start >= prevStart.Value ) {
+					Console.WriteLine( "TextDocument.ApplyTextChanges() changes has BAD ordering : prevStart=" + prevStart.Value + " start=" + start );
+				}
+
+				prevStart = start;
+				string oldtext = GetTextAt (start, length);
+
+				string newtext = change.NewText;
+				if ( newtext == null ) newtext = "";
+
+				Console.WriteLine ("TextDocument.ApplyTextChanges() :: s=" + start + " l=" + length + " ot='" + oldtext + "' nt='" + newtext + "' l2=" + newtext.Length);
+
+			/*	if (length > 0) {	// this works but requires 2 operations...
+					RemoveText (start, length);
+				}
+
+				if (newtext.Length > 0) {
+					InsertText (start, newtext);
+				}	*/
+
+				if ( newtext.Length < 1 ) newtext = null;
+				ReplaceText(start, length, newtext);
 			}
 		}
 
@@ -425,7 +495,7 @@ namespace Mono.TextEditor
 			if (endOffset > Length)
 				throw new ArgumentException ("endOffset > Length");
 
-			return this.currentSnapshot.GetText(startOffset, endOffset - startOffset);
+			return buffer.ToString (startOffset, endOffset - startOffset);
 		}
 
 		public string GetTextBetween (DocumentLocation start, DocumentLocation end)
@@ -440,7 +510,16 @@ namespace Mono.TextEditor
 		
 		public string GetTextAt (int offset, int count)
 		{
-			return this.currentSnapshot.GetText(offset, count);
+			if (offset < 0)
+				throw new ArgumentException ("startOffset < 0");
+			if (offset > Length)
+				throw new ArgumentException ("startOffset > Length");
+			if (count < 0)
+				throw new ArgumentException ("count < 0");
+			if (offset + count > Length)
+				throw new ArgumentException ("offset + count is beyond EOF");
+
+			return buffer.ToString (offset, count);
 		}
 		
 		public string GetTextAt (DocumentRegion region)
@@ -476,17 +555,17 @@ namespace Mono.TextEditor
 		
 		public char GetCharAt (int offset)
 		{
-			return this.currentSnapshot[offset];
+			return buffer [offset];
 		}
 
 		public char GetCharAt (DocumentLocation location)
 		{
-			return this.currentSnapshot[LocationToOffset (location)];
+			return buffer [LocationToOffset (location)];
 		}
 
 		public char GetCharAt (int line, int column)
 		{
-			return this.currentSnapshot[LocationToOffset (line, column)];
+			return buffer [LocationToOffset (line, column)];
 		}
 
 		/// <summary>
@@ -498,62 +577,13 @@ namespace Mono.TextEditor
 		/// <returns>The first index where the character was found; or -1 if no occurrence was found.</returns>
 		public int IndexOf (char c, int startIndex, int count)
 		{
-			var snapshot = this.currentSnapshot;
-
-			for (int i = 0; (i < count); ++i)
-			{
-				if (snapshot[i + startIndex] == c)
-				{
-					return i + startIndex;
-				}
-			}
-
-			return -1;
+			// REPLACED by an old version...
+			return Text.IndexOf (c, startIndex, count);
 		}
 
-		/// <summary>
-		/// Gets the index of the first occurrence of the specified search text in this text source.
-		/// </summary>
-		/// <param name="searchText">The search text</param>
-		/// <param name="startIndex">Start index of the area to search.</param>
-		/// <param name="count">Length of the area to search.</param>
-		/// <param name="comparisonType">String comparison to use.</param>
-		/// <returns>The first index where the search term was found; or -1 if no occurrence was found.</returns>
-		public int IndexOf(string searchText, int startIndex, int count, StringComparison comparisonType)
-		{
-			//TODO do we really need to handle general StringComparison or should we hard code this only for Ordinal
-			// (where we use IndexOf(c, ...) to find possible matches first.
-			var snapshot = this.currentSnapshot;
-			if ((startIndex < 0) || (count < 0) || (startIndex + count > snapshot.Length))
-			{
-				throw new ArgumentOutOfRangeException(nameof(startIndex));
-			}
+	// REMOVED...
+	//	public int IndexOf(string searchText, int startIndex, int count, StringComparison comparisonType)
 
-			if ((count < 0) || (startIndex + count > snapshot.Length) || (startIndex + count < 0))
-			{
-				throw new ArgumentOutOfRangeException(nameof(count));
-			}
-
-			const int bufferSize = 4095;
-
-			int position = startIndex;
-			while (position < startIndex + count)
-			{
-				var end = System.Math.Min(position + bufferSize + searchText.Length, startIndex + count);
-				var text = snapshot.GetText(position, end - position);
-				var index = text.IndexOf(searchText, 0, text.Length, comparisonType);
-				if (index >= 0)
-				{
-					return position + index;
-				}
-
-				position += (bufferSize + 1);
-			}
-
-			return -1;
-		}
-
-#if false	//Do we need these?
 		/// <summary>
 		/// Gets the index of the first occurrence of any character in the specified array.
 		/// </summary>
@@ -607,49 +637,64 @@ namespace Mono.TextEditor
 		{
 			return Text.LastIndexOf (searchText, startIndex, count, comparisonType);
 		}
-#endif
+
+		protected virtual void OnTextReplaced (TextChangeEventArgs args)
+		{
+			if (TextChanged != null)
+				TextChanged (this, args);
+		}
 
 		public event EventHandler<TextChangeEventArgs> TextChanged;
+
+		protected virtual void OnTextReplacing (TextChangeEventArgs args)
+		{
+			if (TextChanging != null)
+				TextChanging (this, args);
+		}
+
 		public event EventHandler<TextChangeEventArgs> TextChanging;
 
-		public event EventHandler TextSet;
-		#endregion
+		protected virtual void OnTextSet (EventArgs e)
+		{
+			EventHandler handler = this.TextSet;
+			if (handler != null)
+				handler (this, e);
+		}
 
-		#region Line Splitter operations
+		public event EventHandler TextSet;
+
+#endregion
+
+#region Line Splitter operations
+
 		public IEnumerable<DocumentLine> Lines {
 			get {
-				return this.GetLinesStartingAt(1); }
+				return splitter.Lines;
+			}
 		}
 
 		public int LineCount {
 			get {
-				return this.currentSnapshot.LineCount;
+				return splitter.Count;
 			}
 		}
 
 		public IEnumerable<DocumentLine> GetLinesBetween (int startLine, int endLine)
 		{
-			var snapshot = this.currentSnapshot;
-
-			endLine = System.Math.Min(endLine, snapshot.LineCount);
-			for (int i = startLine; (i <= endLine); ++i)
-			{
-				yield return this.Get(i);
-			}
+			return splitter.GetLinesBetween (startLine, endLine);
 		}
 
 		public IEnumerable<DocumentLine> GetLinesStartingAt (int startLine)
 		{
-			return this.GetLinesBetween(startLine, int.MaxValue);
+			return splitter.GetLinesStartingAt (startLine);
 		}
 
 		public IEnumerable<DocumentLine> GetLinesReverseStartingAt (int startLine)
 		{
-			for (int i = startLine; (i >= 1); --i)
-			{
-				yield return this.Get(i);
-			}
+			return splitter.GetLinesReverseStartingAt (startLine);
 		}
+
+		// 20200703 tommih : the above method(s) from old, the next (LocationToOffset) can be a new one...
 
 		public int LocationToOffset (int line, int column)
 		{
@@ -691,7 +736,7 @@ namespace Mono.TextEditor
 			if (lineNumber < DocumentLocation.MinLine)
 				return null;
 			
-			return this.Get (lineNumber);
+			return splitter.Get (lineNumber);
 		}
 
 		IDocumentLine IReadonlyTextDocument.GetLine (int lineNumber)
@@ -699,27 +744,18 @@ namespace Mono.TextEditor
 			return GetLine (lineNumber);
 		}
 
-		DocumentLine cachedLine;
-		int cachedLineNumber = -1;
-		DocumentLine cachedLineFromLineNumber;
-
-		void ClearLineCache ()
-		{
-			cachedLine = null;
-			cachedLineNumber = -1;
-		}
+	//	DocumentLine cachedLine;
+	//	int cachedLineNumber = -1;
+	//	DocumentLine cachedLineFromLineNumber;
+	//	void ClearLineCache ()
+	//	{
+	//		cachedLine = null;
+	//		cachedLineNumber = -1;
+	//	}
 
 		public DocumentLine GetLineByOffset (int offset)
 		{
-			if (cachedLine?.Contains (offset) == true) {
-				return cachedLine;
-			}
-			var snapshot = this.currentSnapshot;
-
-			if (offset < 0 || offset > snapshot.Length)
-				return null;
-			var line = snapshot.GetLineFromPosition (offset);
-			return cachedLine = new DocumentLineFromTextSnapshotLine(line);
+			return splitter.GetLineByOffset (offset);
 		}
 
 		IDocumentLine IReadonlyTextDocument.GetLineByOffset (int offset)
@@ -729,24 +765,22 @@ namespace Mono.TextEditor
 
 		public int OffsetToLineNumber (int offset)
 		{
-			var snapshot = this.currentSnapshot;
-
-			if (offset < 0 || offset > snapshot.Length)
-				return 0;
-			return snapshot.GetLineFromPosition(offset).LineNumber + 1;
+			return splitter.OffsetToLineNumber (offset);
 		}
-		#endregion
 
-		#region Undo/Redo operations
+#endregion
+
+#region Undo/Redo operations
+
 		internal class UndoOperation
 		{
-			readonly int beforeVersionNumber;
-			readonly int afterVersionNumber;
-			Microsoft.VisualStudio.Text.INormalizedTextChangeCollection changes;
-
-			public virtual Microsoft.VisualStudio.Text.INormalizedTextChangeCollection Changes {
+// tommih 20200703 property name change "Changes" -> "Args" and revert the old type.
+// tommih 20200703 property name change "Changes" -> "Args" and revert the old type.
+// tommih 20200703 property name change "Changes" -> "Args" and revert the old type.
+			TextChangeEventArgs args;
+			public virtual TextChangeEventArgs Args {
 				get {
-					return changes;
+					return args;
 				}
 			}
 			
@@ -759,40 +793,35 @@ namespace Mono.TextEditor
 			{
 			}
 
-			public UndoOperation (Microsoft.VisualStudio.Text.TextContentChangedEventArgs args)
+			public UndoOperation (TextChangeEventArgs args)
 			{
-				this.beforeVersionNumber = args.BeforeVersion.VersionNumber;
-				this.afterVersionNumber = args.AfterVersion.VersionNumber;
-
-				this.changes = args.Changes;
+				this.args = args;
 			}
 
 			public virtual void Undo (TextDocument doc, bool fireEvent = true)
 			{
-				if (this.Changes.Count > 0) {
-					using (var edit = doc.TextBuffer.CreateEdit(Microsoft.VisualStudio.Text.EditOptions.None, this.beforeVersionNumber, typeof(Microsoft.VisualStudio.Text.BufferUndoManager.Implementation.TextBufferChangeUndoPrimitive))) {
-						foreach (var change in this.changes)
-							edit.Replace(change.NewPosition, change.NewLength, change.OldText);
+			//	var changes = new List<TextChange>();
+				var changes = new List<Microsoft.CodeAnalysis.Text.TextChange>();
+			//TODO	foreach (var change in args.TextChanges)
+			//TODO		changes.Add(new TextChange(change.NewOffset, change.InsertedText, change.RemovedText));
 
-						edit.Apply();
-					}
-				}
+Console.WriteLine( "TODO TextDocument.Undo not implemented!" );
 
+				doc.ApplyTextChanges(changes);
 				if (fireEvent)
 					OnUndoDone ();
 			}
 			
 			public virtual void Redo (TextDocument doc, bool fireEvent = true)
 			{
-				if (this.Changes.Count > 0) {
-					using (var edit = doc.TextBuffer.CreateEdit(Microsoft.VisualStudio.Text.EditOptions.None, this.afterVersionNumber, typeof(Microsoft.VisualStudio.Text.BufferUndoManager.Implementation.TextBufferChangeUndoPrimitive))) {
-						foreach (var change in this.changes)
-							edit.Replace(change.OldPosition, change.OldLength, change.NewText);
+			//	var changes = new List<TextChange>();
+				var changes = new List<Microsoft.CodeAnalysis.Text.TextChange>();
+			//TODO	foreach (var change in args.TextChanges.Reverse())
+			//TODO		changes.Add(new TextChange(change.Offset, change.RemovedText, change.InsertedText));
 
-						edit.Apply();
-					}
-				}
+Console.WriteLine( "TODO TextDocument.Redo not implemented!" );
 
+				doc.ApplyTextChanges(changes);
 				if (fireEvent)
 					OnRedoDone ();
 			}
@@ -829,7 +858,11 @@ namespace Mono.TextEditor
 				}
 			}
 
-			public virtual Microsoft.VisualStudio.Text.INormalizedTextChangeCollection Changes {
+// tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
+// tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
+// tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
+		//	public virtual Microsoft.VisualStudio.Text.INormalizedTextChangeCollection Changes {
+			public override TextChangeEventArgs Args {
 				get {
 					return null;
 				}
@@ -895,9 +928,13 @@ namespace Mono.TextEditor
 				}
 			}
 
-			public virtual Microsoft.VisualStudio.Text.INormalizedTextChangeCollection Changes {
+// tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
+// tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
+// tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
+		//	public virtual Microsoft.VisualStudio.Text.INormalizedTextChangeCollection Changes {
+			public override TextChangeEventArgs Args {
 				get {
-					return operations.Count > 0 ? operations [operations.Count - 1].Changes : null;
+					return operations.Count > 0 ? operations [operations.Count - 1].Args : null;
 				}
 			}
 		}
@@ -916,7 +953,8 @@ namespace Mono.TextEditor
 					op = ((AtomicUndoOperation)op).Operations.FirstOrDefault ();
 				if (op == null)
 					return -1;
-				return ((UndoOperation)op).Changes[0].OldPosition;
+			//	return ((UndoOperation)op).Changes[0].OldPosition;
+				return ((UndoOperation)op).Args.TextChanges.Select (c => c.Offset).Min ();
 			}
 		}
 
@@ -929,7 +967,8 @@ namespace Mono.TextEditor
 					op = ((AtomicUndoOperation)op).Operations.FirstOrDefault ();
 				if (op == null)
 					return -1;
-				return ((UndoOperation)op).Changes[0].NewPosition;
+			//	return ((UndoOperation)op).Changes[0].NewPosition;
+				return ((UndoOperation)op).Args.TextChanges.Select (c => c.Offset).Min ();
 			}
 		}
 
@@ -978,13 +1017,16 @@ namespace Mono.TextEditor
 		{
 			return diffTracker.GetLineState (line);
 		}
-		
-		
+
 		/// <summary>
 		/// Marks the document not dirty at this point (should be called after save).
 		/// </summary>
 		public void SetNotDirtyState ()
 		{
+			OptimizeTypedUndo ();
+			if (undoStack.Count > 0 && undoStack.Peek () is KeyboardStackUndo)
+				((KeyboardStackUndo)undoStack.Peek ()).IsClosed = true;
+
 			savePoint = undoStack.ToArray ();
 			this.CommitUpdateAll ();
 			DiffTracker.SetBaseDocument (CreateDocumentSnapshot ());
@@ -995,12 +1037,15 @@ namespace Mono.TextEditor
 			if (undoStack.Count == 0)
 				return;
 			UndoOperation top = undoStack.Pop ();
-			if (top.Changes == null || top.Changes.Count > 1) {
+		//	if (top.Changes == null || top.Changes.Count > 1) {
+			if (top.Args == null) {
 				undoStack.Push (top);
 				return;
 			}
-			foreach (var change in top.Changes) {
-				if (change.NewLength != 1 || (top is KeyboardStackUndo && ((KeyboardStackUndo)top).IsClosed)) {
+		//	foreach (var change in top.Changes) {
+		//		if (change.NewLength != 1 || (top is KeyboardStackUndo && ((KeyboardStackUndo)top).IsClosed)) {
+			foreach (var change in top.Args.TextChanges) {
+				if (change == null || change.InsertedText == null || change.InsertionLength != 1 || (top is KeyboardStackUndo && ((KeyboardStackUndo)top).IsClosed)) {
 					undoStack.Push (top);
 					continue;
 				}
@@ -1011,9 +1056,12 @@ namespace Mono.TextEditor
 					undoStack.Push (keyUndo);
 					keyUndo = new KeyboardStackUndo ();
 				}
-				if (keyUndo.Changes != null) {
-					foreach (var kchange in keyUndo.Changes) {
-						if (kchange.OldPosition + 1 != change.OldPosition || change.NewLength == 0 || !char.IsLetterOrDigit (change.NewText [0])) {
+			//	if (keyUndo.Changes != null) {
+			//		foreach (var kchange in keyUndo.Changes) {
+			//			if (kchange.OldPosition + 1 != change.OldPosition || change.NewLength == 0 || !char.IsLetterOrDigit (change.NewText [0])) {
+				if (keyUndo.Args != null) {
+					foreach (var kchange in keyUndo.Args.TextChanges) {
+						if (kchange.Offset + 1 != change.Offset || !char.IsLetterOrDigit (change.InsertedText [0])) {
 							keyUndo.IsClosed = true;
 							undoStack.Push (keyUndo);
 							keyUndo = new KeyboardStackUndo ();
@@ -1235,6 +1283,7 @@ namespace Mono.TextEditor
 		
 		public event EventHandler                         BeginUndo;
 		public event EventHandler<UndoOperationEventArgs> EndUndo;
+
 #endregion
 		
 #region Folding
@@ -1523,6 +1572,7 @@ namespace Mono.TextEditor
 		}
 
 		public event EventHandler<FoldSegmentEventArgs> Folded;
+
 #endregion
 
 #region Text line markers
@@ -1795,8 +1845,33 @@ namespace Mono.TextEditor
 			return wasRemoved;
 		}
 
-		#endregion
+#endregion
 
+		void HandleSplitterLineSegmentTreeLineRemoved (object sender, TextChangeEventArgs e)
+		{
+			for (int i = 0; i < e.TextChanges.Count; ++i) {
+				var change = e.TextChanges[i];
+				var line = GetLineByOffset (change.Offset);
+				if (line == null)
+					continue;
+				var endOffset = change.Offset + change.RemovalLength;
+				var offset = line.Offset;
+				do {
+					foreach (TextLineMarker marker in GetMarkers (line)) {
+						if (marker is IExtendingTextLineMarker) {
+						//	UnRegisterVirtualTextMarker ((IExtendingTextLineMarker)marker); // old code, virtual markers not added anymore...
+							lock (extendingTextMarkers) {
+								extendingTextMarkers.Remove (marker);
+								OnHeightChanged (EventArgs.Empty);
+							}
+						}
+					}
+					offset += line.LengthIncludingDelimiter;
+					line = line.NextLine;
+				} while (line != null && offset < endOffset);
+			}
+		}
+		
 		public bool Contains (int offset)
 		{
 			return new TextSegment (0, Length).Contains (offset);
@@ -1806,9 +1881,9 @@ namespace Mono.TextEditor
 		{
 			return new TextSegment (0, Length).Contains (segment);
 		}
-		
-		
+
 #region Update logic
+
 		List<DocumentUpdateRequest> updateRequests = new List<DocumentUpdateRequest> ();
 		
 		public IEnumerable<DocumentUpdateRequest> UpdateRequests {
@@ -1874,9 +1949,11 @@ namespace Mono.TextEditor
 		}
 		
 		public event EventHandler DocumentUpdated;
+
 #endregion
 
 #region Helper functions
+
 		public const string openBrackets    = "([{<";
 		public const string closingBrackets = ")]}>";
 		
@@ -1914,10 +1991,8 @@ namespace Mono.TextEditor
 			IdentifierPart
 
 		}
-		
 
 		public static CharacterClass GetCharacterClass (char ch)
-
 		{
 			if (Char.IsWhiteSpace (ch))
 				return CharacterClass.Whitespace;
@@ -1925,7 +2000,6 @@ namespace Mono.TextEditor
 				return CharacterClass.IdentifierPart;
 
 			return CharacterClass.Unknown;
-
 		}
 		
 		public static void RemoveTrailingWhitespaces (TextEditorData data, DocumentLine line)
@@ -1946,6 +2020,7 @@ namespace Mono.TextEditor
 				data.Remove (removeOffset, whitespaces);
 			}
 		}
+
 #endregion
 
 		public bool IsInUndo {
@@ -1956,13 +2031,12 @@ namespace Mono.TextEditor
 		
 #region Diff
 
-
 		int[] GetDiffCodes (ref int codeCounter, Dictionary<string, int> codeDictionary, bool includeEol)
 		{
 			int i = 0;
 			var result = new int[LineCount];
 			foreach (DocumentLine line in Lines) {
-				string lineText = this.GetTextAt (line.Offset, includeEol ? line.LengthIncludingDelimiter : line.Length);
+				string lineText = buffer.ToString (line.Offset, includeEol ? line.LengthIncludingDelimiter : line.Length);
 				int curCode;
 				if (!codeDictionary.TryGetValue (lineText, out curCode)) {
 					codeDictionary[lineText] = curCode = ++codeCounter;
@@ -1980,11 +2054,11 @@ namespace Mono.TextEditor
 			return Mono.TextEditor.Utils.Diff.GetDiff<int> (this.GetDiffCodes (ref codeCounter, codeDictionary, includeEol),
 				changedDocument.GetDiffCodes (ref codeCounter, codeDictionary, includeEol));
 		}
+
 #endregion
 
-		
+#region ContentLoaded
 
-#region ContentLoaded 
 		// The problem: Action to perform on a newly opened text editor, but content didn't get loaded because autosave file exist.
 		//              At this point the document is open, but the content didn't yet have loaded - therefore the action on the conent can't be perfomed.
 		// Solution: Perform the action after the user did choose load autosave or not. 
@@ -2054,25 +2128,24 @@ namespace Mono.TextEditor
 			}
 			realizedActions.Add (action);
 		}
+
 #endregion
 
 #region ITextSource implementation
 
 		public System.IO.TextReader CreateReader ()
 		{
-			var snapshot = this.currentSnapshot;
-			return new SnapshotSpanToTextReader(new Microsoft.VisualStudio.Text.SnapshotSpan(snapshot, 0, snapshot.Length));
+			return new ImmutableTextTextReader (buffer);
 		}
 
 		public System.IO.TextReader CreateReader (int offset, int length)
 		{
-			var snapshot = this.currentSnapshot;
-			return new SnapshotSpanToTextReader(new Microsoft.VisualStudio.Text.SnapshotSpan(snapshot, offset, length));
+			return new ImmutableTextTextReader(buffer.GetText(offset, length));
 		}
 
 		public virtual ITextSourceVersion Version {
 			get {
-				return new TextVersionToTextSourceVersion(this.currentSnapshot.Version);
+				return versionProvider.CurrentVersion;
 			}
 		}
 
@@ -2085,27 +2158,66 @@ namespace Mono.TextEditor
 			}
 		}
 
+		internal class SnapshotDocument : TextDocument
+		{
+			readonly ITextSourceVersion version;
+			public override ITextSourceVersion Version  {
+				get {
+					return version;
+				}
+			}
+
+		//	public SnapshotDocument (TextDocument doc) : base (doc.useBOM, doc.encoding, doc.fileName, CreateBufferFromTextDocument(doc))
+		//	public SnapshotDocument (TextDocument doc) : base (doc.UseBOM, doc.Encoding, doc.fileName, doc.buffer, new LazyLineSplitter (doc.LineCount))
+			public SnapshotDocument (TextDocument doc) : base (doc.buffer.ToString(), new LazyLineSplitter (doc.LineCount))
+			{
+Console.WriteLine( "SnapshotDocument ctor" );
+				this.version = doc.Version;
+				((LazyLineSplitter)splitter).src = this;
+				fileName = doc.fileName;
+				Encoding = doc.Encoding;
+				mimeType = doc.mimeType;
+
+				IsReadOnly = true;
+			}
+		}
+
+		public TextDocument CreateDocumentSnapshot ()
+		{
+			return new SnapshotDocument (this);
+		}
+
 		public void CopyTo (int sourceIndex, char [] destination, int destinationIndex, int count)
 		{
-			var snapshot = this.currentSnapshot;
-			this.currentSnapshot.CopyTo(sourceIndex, destination, destinationIndex, count);
+			buffer.CopyTo (sourceIndex, destination, destinationIndex, count); 
+		}
+
+		public ImmutableText GetImmutableText ()
+		{
+			return buffer;
+		}
+
+		public ImmutableText GetImmutableText (int offset, int count)
+		{
+			return buffer.GetText (offset, count);
 		}
 
 		ITextSource ITextSource.CreateSnapshot ()
 		{
-			var snapshot = this.currentSnapshot;
-			return new SnapshotSpanToTextSource(this.Encoding, new Microsoft.VisualStudio.Text.SnapshotSpan(snapshot, 0, snapshot.Length));
+			return GetImmutableText ();
 		}
 
 		ITextSource ITextSource.CreateSnapshot (int offset, int length)
 		{
-			var snapshot = this.currentSnapshot;
-			return new SnapshotSpanToTextSource(this.Encoding, new Microsoft.VisualStudio.Text.SnapshotSpan(snapshot, offset, length));
+			return GetImmutableText (offset, length);
 		}
 
-		public IReadonlyTextDocument CreateDocumentSnapshot ()
+// 20200703 tommih :: the method below is kind-of-duplicate to CreateDocumentSnapshot().
+// required by ITextDocument (or similar), cannot have "public" definition.
+
+		IReadonlyTextDocument ITextDocument.CreateDocumentSnapshot ()
 		{
-			return new SnapshotToReadonlyTextDocument(this.FileName, this.MimeType, this.Encoding, this.currentSnapshot);
+			return CreateDocumentSnapshot ();
 		}
 
 		public void WriteTextTo (TextWriter writer)
@@ -2131,470 +2243,14 @@ namespace Mono.TextEditor
 
 		internal event EventHandler HeightChanged;
 
-		private DocumentLine Get(int number)
-		{
-			if (cachedLineNumber == number)
-				return cachedLineFromLineNumber;
-			var snapshot = this.currentSnapshot;
-			int snapshotLineNumber = number - 1;
-			if (snapshotLineNumber < 0 || snapshotLineNumber >= snapshot.LineCount)
-				return null;
-			cachedLineNumber = number;
-			return cachedLineFromLineNumber = new DocumentLineFromTextSnapshotLine(snapshot.GetLineFromLineNumber(snapshotLineNumber));
-		}
+	// REMOVED...
+	//	private DocumentLine Get(int number)
+	//	internal sealed class DocumentLineFromTextSnapshotLine : DocumentLine
+	//	class SnapshotToReadonlyTextDocument : SnapshotSpanToTextSource, IReadonlyTextDocument
+	//	class SnapshotSpanToTextSource : ITextSource
+	//	sealed class SnapshotSpanToTextReader : TextReader
+	//	public class TextVersionToTextSourceVersion : ITextSourceVersion
 
-		internal sealed class DocumentLineFromTextSnapshotLine : DocumentLine
-		{
-			public Microsoft.VisualStudio.Text.ITextSnapshotLine Line { get; }
-
-			public override int Offset
-			{
-				get { return this.Line.Start; }
-				set
-				{
-
-				}
-			}
-
-			public override int LineNumber
-			{
-				get
-				{
-					return this.Line.LineNumber + 1;
-				}
-			}
-				   
-			public override DocumentLine NextLine
-			{
-				get
-				{
-					int newLineNumber = this.Line.LineNumber + 1;
-					return (newLineNumber < this.Line.Snapshot.LineCount) ? new DocumentLineFromTextSnapshotLine(this.Line.Snapshot.GetLineFromLineNumber(newLineNumber)) : null;
-				}
-			}
-
-			public override DocumentLine PreviousLine
-			{
-				get
-				{
-					int newLineNumber = this.Line.LineNumber - 1;
-					return (newLineNumber >= 0) ? new DocumentLineFromTextSnapshotLine(this.Line.Snapshot.GetLineFromLineNumber(newLineNumber)) : null;
-				}
-			}
-
-			public DocumentLineFromTextSnapshotLine(Microsoft.VisualStudio.Text.ITextSnapshotLine line) : base(line.LengthIncludingLineBreak, DocumentLineFromTextSnapshotLine.LineCode(line))
-			{
-				this.Line = line;
-			}
-
-			public override string ToString()
-			{
-				return string.Format("[LineSegment: lineNumber={0}, Offset={1}]", this.Line.LineNumber, this.Line.Start.Position);
-			}
-
-			private static UnicodeNewline LineCode(Microsoft.VisualStudio.Text.ITextSnapshotLine line)
-			{
-				if (line.LineBreakLength == 2)
-				{
-					return UnicodeNewline.CRLF;
-				}
-				else if (line.LineBreakLength == 0)
-				{
-					return UnicodeNewline.Unknown;
-				}
-				else
-				{
-					switch(line.Snapshot[line.End])
-					{
-						case '\u000A': return UnicodeNewline.LF;
-						//case '\u000B': return UnicodeNewline.VT; // Not recognized by VS
-						//case '\u000C': return UnicodeNewline.FF; // Not recognized by VS
-
-						case '\u000D': return UnicodeNewline.CR;
-						case '\u0085': return UnicodeNewline.NEL;
-						case '\u2028': return UnicodeNewline.LS;
-						case '\u2029': return UnicodeNewline.PS;
-						default: return UnicodeNewline.Unknown;
-					}
-				}
-			}
-
-			public override int GetHashCode()
-			{
-				return this.Line.Snapshot.GetHashCode() ^ this.Line.LineNumber;
-			}
-
-			public override bool Equals(object other)
-			{
-				var otherLine = other as DocumentLineFromTextSnapshotLine;
-				return (otherLine != null) && (otherLine.Line.Snapshot == this.Line.Snapshot) && (otherLine.Line.LineNumber == this.Line.LineNumber);
-			}
-		}
-
-		class SnapshotToReadonlyTextDocument : SnapshotSpanToTextSource, IReadonlyTextDocument
-		{
-			public SnapshotToReadonlyTextDocument(string fileName, string mimeType, Encoding encoding, Microsoft.VisualStudio.Text.ITextSnapshot snapshot)
-				: base(encoding, new Microsoft.VisualStudio.Text.SnapshotSpan(snapshot, 0, snapshot.Length))
-			{
-				this.FileName = fileName;
-				this.MimeType = mimeType;
-			}
-
-			public bool IsReadOnly { get { return true; } }
-
-			public FilePath FileName { get; }
-
-			public string MimeType { get; }
-
-			public int LineCount { get { return this.Span.Snapshot.LineCount; } }
-
-			public int LocationToOffset (int line, int column)
-			{
-				if (line > this.LineCount || line < DocumentLocation.MinLine)
-					return -1;
-				IDocumentLine documentLine = GetLine (line);
-				return System.Math.Min (Length, documentLine.Offset + System.Math.Max (0, System.Math.Min (documentLine.Length, column - 1)));
-			}
-
-			public DocumentLocation OffsetToLocation(int offset)
-			{
-				IDocumentLine line = this.GetLineByOffset(offset);
-				if (line == null)
-					return DocumentLocation.Empty;
-
-				var col = System.Math.Max(1, System.Math.Min(line.LengthIncludingDelimiter, offset - line.Offset) + 1);
-				return new DocumentLocation(line.LineNumber, col);
-			}
-
-			public IDocumentLine GetLine(int lineNumber)
-			{
-				var snapshot = this.Span.Snapshot;
-				int snapshotLineNumber = lineNumber - 1;
-				if (snapshotLineNumber < 0 || snapshotLineNumber >= snapshot.LineCount)
-					return null;
-
-				return new DocumentLineFromTextSnapshotLine(snapshot.GetLineFromLineNumber(snapshotLineNumber));
-			}
-
-			public IDocumentLine GetLineByOffset(int offset)
-			{
-				var snapshot = this.Span.Snapshot;
-				if (offset < 0 || offset > snapshot.Length)
-					return null;
-
-				var line = snapshot.GetLineFromPosition(offset);
-				return new DocumentLineFromTextSnapshotLine(line);
-			}
-		}
-
-		class SnapshotSpanToTextSource : ITextSource
-		{
-			protected readonly Microsoft.VisualStudio.Text.SnapshotSpan Span;
-
-			public SnapshotSpanToTextSource(Encoding encoding, Microsoft.VisualStudio.Text.SnapshotSpan span)
-			{
-				this.Encoding = encoding;
-				this.Span = span;
-			}
-
-			public ITextSourceVersion Version { get { return null; } }
-
-			/// <summary>
-			/// Encoding of the text that was read from or is going to be saved to.
-			/// </summary>
-			public Encoding Encoding { get; }
-
-			/// <summary>
-			/// Gets the total text length.
-			/// </summary>
-			/// <returns>The length of the text, in characters.</returns>
-			/// <remarks>This is the same as Text.Length, but is more efficient because
-			///  it doesn't require creating a String object.</remarks>
-			public int Length { get { return this.Span.Length; } }
-
-			/// <summary>
-			/// Gets the whole text as string.
-			/// </summary>
-			[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods")]
-			public string Text { get { return this.Span.GetText(); } }
-
-			/// <summary>
-			/// Gets a character at the specified position in the document.
-			/// </summary>
-			/// <paramref name="offset">The index of the character to get.</paramref>
-			/// <exception cref="ArgumentOutOfRangeException">Offset is outside the valid range (0 to TextLength-1).</exception>
-			/// <returns>The character at the specified position.</returns>
-			/// <remarks>This is the same as Text[offset], but is more efficient because
-			///  it doesn't require creating a String object.</remarks>
-			public char this[int offset] { get { return this.Span.Snapshot[offset + this.Span.Start.Position]; } }
-
-			/// <summary>
-			/// Gets a character at the specified position in the document.
-			/// </summary>
-			/// <paramref name="offset">The index of the character to get.</paramref>
-			/// <exception cref="ArgumentOutOfRangeException">Offset is outside the valid range (0 to TextLength-1).</exception>
-			/// <returns>The character at the specified position.</returns>
-			/// <remarks>This is the same as Text[offset], but is more efficient because
-			///  it doesn't require creating a String object.</remarks>
-			public char GetCharAt(int offset) { return this.Span.Snapshot[offset + this.Span.Start.Position]; }
-
-			/// <summary>
-			/// Retrieves the text for a portion of the document.
-			/// </summary>
-			/// <exception cref="ArgumentOutOfRangeException">offset or length is outside the valid range.</exception>
-			/// <remarks>This is the same as Text.Substring, but is more efficient because
-			///  it doesn't require creating a String object for the whole document.</remarks>
-			public string GetTextAt(int offset, int length) { return this.Span.Snapshot.GetText(offset + this.Span.Start.Position, length); }
-
-			/// <summary>
-			/// Creates a new TextReader to read from this text source.
-			/// </summary>
-			public TextReader CreateReader() { return new Microsoft.VisualStudio.Platform.NewTextSnapshotToTextReader(this.Span.Snapshot, this.Span.Start, this.Span.Length); }
-
-			/// <summary>
-			/// Creates a new TextReader to read from this text source.
-			/// </summary>
-			public TextReader CreateReader(int offset, int length)
-			{
-				if ((offset < 0) || (offset > this.Length))
-					throw new ArgumentOutOfRangeException("offset");
-				int end = offset + length;
-				if ((end < offset) || (end > this.Length))
-					throw new ArgumentOutOfRangeException("length");
-
-				return new Microsoft.VisualStudio.Platform.NewTextSnapshotToTextReader(this.Span.Snapshot, this.Span.Start + offset, length);
-			}
-
-			/// <summary>
-			/// Writes the text from this document into the TextWriter.
-			/// </summary>
-			public void WriteTextTo(TextWriter writer)
-			{
-				this.WriteTextTo(writer, 0, this.Span.Length);
-			}
-
-			/// <summary>
-			/// Writes the text from this document into the TextWriter.
-			/// </summary>
-			public void WriteTextTo(TextWriter writer, int offset, int length)
-			{
-				this.Span.Snapshot.Write(writer, new Microsoft.VisualStudio.Text.Span(this.Span.Start.Position + offset, length));
-			}
-
-			/// <summary>
-			/// Copies text from the source index to a destination array at destinationIndex.
-			/// </summary>
-			/// <param name="sourceIndex">The start offset copied from.</param>
-			/// <param name="destination">The destination array copied to.</param>
-			/// <param name="destinationIndex">The destination index copied to.</param>
-			/// <param name="count">The number of characters to be copied.</param>
-			public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
-			{
-				this.Span.Snapshot.CopyTo(this.Span.Start.Position + sourceIndex, destination, destinationIndex, count);
-			}
-
-			/// <summary>
-			/// Creates an immutable snapshot of this text source.
-			/// Unlike all other methods in this interface, this method is thread-safe.
-			/// </summary>
-			public ITextSource CreateSnapshot() { return this; }
-
-			/// <summary>
-			/// Creates an immutable snapshot of a part of this text source.
-			/// Unlike all other methods in this interface, this method is thread-safe.
-			/// </summary>
-			public ITextSource CreateSnapshot(int offset, int length)
-			{
-				return new SnapshotSpanToTextSource(this.Encoding, new Microsoft.VisualStudio.Text.SnapshotSpan(this.Span.Snapshot, this.Span.Start.Position + offset, length));
-			}
-		}
-
-		sealed class SnapshotSpanToTextReader : TextReader
-		{
-			private readonly Microsoft.VisualStudio.Text.SnapshotSpan span;
-			private int currentPosition;
-			public SnapshotSpanToTextReader(Microsoft.VisualStudio.Text.SnapshotSpan span)
-			{
-				this.span = span;
-			}
-
-			public override int Peek()
-			{
-				if (currentPosition >= this.span.Length)
-					return -1;
-				return this.span.Snapshot[this.span.Start.Position + currentPosition];
-			}
-
-			public override int Read()
-			{
-				if (currentPosition >= this.span.Length)
-					return -1;
-				return this.span.Snapshot[this.span.Start.Position + currentPosition++];
-			}
-
-			public override int Read (char[] buffer, int index, int count) {
-				if (currentPosition == -1)
-					throw new ObjectDisposedException("SnapshotSpanToTextReader");
-				if (buffer == null)
-					throw new ArgumentNullException("buffer");
-				if (index < 0)
-					throw new ArgumentOutOfRangeException("index");
-				if (count < 0)
-					throw new ArgumentOutOfRangeException("count");
-				if (((index + count) < 0) || ((index + count) > buffer.Length))
-					throw new ArgumentOutOfRangeException("count");
-
-				int charactersToRead = System.Math.Min(this.span.Length - currentPosition, count);
-				this.span.Snapshot.CopyTo(this.span.Start.Position + currentPosition, buffer, index, charactersToRead);
-				currentPosition += charactersToRead;
-
-				return charactersToRead;
-			}
-
-			public override int ReadBlock (char[] buffer, int index, int count) {
-				return Read(buffer, index, count);
-			}
-
-			public override string ReadLine () {
-				if (currentPosition == -1)
-					throw new ObjectDisposedException("TextSnapshotToTextReader");
-
-				if (currentPosition >= this.span.Length)
-					return null;
-
-				int position = this.span.Start.Position + currentPosition;
-				var line = this.span.Snapshot.GetLineFromPosition(position);
-				int end = System.Math.Min(line.End.Position, this.span.End.Position);
-
-				//Handle the case where the current position is between a \r\n without crashing (but returning an empty string instead).
-				string text = (end > position)
-							  ? this.span.Snapshot.GetText(position, end - position)
-							  : string.Empty;
-
-				currentPosition = System.Math.Min(line.EndIncludingLineBreak.Position, this.span.End.Position) - this.span.Start.Position;
-
-				return text;
-			}
-
-			public override string ReadToEnd () {
-				if (currentPosition == -1)
-					throw new ObjectDisposedException("TextSnapshotToTextReader");
-
-				string text = this.span.Snapshot.GetText(this.span.Start.Position + currentPosition, this.span.Length - currentPosition);
-				currentPosition = this.span.Length;
-
-				return text;
-			}
-
-			public override void Close () {
-				currentPosition = -1;
-				base.Close();
-			}
-
-			protected override void Dispose (bool disposing) {
-				currentPosition = -1;
-				base.Dispose(disposing);
-			}
-		}
-
-		public class TextVersionToTextSourceVersion : ITextSourceVersion
-		{
-			private readonly Microsoft.VisualStudio.Text.ITextVersion version;
-
-			public TextVersionToTextSourceVersion(Microsoft.VisualStudio.Text.ITextVersion version)
-			{
-				this.version = version;
-			}
-
-			public bool BelongsToSameDocumentAs(ITextSourceVersion other)
-			{
-				return (other as TextVersionToTextSourceVersion)?.version.TextBuffer == this.version.TextBuffer;
-			}
-
-			public int CompareAge(ITextSourceVersion other)
-			{
-				var otherVersion = other as TextVersionToTextSourceVersion;
-				if (otherVersion?.version.TextBuffer != this.version.TextBuffer)
-				{
-					throw new ArgumentException(nameof(other) + " is from a different document");
-				}
-
-				int cmp = this.version.VersionNumber - otherVersion.version.VersionNumber;
-				return (cmp > 0) ? 1 : ((cmp == 0) ? 0 : -1);
-			}
-
-			/// <summary>
-			/// Gets the changes from this checkpoint to the other checkpoint.
-			/// If 'other' is older than this checkpoint, reverse changes are calculated.
-			/// </summary>
-			/// <remarks>This method is thread-safe.</remarks>
-			/// <exception cref="System.ArgumentException">Raised if 'other' belongs to a different document than this checkpoint.</exception>
-			public IEnumerable<TextChangeEventArgs> GetChangesTo(ITextSourceVersion other)
-			{
-				var otherVersion = other as TextVersionToTextSourceVersion;
-				if (otherVersion?.version.TextBuffer != this.version.TextBuffer)
-				{
-					throw new ArgumentException(nameof(other) + " is from a different document");
-				}
-
-				int cmp = this.version.VersionNumber - otherVersion.version.VersionNumber;
-				if (cmp == 0)
-					yield break;
-				if (cmp > 0)
-				{
-					var v = otherVersion.version;
-					while (v != this.version)
-					{
-						if (v.Changes != null)
-						{
-							for (int i = v.Changes.Count - 1; (i >= 0); --i)
-							{
-								var change = v.Changes[i];
-								yield return new TextChangeEventArgs(change.OldPosition, change.NewPosition, change.OldText, change.NewText);
-							}
-						}
-
-						v = v.Next;
-					}
-				}
-				else
-				{
-					// Calculate the changes from the (older) this to the (newer) other & return in reverse order.
-					var changes = new List<TextChangeEventArgs>(other.GetChangesTo(this));
-					for (int i = changes.Count - 1; (i >= 0); --i)
-					{
-						yield return changes[i];
-					}
-				}
-			}
-
-			/// <summary>
-			/// Calculates where the offset has moved in the other buffer version.
-			/// </summary>
-			/// <exception cref="System.ArgumentException">Raised if 'other' belongs to a different document than this checkpoint.</exception>
-			public int MoveOffsetTo(ITextSourceVersion other, int oldOffset)
-			{
-				var otherVersion = other as TextVersionToTextSourceVersion;
-				if (otherVersion?.version.TextBuffer != this.version.TextBuffer)
-					throw new ArgumentException(nameof(other) + " is from a different document");
-				
-				int cmp = this.version.VersionNumber - otherVersion.version.VersionNumber;
-				if (cmp == 0)
-					return oldOffset;
-
-				int result;
-				if (cmp > 0) {
-					result = Microsoft.VisualStudio.Text.Tracking.TrackPositionBackwardInTime (Microsoft.VisualStudio.Text.PointTrackingMode.Positive,
-																		oldOffset,
-																		this.version, otherVersion.version);
-				} else {
-					result = Microsoft.VisualStudio.Text.Tracking.TrackPositionForwardInTime(Microsoft.VisualStudio.Text.PointTrackingMode.Positive,
-																	   oldOffset,
-																	   this.version, otherVersion.version);
-				}
-				return result;
-			}
-		}
 	}
 
 	delegate bool ReadOnlyCheckDelegate (int line);
