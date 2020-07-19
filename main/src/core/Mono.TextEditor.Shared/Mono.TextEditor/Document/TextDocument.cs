@@ -298,6 +298,7 @@ Console.WriteLine( "Text setter called" );
 				buffer.Version = Version;
 				OnTextSet (EventArgs.Empty);
 				CommitUpdateAll ();
+
 				ClearUndoBuffer ();
 			}
 		}
@@ -382,31 +383,69 @@ if ( args.TextChanges.Count != 1 ) throw new InvalidOperationException("args.Tex
 				OnEndUndo (new UndoOperationEventArgs (operation));
 		}
 
-		// tommih 20200617 : some new methods here, not implemented yet...
-
-		public void ApplyTextChanges (IEnumerable<MonoDevelop.Core.Text.TextChange> changes)
+		// this is an old version, used only for undo/redo operations...
+		public void ApplyTextChanges_old (IEnumerable<MonoDevelop.Core.Text.TextChange> changes)
 		{
-Console.WriteLine( "TextDocument.ApplyTextChanges() 1 not implemented!" );
-throw new NotImplementedException();
-		/*	if (changes == null)
+			if (changes == null)
 				throw new ArgumentNullException (nameof (changes));
 
-			var edit = this.TextBuffer.CreateEdit ();
 			foreach (var change in changes)
-				edit.Replace (change.Offset, change.RemovalLength, change.InsertedText.Text);
-			edit.Apply ();	*/
+			{
+				int start = change.Offset;
+				int length = change.RemovalLength;
+
+				string oldtext = GetTextAt (start, length);
+
+				string newtext = change.InsertedText.Text;
+				if ( newtext == null ) newtext = "";
+
+				Console.WriteLine ("TextDocument.ApplyTextChanges_old() :: s=" + start + " l=" + length + " ot='" + oldtext + "' nt='" + newtext + "' l2=" + newtext.Length);
+
+				if ( newtext.Length < 1 ) newtext = null;
+				ReplaceText (start, length, newtext);
+			}
 		}
 
-		public void ApplyTextChanges(IEnumerable<Microsoft.CodeAnalysis.Text.TextChange> changes)
+		public void ApplyTextChanges (IEnumerable<Microsoft.CodeAnalysis.Text.TextChange> changes)
 		{
-Console.WriteLine( "TextDocument.ApplyTextChanges() 2 not implemented!" );
-throw new NotImplementedException();
-		/*	if (changes == null)
+
+Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
+
+			if (changes == null)
 				throw new ArgumentNullException(nameof(changes));
-			var edit = this.TextBuffer.CreateEdit();
-			foreach (var change in changes)
-				edit.Replace(change.Span.Start, change.Span.Length, change.NewText);
-			edit.Apply();	*/
+
+			// apply the changes in reverse order, to keep the positions from begin corrupted.
+			// TODO is "changes" always ordered like this? ever need to sort it???
+
+			int? prevStart = null;
+			foreach (var change in changes.Reverse())
+			{
+				int start = change.Span.Start;
+				int length = change.Span.Length;
+
+				if ( prevStart.HasValue && start >= prevStart.Value ) {
+					Console.WriteLine( "TextDocument.ApplyTextChanges() changes has BAD ordering : prevStart=" + prevStart.Value + " start=" + start );
+				}
+
+				prevStart = start;
+				string oldtext = GetTextAt (start, length);
+
+				string newtext = change.NewText;
+				if ( newtext == null ) newtext = "";
+
+				Console.WriteLine ("TextDocument.ApplyTextChanges() :: s=" + start + " l=" + length + " ot='" + oldtext + "' nt='" + newtext + "' l2=" + newtext.Length);
+
+			/*	if (length > 0) {	// this works but requires 2 operations...
+					RemoveText (start, length);
+				}
+
+				if (newtext.Length > 0) {
+					InsertText (start, newtext);
+				}	*/
+
+				if ( newtext.Length < 1 ) newtext = null;
+				ReplaceText (start, length, newtext);
+			}
 		}
 
 		public string GetTextBetween (int startOffset, int endOffset)
@@ -642,6 +681,7 @@ throw new NotImplementedException();
 			int lineNr = this.OffsetToLineNumber (offset);
 			if (lineNr < DocumentLocation.MinLine)
 				return DocumentLocation.Empty;
+
 			DocumentLine line = GetLine (lineNr);
 			var col = System.Math.Max (1, System.Math.Min (line.LengthIncludingDelimiter, offset - line.Offset) + 1);
 			return new DocumentLocation (lineNr, col);
@@ -720,7 +760,8 @@ throw new NotImplementedException();
 				foreach (var change in args.TextChanges)
 					changes.Add(new TextChange(change.NewOffset, change.InsertedText, change.RemovedText));
 
-				doc.ApplyTextChanges(changes);
+				doc.ApplyTextChanges_old(changes);
+
 				if (fireEvent)
 					OnUndoDone ();
 			}
@@ -731,7 +772,8 @@ throw new NotImplementedException();
 				foreach (var change in args.TextChanges.Reverse())
 					changes.Add(new TextChange(change.Offset, change.RemovedText, change.InsertedText));
 
-				doc.ApplyTextChanges(changes);
+				doc.ApplyTextChanges_old(changes);
+
 				if (fireEvent)
 					OnRedoDone ();
 			}
