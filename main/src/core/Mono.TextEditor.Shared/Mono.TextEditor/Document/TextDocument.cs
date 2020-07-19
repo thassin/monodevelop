@@ -346,6 +346,7 @@ Console.WriteLine( "Text setter called" );
 				buffer.Version = Version;
 				OnTextSet (EventArgs.Empty);
 				CommitUpdateAll ();
+
 				ClearUndoBuffer ();
 
 				IsReadOnly = tmp;
@@ -435,6 +436,29 @@ if ( args.TextChanges.Count != 1 ) throw new InvalidOperationException("args.Tex
 				OnEndUndo (new UndoOperationEventArgs (operation));
 		}
 
+		// this is an old version, used only for undo/redo operations...
+		public void ApplyTextChanges_old (IEnumerable<MonoDevelop.Core.Text.TextChange> changes)
+		{
+			if (changes == null)
+				throw new ArgumentNullException (nameof (changes));
+
+			foreach (var change in changes)
+			{
+				int start = change.Offset;
+				int length = change.RemovalLength;
+
+				string oldtext = GetTextAt (start, length);
+
+				string newtext = change.InsertedText.Text;
+				if ( newtext == null ) newtext = "";
+
+				Console.WriteLine ("TextDocument.ApplyTextChanges_old() :: s=" + start + " l=" + length + " ot='" + oldtext + "' nt='" + newtext + "' l2=" + newtext.Length);
+
+				if ( newtext.Length < 1 ) newtext = null;
+				ReplaceText (start, length, newtext);
+			}
+		}
+
 		public void ApplyTextChanges (IEnumerable<Microsoft.CodeAnalysis.Text.TextChange> changes)
 		{
 
@@ -473,7 +497,7 @@ Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
 				}	*/
 
 				if ( newtext.Length < 1 ) newtext = null;
-				ReplaceText(start, length, newtext);
+				ReplaceText (start, length, newtext);
 			}
 		}
 
@@ -723,6 +747,7 @@ Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
 			int lineNr = this.OffsetToLineNumber (offset);
 			if (lineNr < DocumentLocation.MinLine)
 				return DocumentLocation.Empty;
+
 			DocumentLine line = GetLine (lineNr);
 			var col = System.Math.Max (1, System.Math.Min (line.LengthIncludingDelimiter, offset - line.Offset) + 1);
 			return new DocumentLocation (lineNr, col);
@@ -809,28 +834,24 @@ Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
 
 			public virtual void Undo (TextDocument doc, bool fireEvent = true)
 			{
-			//	var changes = new List<TextChange>();
-				var changes = new List<Microsoft.CodeAnalysis.Text.TextChange>();
-			//TODO	foreach (var change in args.TextChanges)
-			//TODO		changes.Add(new TextChange(change.NewOffset, change.InsertedText, change.RemovedText));
+				var changes = new List<TextChange>();
+				foreach (var change in args.TextChanges)
+					changes.Add(new TextChange(change.NewOffset, change.InsertedText, change.RemovedText));
 
-Console.WriteLine( "TODO TextDocument.Undo not implemented!" );
+				doc.ApplyTextChanges_old(changes);
 
-				doc.ApplyTextChanges(changes);
 				if (fireEvent)
 					OnUndoDone ();
 			}
 			
 			public virtual void Redo (TextDocument doc, bool fireEvent = true)
 			{
-			//	var changes = new List<TextChange>();
-				var changes = new List<Microsoft.CodeAnalysis.Text.TextChange>();
-			//TODO	foreach (var change in args.TextChanges.Reverse())
-			//TODO		changes.Add(new TextChange(change.Offset, change.RemovedText, change.InsertedText));
+				var changes = new List<TextChange>();
+				foreach (var change in args.TextChanges.Reverse())
+					changes.Add(new TextChange(change.Offset, change.RemovedText, change.InsertedText));
 
-Console.WriteLine( "TODO TextDocument.Redo not implemented!" );
+				doc.ApplyTextChanges_old(changes);
 
-				doc.ApplyTextChanges(changes);
 				if (fireEvent)
 					OnRedoDone ();
 			}
@@ -867,10 +888,10 @@ Console.WriteLine( "TODO TextDocument.Redo not implemented!" );
 				}
 			}
 
-// tommih 20200703 method name change "Changes" -> "Args".
-// tommih 20200703 method name change "Changes" -> "Args".
-// tommih 20200703 method name change "Changes" -> "Args".
-		//	public virtual Microsoft.VisualStudio.Text.INormalizedTextChangeCollection Changes {
+// tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
+// tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
+// tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
+		//oe	public virtual Microsoft.VisualStudio.Text.INormalizedTextChangeCollection Changes {
 			public override TextChangeEventArgs Args {
 				get {
 					return null;
@@ -937,10 +958,10 @@ Console.WriteLine( "TODO TextDocument.Redo not implemented!" );
 				}
 			}
 
-// tommih 20200703 method name change "Changes" -> "Args".
-// tommih 20200703 method name change "Changes" -> "Args".
-// tommih 20200703 method name change "Changes" -> "Args".
-		//	public virtual Microsoft.VisualStudio.Text.INormalizedTextChangeCollection Changes {
+// tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
+// tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
+// tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
+		//oe	public virtual Microsoft.VisualStudio.Text.INormalizedTextChangeCollection Changes {
 			public override TextChangeEventArgs Args {
 				get {
 					return operations.Count > 0 ? operations [operations.Count - 1].Args : null;
