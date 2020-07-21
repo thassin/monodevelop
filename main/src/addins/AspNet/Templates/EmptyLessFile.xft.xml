@@ -14,6 +14,6 @@
 	</TemplateConfiguration>
 
 	<TemplateFiles>
-		<File DefaultExtension=".less" src="StylesheetTemplate.less" />
+		<File DefaultExtension=".less" src="StyleSheetTemplate.less" />
 	</TemplateFiles>
 </Template>

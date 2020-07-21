@@ -63,9 +63,9 @@
 		<Import file = "Templates/TypeScriptFileTemplate.ts"/>
 		<Import file = "Templates/PreprocessedRazorTemplate.xft.xml" />
 		<Import file = "Templates/RouteConfig.cs"/>
-		<Import file = "Templates/StylesheetTemplate.css"/>
-		<Import file = "Templates/StylesheetTemplate.less"/>
-		<Import file = "Templates/StylesheetTemplate.scss"/>
+		<Import file = "Templates/StyleSheetTemplate.css"/>
+		<Import file = "Templates/StyleSheetTemplate.less"/>
+		<Import file = "Templates/StyleSheetTemplate.scss"/>
 		<Import file = "Templates/WebApiConfig.cs"/>
 		<Import file = "Templates/WebConfig-Application.xft.xml"/>
 		<Import file = "Templates/WebConfig-SubDir.xft.xml"/>

@@ -39,10 +39,10 @@ using Microsoft.CodeAnalysis.ErrorReporting;
 using Microsoft.CodeAnalysis.LanguageServices;
 using Microsoft.CodeAnalysis.Shared.Extensions;
 using Microsoft.CodeAnalysis.Shared.Utilities;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Projection;
-using Microsoft.VisualStudio.Utilities;
+//using Microsoft.VisualStudio.Text; oe removed...
+//using Microsoft.VisualStudio.Text.Editor; oe removed...
+//using Microsoft.VisualStudio.Text.Projection; oe removed...
+//using Microsoft.VisualStudio.Utilities; oe removed...
 using MonoDevelop.Projects;
 using MonoDevelop.Ide.Editor;
 using MonoDevelop.Core.Text;

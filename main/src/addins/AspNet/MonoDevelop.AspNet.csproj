@@ -567,13 +567,13 @@
     <None Include="Templates\EmptyTypeScriptFile.xft.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Templates\StylesheetTemplate.css">
+    <None Include="Templates\StyleSheetTemplate.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Templates\StylesheetTemplate.less">
+    <None Include="Templates\StyleSheetTemplate.less">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Templates\StylesheetTemplate.scss">
+    <None Include="Templates\StyleSheetTemplate.scss">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Templates\JsonFileTemplate.json">

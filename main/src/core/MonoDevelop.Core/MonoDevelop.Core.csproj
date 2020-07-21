@@ -2,11 +2,9 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <Import Project="..\..\..\MonoDevelop.props" />
   <PropertyGroup>
-    <ReferencesVSEditorCopyToOutput>true</ReferencesVSEditorCopyToOutput>
     <ReferencesRoslynCopyToOutput>true</ReferencesRoslynCopyToOutput>
   </PropertyGroup>
   <Import Project="$(ReferencesRoslyn)" />
-  <Import Project="$(ReferencesVSEditor)" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -116,10 +114,6 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.VisualStudio.Text.UI.Wpf">
-      <HintPath>$(PackagesDirectory)\Microsoft.VisualStudio.Text.UI.Wpf.$(NuGetVersionVSEditor)\lib\net46\Microsoft.VisualStudio.Text.UI.Wpf.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>..\..\..\packages\Mono.Cecil.0.10.0-beta6\lib\net40\Mono.Cecil.dll</HintPath>
     </Reference>

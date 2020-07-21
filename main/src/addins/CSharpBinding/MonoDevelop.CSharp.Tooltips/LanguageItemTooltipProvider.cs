@@ -46,7 +46,9 @@ namespace MonoDevelop.SourceEditor
 {
 	class LanguageItemTooltipProvider : TooltipProvider, IDisposable
 	{
-		#region ITooltipProvider implementation 
+
+#region ITooltipProvider implementation
+
 		public override async Task<TooltipItem> GetItem (TextEditor editor, DocumentContext ctx, int offset, CancellationToken token = default(CancellationToken))
 		{
 			if (ctx == null)
@@ -97,7 +99,7 @@ namespace MonoDevelop.SourceEditor
 			}
 		}
 
-		#region IDisposable implementation
+#region IDisposable implementation
 
 		public override void Dispose ()
 		{
@@ -107,8 +109,7 @@ namespace MonoDevelop.SourceEditor
 			base.Dispose ();
 		}
 
-		#endregion
-
+#endregion
 
 		public override Components.Window CreateTooltipWindow (TextEditor editor, DocumentContext ctx, TooltipItem item, int offset, Xwt.ModifierKeys modifierState)
 		{
@@ -160,7 +161,8 @@ namespace MonoDevelop.SourceEditor
 		{
 			return true;
 		}
-		#endregion
+
+#endregion
 
 		public static Task<TooltipInformation> CreateTooltipInformation (CancellationToken ctoken, MonoDevelop.Ide.Editor.TextEditor editor, MonoDevelop.Ide.Editor.DocumentContext ctx, ISymbol entity, bool smartWrap, bool createFooter = false, SemanticModel model = null)
 		{

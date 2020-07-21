@@ -39,8 +39,8 @@ using MonoDevelop.Ide.Editor.Extension;
 using MonoDevelop.Ide;
 using Microsoft.CodeAnalysis.CSharp.Completion;
 using MonoDevelop.Ide.Gui;
-using Microsoft.VisualStudio.Platform;
-using Microsoft.VisualStudio.Text;
+//using Microsoft.VisualStudio.Platform; oe removed...
+//using Microsoft.VisualStudio.Text; oe removed...
 using MonoDevelop.Ide.CodeTemplates;
 using System.Linq;
 using System.Text;
@@ -57,8 +57,9 @@ namespace MonoDevelop.CSharp.Completion
 		public override CompletionProvider Provider => provider.Value;         
 		protected override string MimeType => CSharpFormatter.MimeType;
 
-
-		public CSharpCompletionData (Microsoft.CodeAnalysis.Document document, ITextSnapshot triggerSnapshot, CompletionService completionService, CompletionItem completionItem) : base (document, triggerSnapshot, completionService, completionItem)
+	// oe TODO parameter removed -- how to replace it??? also see RoslynCompletionData.
+	//oe	public CSharpCompletionData (Microsoft.CodeAnalysis.Document document, ITextSnapshot triggerSnapshot, CompletionService completionService, CompletionItem completionItem) : base (document, triggerSnapshot, completionService, completionItem)
+		public CSharpCompletionData (Microsoft.CodeAnalysis.Document document, CompletionService completionService, CompletionItem completionItem) : base (document, completionService, completionItem)
 		{
 			provider = new Lazy<CompletionProvider> (delegate {
 				return ((CSharpCompletionService)completionService).GetProvider (CompletionItem);

@@ -27,7 +27,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-
 using System;
 using System.IO;
 using System.Collections;
@@ -159,7 +158,8 @@ namespace MonoDevelop.Ide
 			Counters.Initialization.Trace ("Initializing Runtime");
 			Runtime.Initialize (true);
 
-			Composition.CompositionManager.InitializeAsync ().Ignore ();
+		// oe REMOVED...
+		//oe	Composition.CompositionManager.InitializeAsync ().Ignore ();
 
 			IdeApp.Customizer.OnCoreInitialized ();
 

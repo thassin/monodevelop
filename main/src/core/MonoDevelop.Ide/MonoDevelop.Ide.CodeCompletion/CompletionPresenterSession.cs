@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis.Completion;
-using Microsoft.VisualStudio.Text;
+//using Microsoft.VisualStudio.Text; oe removed...
 
 namespace MonoDevelop.Ide.CodeCompletion
 {
@@ -36,7 +36,8 @@ namespace MonoDevelop.Ide.CodeCompletion
 	{
 		protected abstract RoslynCompletionData WrapItem (CompletionItem item);
 
-		public void PresentItems (ITrackingSpan triggerSpan, IList<CompletionItem> items, CompletionItem selectedItem, CompletionItem suggestionModeItem, bool suggestionMode, bool isSoftSelected, ImmutableArray<CompletionItemFilter> completionItemFilters, string filterText)
+	//oe	public void PresentItems (ITrackingSpan triggerSpan, IList<CompletionItem> items, CompletionItem selectedItem, CompletionItem suggestionModeItem, bool suggestionMode, bool isSoftSelected, ImmutableArray<CompletionItemFilter> completionItemFilters, string filterText)
+		public void PresentItems (IList<CompletionItem> items, CompletionItem selectedItem, CompletionItem suggestionModeItem, bool suggestionMode, bool isSoftSelected, ImmutableArray<CompletionItemFilter> completionItemFilters, string filterText)
 		{
 			var result = new CompletionDataList ();
 

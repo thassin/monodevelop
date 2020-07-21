@@ -57,7 +57,7 @@ using MonoDevelop.Ide.TypeSystem;
 using MonoDevelop.Refactoring;
 using Microsoft.CodeAnalysis.Completion;
 using Microsoft.CodeAnalysis.Host.Mef;
-using Microsoft.VisualStudio.Platform;
+//using Microsoft.VisualStudio.Platform; oe removed...
 
 namespace MonoDevelop.CSharp.Completion
 {
@@ -441,7 +441,7 @@ namespace MonoDevelop.CSharp.Completion
 				kind = CompletionTriggerKind.Insertion;
 				break;
 			}
-			var triggerSnapshot = Editor.GetPlatformTextBuffer ().CurrentSnapshot;
+		//oe	var triggerSnapshot = Editor.GetPlatformTextBuffer ().CurrentSnapshot;
 			var trigger = new CompletionTrigger(kind, triggerInfo.TriggerCharacter.HasValue ? triggerInfo.TriggerCharacter.Value : '\0');
 			if (triggerInfo.CompletionTriggerReason == CompletionTriggerReason.CharTyped) {
 				if (!cs.ShouldTriggerCompletion (sourceText, completionContext.TriggerOffset, trigger, null)) {
@@ -464,7 +464,8 @@ namespace MonoDevelop.CSharp.Completion
 			foreach (var item in completionList.Items) {
 				if (string.IsNullOrEmpty (item.DisplayText))
 					continue;
-				var data = new CSharpCompletionData (analysisDocument, triggerSnapshot, cs, item);
+			//oe	var data = new CSharpCompletionData (analysisDocument, triggerSnapshot, cs, item);
+				var data = new CSharpCompletionData (analysisDocument, cs, item);
 				result.Add (data);
 				if (item.Rules.MatchPriority > 0) {
 					if (defaultCompletionData == null || defaultCompletionData.Rules.MatchPriority < item.Rules.MatchPriority)

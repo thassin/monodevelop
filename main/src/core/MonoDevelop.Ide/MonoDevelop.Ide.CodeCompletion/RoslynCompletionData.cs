@@ -38,8 +38,8 @@ using MonoDevelop.Ide.Editor;
 using MonoDevelop.Ide.Editor.Extension;
 using MonoDevelop.Ide;
 using MonoDevelop.Ide.Gui;
-using Microsoft.VisualStudio.Platform;
-using Microsoft.VisualStudio.Text;
+//using Microsoft.VisualStudio.Platform; oe removed...
+//using Microsoft.VisualStudio.Text; oe removed...
 using MonoDevelop.Ide.CodeTemplates;
 using System.Linq;
 using System.Text;
@@ -51,7 +51,7 @@ namespace MonoDevelop.Ide.CodeCompletion
 	public abstract class RoslynCompletionData : CompletionData
 	{
 		protected readonly Microsoft.CodeAnalysis.Document doc;
-		protected readonly ITextSnapshot triggerSnapshot;
+	//oe	protected readonly ITextSnapshot triggerSnapshot; removed...
 		protected readonly CompletionService completionService;
 
 		public CompletionItem CompletionItem { get; private set; }
@@ -104,10 +104,12 @@ namespace MonoDevelop.Ide.CodeCompletion
 
 		static Dictionary<int, string> IconIdCache = new Dictionary<int, string>();
 
-		public RoslynCompletionData (Microsoft.CodeAnalysis.Document document, ITextSnapshot triggerSnapshot, CompletionService completionService, CompletionItem completionItem)
+	// oe TODO parameter removed -- how to replace it??? also see CSharpCompletionData.
+	//oe	public RoslynCompletionData (Microsoft.CodeAnalysis.Document document, ITextSnapshot triggerSnapshot, CompletionService completionService, CompletionItem completionItem)
+		public RoslynCompletionData (Microsoft.CodeAnalysis.Document document, CompletionService completionService, CompletionItem completionItem)
 		{
 			this.doc = document;
-			this.triggerSnapshot = triggerSnapshot;
+		//oe	this.triggerSnapshot = triggerSnapshot;
 			this.completionService = completionService;
 			CompletionItem = completionItem;
 		}
@@ -214,8 +216,12 @@ namespace MonoDevelop.Ide.CodeCompletion
 			}
 		}
 
+		// oe REPLACE method...
 		public override void InsertCompletionText (CompletionListWindow window, ref KeyActions ka, KeyDescriptor descriptor)
 		{
+
+Console.WriteLine("oe-TODO :: RoslynCompletionData.InsertCompletionText");
+
 			var document = IdeApp.Workbench.ActiveDocument;
 			var editor = document?.Editor;
 			if (editor == null || Provider == null) {
@@ -223,27 +229,43 @@ namespace MonoDevelop.Ide.CodeCompletion
 				return;
 			}
 			var completionChange = Provider.GetChangeAsync (doc, CompletionItem, null, default (CancellationToken)).WaitAndGetResult (default (CancellationToken));
-
-			var currentBuffer = editor.GetPlatformTextBuffer ();
 			var textChange = completionChange.TextChange;
-			var triggerSnapshotSpan = new SnapshotSpan (triggerSnapshot, new Span (textChange.Span.Start, textChange.Span.Length));
-			var mappedSpan = triggerSnapshotSpan.TranslateTo (currentBuffer.CurrentSnapshot, SpanTrackingMode.EdgeInclusive);
-			using (var undo = editor.OpenUndoGroup ()) {
-				// Work around for https://github.com/dotnet/roslyn/issues/22885
-				if (editor.GetCharAt (mappedSpan.Start) == '@') {
-					editor.ReplaceText (mappedSpan.Start + 1, mappedSpan.Length - 1, completionChange.TextChange.NewText);
-				} else
-					editor.ReplaceText (mappedSpan.Start, mappedSpan.Length, completionChange.TextChange.NewText);
-			
+
+			int start = textChange.Span.Start;
+			int length = textChange.Span.Length;
+
+			string newText = textChange.NewText;
+
+			// tommih 20200721 : usually "length" is too small (always 1), even though multiple chars have been typed since the completion event launch.
+			// -> perhaps one could simply use the caret-position to fix that in most cases? there is no option to change line or go back???
+
+			int length2 = editor.CaretOffset - start;
+Console.WriteLine("RoslynCompletionData.InsertCompletionText :: debug l=" + length + " l2=" + length2);
+			if (length2 > length) textChange = new TextChange( new TextSpan( start, length2 ), newText );
+
+Console.WriteLine("RoslynCompletionData.InsertCompletionText :: textChange s=" + textChange.Span.Start + " l=" + textChange.Span.Length + " nt='" + textChange.NewText + "'");
+
+			editor.ApplyTextChanges ( new [] { textChange } );
+
+		//oe	var currentBuffer = editor.GetPlatformTextBuffer ();
+		//oe	var triggerSnapshotSpan = new SnapshotSpan (triggerSnapshot, new Span (textChange.Span.Start, textChange.Span.Length));
+		//oe	var mappedSpan = triggerSnapshotSpan.TranslateTo (currentBuffer.CurrentSnapshot, SpanTrackingMode.EdgeInclusive);
+		//oe	using (var undo = editor.OpenUndoGroup ()) {
+		//oe		// Work around for https://github.com/dotnet/roslyn/issues/22885
+		//oe		if (editor.GetCharAt (mappedSpan.Start) == '@') {
+		//oe			editor.ReplaceText (mappedSpan.Start + 1, mappedSpan.Length - 1, completionChange.TextChange.NewText);
+		//oe		} else
+		//oe			editor.ReplaceText (mappedSpan.Start, mappedSpan.Length, completionChange.TextChange.NewText);
 
 				if (completionChange.NewPosition.HasValue)
 					editor.CaretOffset = completionChange.NewPosition.Value;
 
-				if (CompletionItem.Rules.FormatOnCommit) {
-					var endOffset = mappedSpan.Start.Position + completionChange.TextChange.NewText.Length;
-					Format (editor, document, mappedSpan.Start, endOffset);
-				}
-			}
+		//oe		if (CompletionItem.Rules.FormatOnCommit) {
+		//oe			var endOffset = mappedSpan.Start.Position + completionChange.TextChange.NewText.Length;
+		//oe			Format (editor, document, mappedSpan.Start, endOffset);
+		//oe		}
+		//oe	}
+
 		}
 
 		protected abstract void Format (TextEditor editor, Gui.Document document, int start, int end);
