@@ -237,7 +237,7 @@ Console.WriteLine("oe-TODO :: RoslynCompletionData.InsertCompletionText");
 			string newText = textChange.NewText;
 
 			// tommih 20200721 : usually "length" is too small (always 1), even though multiple chars have been typed since the completion event launch.
-			// -> perhaps one could simply use the caret-position to fix that in most cases? there is no option to change line or go back???
+			// -> perhaps one could simply use the current caret-position to fix that in most cases? there is no option to change line or go back???
 
 			int length2 = editor.CaretOffset - start;
 Console.WriteLine("RoslynCompletionData.InsertCompletionText :: debug l=" + length + " l2=" + length2);

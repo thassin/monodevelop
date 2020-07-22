@@ -193,30 +193,35 @@ namespace MonoDevelop.CodeActions
 		static async Task FixAll (TextEditor editor, ValidCodeDiagnosticAction fix, FixAllProvider provider, DiagnosticAnalyzer diagnosticAnalyzer)
 		{
 
-Console.WriteLine("oe-TODO not implemented :: CodeFixMenuService.FixAll");
+Console.WriteLine("oe-TODO CodeFixMenuService.FixAll :: not implemented");
 
-		/* oe-TODO not implemented...
-			var diagnosticIds = diagnosticAnalyzer.SupportedDiagnostics.Select (d => d.Id).ToImmutableHashSet ();
+		/*	var diagnosticIds = diagnosticAnalyzer.SupportedDiagnostics.Select (d => d.Id).ToImmutableHashSet ();
 
 			var analyzers = new [] { diagnosticAnalyzer }.ToImmutableArray ();
-			var codeFixService = CompositionManager.GetExportedValue<ICodeFixService> () as CodeFixService;
-			var fixAllDiagnosticProvider = codeFixService.CreateFixAllState (
-				provider,
-				editor.DocumentContext.AnalysisDocument,
-				FixAllProviderInfo.Create (null),
-				null,
-				null,
+
+		// oe REMOVE block...
+		//oe	var codeFixService = CompositionManager.GetExportedValue<ICodeFixService> () as CodeFixService;
+		//oe	var fixAllDiagnosticProvider = codeFixService.CreateFixAllState (
+		//oe		provider,
+		//oe		editor.DocumentContext.AnalysisDocument,
+		//oe		FixAllProviderInfo.Create (null),
+		//oe		null,
+		//oe		null,
+		//oe		async (doc, diagnostics, token) => await GetDiagnosticsForDocument (analyzers, doc, diagnostics, token).ConfigureAwait (false),
+		//oe		(Project arg1, bool arg2, ImmutableHashSet<string> arg3, CancellationToken arg4) => {
+		//oe			return Task.FromResult ((IEnumerable<Diagnostic>)new Diagnostic[] { });
+		//oe		}).DiagnosticProvider;
+
+		// 2020-07-22 : the code here looks the same as in oe-20171024-7.4-build373 but that is using a different version of RefactoringEssentials?
+		// -> could try to downgrade that as well here??? does it affect elsewhere? nope just in "addins/MonoDevelop.Refactoring" apparently.
+		// -> so FixAllState is missing from RefactoringEssentials package used here...
+
+			var fixAllDiagnosticProvider = new FixAllState.FixAllDiagnosticProvider (
+				diagnosticIds,
 				async (doc, diagnostics, token) => await GetDiagnosticsForDocument (analyzers, doc, diagnostics, token).ConfigureAwait (false),
 				(Project arg1, bool arg2, ImmutableHashSet<string> arg3, CancellationToken arg4) => {
-					return Task.FromResult ((IEnumerable<Diagnostic>)new Diagnostic[] { });
-				}).DiagnosticProvider;
-
-			//var fixAllDiagnosticProvider = new FixAllState.FixAllDiagnosticProvider (
-			//	diagnosticIds,
-			//	async (doc, diagnostics, token) => await GetDiagnosticsForDocument (analyzers, doc, diagnostics, token).ConfigureAwait (false),
-			//	(Project arg1, bool arg2, ImmutableHashSet<string> arg3, CancellationToken arg4) => {
-			//		return Task.FromResult ((IEnumerable<Diagnostic>)new Diagnostic [] { });
-			//	});
+					return Task.FromResult ((IEnumerable<Diagnostic>)new Diagnostic [] { });
+				});
 
 			var ctx = new FixAllContext (
 				editor.DocumentContext.AnalysisDocument,
