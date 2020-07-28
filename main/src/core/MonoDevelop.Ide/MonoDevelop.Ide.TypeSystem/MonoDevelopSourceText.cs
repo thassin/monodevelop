@@ -44,7 +44,7 @@ namespace MonoDevelop.Ide.TypeSystem
 {
 
 // oe REMOVED...
-//	abstract class SnapshotSourceText : SourceText
+//oe	abstract class SnapshotSourceText : SourceText
 
 	sealed class MonoDevelopSourceText : SourceText
 	{
@@ -146,9 +146,9 @@ namespace MonoDevelop.Ide.TypeSystem
 #endregion
 
 	// oe REMOVED...
-	//	public static SourceText Create (TextEditor editor, MonoDevelopSourceTextContainer container)
-	//	public static SourceText Create (ITextSource doc)
-	//	class ChangedSourceText : SnapshotSourceText
+	//oe	public static SourceText Create (TextEditor editor, MonoDevelopSourceTextContainer container)
+	//oe	public static SourceText Create (ITextSource doc)
+	//oe	class ChangedSourceText : SnapshotSourceText
 
 	}
 	

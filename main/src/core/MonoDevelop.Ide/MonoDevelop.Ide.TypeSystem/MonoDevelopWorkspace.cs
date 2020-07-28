@@ -48,7 +48,7 @@ using System.ComponentModel;
 using Mono.Addins;
 using MonoDevelop.Core.AddIns;
 using Microsoft.CodeAnalysis.Shared.Utilities;
-//using MonoDevelop.Ide.Composition; oe removed...
+using MonoDevelop.Ide.Composition; // oe TODO is this needed? CompositionManager.Instance.HostServices removed.
 
 namespace MonoDevelop.Ide.TypeSystem
 {
@@ -72,7 +72,7 @@ namespace MonoDevelop.Ide.TypeSystem
 			}
 		}
 
-		// oe add... TODO any updates to this needed???
+		// oe add...
 		static string[] mefHostServices = new [] {
 			"Microsoft.CodeAnalysis.Workspaces",
 			//FIXME: this does not load yet. We should provide alternate implementations of its services.
@@ -99,7 +99,6 @@ namespace MonoDevelop.Ide.TypeSystem
 			List<Assembly> assemblies = new List<Assembly> ();
 			assemblies.Add (typeof (MonoDevelopWorkspace).Assembly);
 			foreach (var asmName in mefHostServices) {
-Console.WriteLine( "MonoDevelopWorkspace :: INIT " + asmName );
 				try {
 					var asm = Assembly.Load (asmName);
 					if (asm == null)
@@ -135,8 +134,7 @@ Console.WriteLine( "MonoDevelopWorkspace :: INIT " + asmName );
 			OnSolutionAdded (sInfo);
 		}
 
-	//oe	internal MonoDevelopWorkspace (MonoDevelop.Projects.Solution solution) : base (HostServices, "MonoDevelop")
-		internal MonoDevelopWorkspace (MonoDevelop.Projects.Solution solution) : base (services, "MonoDevelop")
+		internal MonoDevelopWorkspace (MonoDevelop.Projects.Solution solution) : base (HostServices, "MonoDevelop")
 		{
 			this.monoDevelopSolution = solution;
 			this.Id = WorkspaceId.Next ();

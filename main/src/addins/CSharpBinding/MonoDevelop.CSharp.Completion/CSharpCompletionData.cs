@@ -57,9 +57,9 @@ namespace MonoDevelop.CSharp.Completion
 		public override CompletionProvider Provider => provider.Value;         
 		protected override string MimeType => CSharpFormatter.MimeType;
 
-	// oe TODO parameter removed -- how to replace it??? also see RoslynCompletionData.
+	// oe TODO parameter removed -- need to to replace it??? also see RoslynCompletionData.
 	//oe	public CSharpCompletionData (Microsoft.CodeAnalysis.Document document, ITextSnapshot triggerSnapshot, CompletionService completionService, CompletionItem completionItem) : base (document, triggerSnapshot, completionService, completionItem)
-		public CSharpCompletionData (Microsoft.CodeAnalysis.Document document, CompletionService completionService, CompletionItem completionItem) : base (document, completionService, completionItem)
+		public CSharpCompletionData (Microsoft.CodeAnalysis.Document document, /* ITextSnapshot triggerSnapshot, */ CompletionService completionService, CompletionItem completionItem) : base (document, /* triggerSnapshot, */ completionService, completionItem)
 		{
 			provider = new Lazy<CompletionProvider> (delegate {
 				return ((CSharpCompletionService)completionService).GetProvider (CompletionItem);

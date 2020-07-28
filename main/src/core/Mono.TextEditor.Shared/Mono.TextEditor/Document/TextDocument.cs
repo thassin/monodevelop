@@ -40,18 +40,19 @@ using MonoDevelop.Ide.Editor;
 using MonoDevelop.Core;
 using System.IO;
 using MonoDevelop.Ide.Editor.Highlighting;
-//using Microsoft.VisualStudio.Platform; oe remove...
-//using Microsoft.VisualStudio.Text.Tagging; oe remove...
+//using Microsoft.VisualStudio.Platform; oe removed...
+//using Microsoft.VisualStudio.Text.Tagging; oe removed...
 
 namespace Mono.TextEditor
 {
 	class TextDocument : ITextDocument, IDisposable
 	{
+
 	// oe REMOVED...
-	//	public Microsoft.VisualStudio.Text.ITextDocument VsTextDocument { get; }
-	//	public Microsoft.VisualStudio.Text.ITextBuffer TextBuffer { get { return this.VsTextDocument.TextBuffer; } }
-	//	Microsoft.VisualStudio.Text.ITextSnapshot currentSnapshot;
-	//	bool lineEndingMismatch;
+	//oe	public Microsoft.VisualStudio.Text.ITextDocument VsTextDocument { get; }
+	//oe	public Microsoft.VisualStudio.Text.ITextBuffer TextBuffer { get { return this.VsTextDocument.TextBuffer; } }
+	//oe	Microsoft.VisualStudio.Text.ITextSnapshot currentSnapshot;
+	//oe	bool lineEndingMismatch;
 
 		// oe revert...
 		ImmutableText buffer;
@@ -82,7 +83,7 @@ namespace Mono.TextEditor
 		}
 
 	// oe REMOVED...
-	//	private static Microsoft.VisualStudio.Utilities.IContentType GetContentTypeFromMimeType(string mimeType)
+	//oe	private static Microsoft.VisualStudio.Utilities.IContentType GetContentTypeFromMimeType(string mimeType)
 
 		public event EventHandler MimeTypeChanged;
 
@@ -94,7 +95,7 @@ namespace Mono.TextEditor
 				handler (this, e);
 		}
 
-		FilePath fileName;
+		FilePath fileName; // oe add...
 		public FilePath FileName {
 			get {
 				// oe REPLACE block...
@@ -185,7 +186,7 @@ namespace Mono.TextEditor
 				SyntaxMode = new SyntaxHighlighting (def, this);
 			} else {
 #if false
-		is_notused	SyntaxMode = TagBasedSyntaxHighlighting.CreateSyntaxHighlighting(this.TextBuffer);
+		isnotused	SyntaxMode = TagBasedSyntaxHighlighting.CreateSyntaxHighlighting(this.TextBuffer);
 #else
 				SyntaxMode = DefaultSyntaxHighlighting.Instance;
 #endif
@@ -249,6 +250,7 @@ Console.WriteLine( "debug Initialize completed" );
 
 		public void Dispose()
 		{
+
 		// oe REMOVED...
 		//	this.TextBuffer.Changed -= this.OnTextBufferChanged;
 		//	this.TextBuffer.ContentTypeChanged -= this.OnTextBufferContentTypeChanged;
@@ -262,9 +264,9 @@ Console.WriteLine( "tommih : TextDocument Disposed" );
 		}
 
 	// oe REMOVED...
-	//	void OnTextBufferChanged(object sender, Microsoft.VisualStudio.Text.TextContentChangedEventArgs args)
-	//	void OnTextBufferContentTypeChanged(object sender, Microsoft.VisualStudio.Text.ContentTypeChangedEventArgs args)
-	//	void OnTextDocumentFileActionOccured(object sender, Microsoft.VisualStudio.Text.TextDocumentFileActionEventArgs args)
+	//oe	void OnTextBufferChanged(object sender, Microsoft.VisualStudio.Text.TextContentChangedEventArgs args)
+	//oe	void OnTextBufferContentTypeChanged(object sender, Microsoft.VisualStudio.Text.ContentTypeChangedEventArgs args)
+	//oe	void OnTextDocumentFileActionOccured(object sender, Microsoft.VisualStudio.Text.TextDocumentFileActionEventArgs args)
 
 		void HandleFoldSegmentTreetreeNodeRemoved (object sender, RedBlackTree<FoldSegment>.RedBlackTreeNodeEventArgs e)
 		{
@@ -644,7 +646,7 @@ Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
 		}
 
 	// oe REMOVED...
-	//	public int IndexOf(string searchText, int startIndex, int count, StringComparison comparisonType)
+	//oe	public int IndexOf(string searchText, int startIndex, int count, StringComparison comparisonType)
 
 	// oe NOTICE using old methods previously disabled from build...
 	// oe NOTICE using old methods previously disabled from build...
@@ -821,14 +823,14 @@ Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
 		}
 
 	// oe REMOVED...
-	//	DocumentLine cachedLine;
-	//	int cachedLineNumber = -1;
-	//	DocumentLine cachedLineFromLineNumber;
-	//	void ClearLineCache ()
-	//	{
-	//		cachedLine = null;
-	//		cachedLineNumber = -1;
-	//	}
+	//oe	DocumentLine cachedLine;
+	//oe	int cachedLineNumber = -1;
+	//oe	DocumentLine cachedLineFromLineNumber;
+	//oe	void ClearLineCache ()
+	//oe	{
+	//oe		cachedLine = null;
+	//oe		cachedLineNumber = -1;
+	//oe	}
 
 		public DocumentLine GetLineByOffset (int offset)
 		{
@@ -853,9 +855,9 @@ Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
 
 		internal class UndoOperation
 		{
-		//	readonly int beforeVersionNumber;
-		//	readonly int afterVersionNumber;
-		//	Microsoft.VisualStudio.Text.INormalizedTextChangeCollection changes;
+		//oe	readonly int beforeVersionNumber;
+		//oe	readonly int afterVersionNumber;
+		//oe	Microsoft.VisualStudio.Text.INormalizedTextChangeCollection changes;
 // tommih 20200703 property name change "Changes" -> "Args" and revert the old type.
 // tommih 20200703 property name change "Changes" -> "Args" and revert the old type.
 // tommih 20200703 property name change "Changes" -> "Args" and revert the old type.
@@ -1005,7 +1007,7 @@ Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
 				}
 			}
 
-		//	public override Microsoft.VisualStudio.Text.INormalizedTextChangeCollection Changes {
+		//oe	public override Microsoft.VisualStudio.Text.INormalizedTextChangeCollection Changes {
 // tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
 // tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
 // tommih 20200703 method name change "Changes" -> "Args" and revert the old type.
@@ -2335,12 +2337,12 @@ Console.WriteLine( "SnapshotDocument ctor" );
 		internal event EventHandler HeightChanged;
 
 	// oe REMOVED...
-	//	private DocumentLine Get(int number)
-	//	internal sealed class DocumentLineFromTextSnapshotLine : DocumentLine
-	//	class SnapshotToReadonlyTextDocument : SnapshotSpanToTextSource, IReadonlyTextDocument
-	//	class SnapshotSpanToTextSource : ITextSource
-	//	sealed class SnapshotSpanToTextReader : TextReader
-	//	public class TextVersionToTextSourceVersion : ITextSourceVersion
+	//oe	private DocumentLine Get(int number)
+	//oe	internal sealed class DocumentLineFromTextSnapshotLine : DocumentLine
+	//oe	class SnapshotToReadonlyTextDocument : SnapshotSpanToTextSource, IReadonlyTextDocument
+	//oe	class SnapshotSpanToTextSource : ITextSource
+	//oe	sealed class SnapshotSpanToTextReader : TextReader
+	//oe	public class TextVersionToTextSourceVersion : ITextSourceVersion
 
 	}
 

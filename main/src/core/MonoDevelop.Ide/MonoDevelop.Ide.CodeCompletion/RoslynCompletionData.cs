@@ -104,9 +104,9 @@ namespace MonoDevelop.Ide.CodeCompletion
 
 		static Dictionary<int, string> IconIdCache = new Dictionary<int, string>();
 
-	// oe TODO parameter removed -- how to replace it??? also see CSharpCompletionData.
+	// oe TODO parameter removed -- need to replace it??? also see CSharpCompletionData.
 	//oe	public RoslynCompletionData (Microsoft.CodeAnalysis.Document document, ITextSnapshot triggerSnapshot, CompletionService completionService, CompletionItem completionItem)
-		public RoslynCompletionData (Microsoft.CodeAnalysis.Document document, CompletionService completionService, CompletionItem completionItem)
+		public RoslynCompletionData (Microsoft.CodeAnalysis.Document document, /* ITextSnapshot triggerSnapshot, */ CompletionService completionService, CompletionItem completionItem)
 		{
 			this.doc = document;
 		//oe	this.triggerSnapshot = triggerSnapshot;

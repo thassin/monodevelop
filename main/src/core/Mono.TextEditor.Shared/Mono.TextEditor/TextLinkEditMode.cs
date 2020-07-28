@@ -396,7 +396,9 @@ namespace Mono.TextEditor
 
 		protected override void HandleKeypress (Gdk.Key key, uint unicodeKey, Gdk.ModifierType modifier)
 		{
+
 Console.WriteLine( "TextLinkEditMode.HandleKeypress()" ); // oe debug....
+
 			int caretOffset = Editor.Caret.Offset - baseOffset;
 			TextLink link = links.Find (l => l.Links.Any (s => s.Offset <= caretOffset && caretOffset <= s.EndOffset));
 			

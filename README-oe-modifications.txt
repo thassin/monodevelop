@@ -7,15 +7,18 @@ with the following modifications:
 main/src/addins/MonoDevelop.SourceEditor2/VSEditor	<directory>
 main/src/core/Mono.TextEditor.Platform			<directory>
 
+main/msbuild/ReferencesVSEditor.props
+
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/JoinableTaskContextHost.cs
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/PlatformCatalog.cs
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/PlatformExtensions.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/ITextEditorFactoryService.cs
 
-
-	 moved/renamed:
+	 moved/renamed:		( TODO leave these as "StylesheetTemplate" lateron... )
 	^^^^^^^^^^^^^^^^
 main/src/addins/AspNet/Templates/StylesheetTemplate.css -> main/src/addins/AspNet/Templates/StyleSheetTemplate.css
 main/src/addins/AspNet/Templates/StylesheetTemplate.less -> main/src/addins/AspNet/Templates/StyleSheetTemplate.less
 main/src/addins/AspNet/Templates/StylesheetTemplate.scss -> main/src/addins/AspNet/Templates/StyleSheetTemplate.scss
-
 
 	 modified:
 	^^^^^^^^^^^
@@ -56,6 +59,7 @@ main/src/core/MonoDevelop.Core/packages.config
 main/src/core/MonoDevelop.Ide/ExtensionModel/MonoDevelop.Ide.addin.xml
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.CodeCompletion/CompletionPresenterSession.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.CodeCompletion/RoslynCompletionData.cs
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/CompositionManager.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/Projection/ProjectedCompletionExtension.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/Projection/ProjectedFilterCompletionTextEditorExtension.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/TextEditor.cs
@@ -70,9 +74,9 @@ main/src/core/MonoDevelop.TextEditor.Tests/MonoDevelop.TextEditor.Tests.csproj
 
 main/tests/MonoDevelop.CSharpBinding.Tests/MonoDevelop.CSharpBinding.Tests.csproj
 
-
 	 added/reverted:
 	^^^^^^^^^^^^^^^^^
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/MDExportProvider.cs
 
 ##############################################################################################
 
@@ -96,7 +100,7 @@ $ ./configure
 $ make clean 
 $ make 
 
-	IF NEEDED, make copies if the following files with fixed filenames:
+	IF NEEDED, make copies of the following files with fixed filenames:
 $ cp ./main/external/fsharpbinding/packages/FSharp.Core/fsharp.core.4.1.0.2.nupkg ./main/external/fsharpbinding/packages/FSharp.Core/FSharp.Core.4.1.0.2.nupkg
 $ cp ./main/external/fsharpbinding/packages/System.ValueTuple/system.valuetuple.4.4.0.nupkg ./main/external/fsharpbinding/packages/System.ValueTuple/System.ValueTuple.4.4.0.nupkg
 	THEN re-try building ( make clean && make ).
