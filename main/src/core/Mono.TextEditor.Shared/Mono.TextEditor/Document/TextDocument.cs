@@ -285,6 +285,7 @@ Console.WriteLine( "debug TextDocument ctor1 :: " + fileName + " : " + mimeType 
 			Encoding enc;
 			var text = TextFileUtility.GetText (fileName, out enc);
 
+if ( text == null ) text = String.Empty; // avoid null values going into ImmutableText ctor...
 ImmutableText buffer = new ImmutableText (text);
 ILineSplitter splitter = new LineSplitter();
 
@@ -304,6 +305,7 @@ Console.WriteLine( "debug TextDocument ctor2 :: " + info );
 Encoding enc = MonoDevelop.Core.Text.TextFileUtility.DefaultEncoding;
 string fileName = null;
 
+if ( text == null ) text = String.Empty; // avoid null values going into ImmutableText ctor...
 ImmutableText buffer = new ImmutableText (text);
 splitter = new LineSplitter();
 
@@ -321,6 +323,7 @@ Console.WriteLine( "debug TextDocument ctor3 SNAPSHOT :: len=" + text.Length );
 Encoding enc = MonoDevelop.Core.Text.TextFileUtility.DefaultEncoding;
 string fileName = null;
 
+if ( text == null ) text = String.Empty; // avoid null values going into ImmutableText ctor...
 ImmutableText buffer = new ImmutableText (text);
 
 			this.Initialize( enc, fileName, buffer, splitter ); // PURA POIS VAAN... ????
