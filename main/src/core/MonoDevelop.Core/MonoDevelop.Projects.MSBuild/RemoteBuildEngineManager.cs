@@ -216,7 +216,7 @@ namespace MonoDevelop.Projects.MSBuild
 if ( toolsVersion == "15.0" )
 {
 	// this is a QUICK workaround for linux only -- for versions > 14.0 a windows configuration is always set? or something like that...
-	Console.WriteLine( "toolsVersion FALLBACK 15.0 => 14.0" );
+	Console.WriteLine( "oe FIXME :: toolsVersion FALLBACK 15.0 => 14.0" );
 	toolsVersion = "14.0";
 }
 
@@ -447,12 +447,12 @@ if ( toolsVersion == "15.0" )
 
 // tommih 20200604
 Console.WriteLine();
-Console.WriteLine( "GetExeLocationInBundle :: toolsVersion=" + toolsVersion );
+Console.WriteLine( "oe DEBUG :: GetExeLocationInBundle :: toolsVersion=" + toolsVersion );
 
 			var exe = builderDir.Combine (toolsVersion, "MonoDevelop.Projects.Formats.MSBuild.exe");
 
 // tommih 20200604
-Console.WriteLine( "GetExeLocationInBundle :: exe=" + exe );
+Console.WriteLine( "oe DEBUG :: GetExeLocationInBundle :: exe=" + exe );
 Console.WriteLine();
 
 			if (File.Exists (exe))
@@ -529,7 +529,7 @@ Console.WriteLine();
 		static void UpdateMSBuildExeConfigFile (TargetRuntime runtime, string sourceConfigFile, string destinationConfigFile, string mdResolverConfig, string binDir)
 		{
 
-Console.WriteLine( "UpdateMSBuildExeConfigFile :: " + runtime.Id + " / " + runtime.Version + " : " + runtime.DisplayRuntimeName );
+Console.WriteLine( "oe DEBUG :: UpdateMSBuildExeConfigFile :: " + runtime.Id + " / " + runtime.Version + " : " + runtime.DisplayRuntimeName );
 
 			// Creates an MSBuild config file with the search paths registered by add-ins.
 
@@ -595,7 +595,7 @@ Console.WriteLine( "UpdateMSBuildExeConfigFile :: " + runtime.Id + " / " + runti
 		static void SetMSBuildConfigProperty (XElement elem, string name, string value, bool append = false, bool insertBefore = false)
 		{
 
-Console.WriteLine( "SetMSBuildConfigProperty :: " + name + " => " + value );
+Console.WriteLine( "oe DEBUG :: SetMSBuildConfigProperty :: " + name + " => " + value );
 
 			var prop = elem.Elements ("property").FirstOrDefault (p => p.Attribute ("name")?.Value == name);
 			if (prop != null) {

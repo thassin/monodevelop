@@ -159,11 +159,11 @@ namespace MonoDevelop.Ide
 			Runtime.Initialize (true);
 
 		//oe	Composition.CompositionManager.InitializeAsync ().Ignore ();
-Stopwatch sw = Stopwatch.StartNew();
-			var cm = Composition.CompositionManager.Instance;
+	Stopwatch sw = Stopwatch.StartNew(); // oe add...
+			var cm = Composition.CompositionManager.Instance; // no longer async.
 			if ( cm == null ) throw new InvalidOperationException( "CompositionManager init failed!" );
-long  milliseconds = sw.ElapsedMilliseconds;
-Console.WriteLine( "CompositionManager init took " + milliseconds + " ms." );
+	long  milliseconds = sw.ElapsedMilliseconds;
+	Console.WriteLine( "CompositionManager init took " + milliseconds + " ms." );
 
 			IdeApp.Customizer.OnCoreInitialized ();
 
@@ -186,9 +186,8 @@ Console.WriteLine( "CompositionManager init took " + milliseconds + " ms." );
 
 // -> since there seems to be no other mechanism, just add a small delay here so that the addins have a chance to get ready.
 // NOTICE 2020-07-28 : now that CompositionManager is loaded syncronously, this is perhaps not even needed....
-
-Console.WriteLine( "WAITING 2 seconds in IdeStartup.Run (must have the platform-addin loaded before app start)..." );
-Thread.Sleep( 2000 );
+	Console.WriteLine( "WAITING 2 seconds in IdeStartup.Run (must have the platform-addin loaded before app start)..." );
+	Thread.Sleep( 2000 ); // no longer needed, as CompositionManager is initialized synchronously???
 
 			monitor.BeginTask (GettextCatalog.GetString ("Starting {0}", BrandingService.ApplicationName), 2);
 

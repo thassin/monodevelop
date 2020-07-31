@@ -228,7 +228,7 @@ namespace Mono.TextEditor
 			}
 		}
 
-		// oe REPLACE...
+		// oe REPLACE method...
 		protected void Initialize(Encoding encoding, string fileName, ImmutableText buffer, ILineSplitter splitter)
 		{
 Console.WriteLine( "debug Initialize :: '" + fileName + "' enc=" + encoding + " len=" +  buffer.Length);
@@ -252,10 +252,10 @@ Console.WriteLine( "debug Initialize completed" );
 		{
 
 		// oe REMOVED...
-		//	this.TextBuffer.Changed -= this.OnTextBufferChanged;
-		//	this.TextBuffer.ContentTypeChanged -= this.OnTextBufferContentTypeChanged;
-		//	this.TextBuffer.Properties.RemoveProperty(typeof(ITextDocument));
-		//	this.VsTextDocument.FileActionOccurred -= this.OnTextDocumentFileActionOccured;
+		//oe	this.TextBuffer.Changed -= this.OnTextBufferChanged;
+		//oe	this.TextBuffer.ContentTypeChanged -= this.OnTextBufferContentTypeChanged;
+		//oe	this.TextBuffer.Properties.RemoveProperty(typeof(ITextDocument));
+		//oe	this.VsTextDocument.FileActionOccurred -= this.OnTextDocumentFileActionOccured;
 
 // TODO what to do here??? is this needed at all???
 Console.WriteLine( "tommih : TextDocument Disposed" );
@@ -309,7 +309,7 @@ if ( text == null ) text = String.Empty; // avoid null values going into Immutab
 ImmutableText buffer = new ImmutableText (text);
 splitter = new LineSplitter();
 
-			this.Initialize( enc, fileName, buffer, splitter ); // PURA POIS VAAN... ????
+			this.Initialize( enc, fileName, buffer, splitter );
 
 Text = text;	// must set the Text property...
 
@@ -326,7 +326,7 @@ string fileName = null;
 if ( text == null ) text = String.Empty; // avoid null values going into ImmutableText ctor...
 ImmutableText buffer = new ImmutableText (text);
 
-			this.Initialize( enc, fileName, buffer, splitter ); // PURA POIS VAAN... ????
+			this.Initialize( enc, fileName, buffer, splitter );
 
 // this constructor is used only for "snapshot document" generation.
 // -> the Text property must NOT be set here!!!
@@ -2027,7 +2027,7 @@ Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
 			RequestUpdate (new MultipleLineUpdate (start, end));
 			CommitDocumentUpdate ();
 		}
-		
+
 		public event EventHandler DocumentUpdated;
 
 #endregion
@@ -2279,7 +2279,7 @@ Console.WriteLine( "SnapshotDocument ctor" );
 
 		public void CopyTo (int sourceIndex, char [] destination, int destinationIndex, int count)
 		{
-			buffer.CopyTo (sourceIndex, destination, destinationIndex, count); 
+			buffer.CopyTo (sourceIndex, destination, destinationIndex, count);
 		}
 
 		// oe add...

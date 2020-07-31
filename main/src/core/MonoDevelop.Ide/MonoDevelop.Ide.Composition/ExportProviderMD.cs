@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MonoDevelop.Ide.Composition
 {
-	public class MDExportProvider
+	public class ExportProviderMD
 	{
 		private static System.Composition.Hosting.CompositionHost container = null;
 

@@ -76,7 +76,7 @@ main/tests/MonoDevelop.CSharpBinding.Tests/MonoDevelop.CSharpBinding.Tests.cspro
 
 	 added/reverted:
 	^^^^^^^^^^^^^^^^^
-main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/MDExportProvider.cs
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/ExportProviderMD.cs
 
 ##############################################################################################
 

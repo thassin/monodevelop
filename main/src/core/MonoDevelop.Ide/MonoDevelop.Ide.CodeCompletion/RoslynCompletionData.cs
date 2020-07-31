@@ -216,7 +216,6 @@ namespace MonoDevelop.Ide.CodeCompletion
 			}
 		}
 
-		// oe REPLACE method...
 		public override void InsertCompletionText (CompletionListWindow window, ref KeyActions ka, KeyDescriptor descriptor)
 		{
 
@@ -231,20 +230,16 @@ Console.WriteLine("oe-TODO :: RoslynCompletionData.InsertCompletionText");
 			var completionChange = Provider.GetChangeAsync (doc, CompletionItem, null, default (CancellationToken)).WaitAndGetResult (default (CancellationToken));
 			var textChange = completionChange.TextChange;
 
+			// oe add...
 			int start = textChange.Span.Start;
 			int length = textChange.Span.Length;
-
 			string newText = textChange.NewText;
-
-			// tommih 20200721 : usually "length" is too small (always 1), even though multiple chars have been typed since the completion event launch.
-			// -> perhaps one could simply use the current caret-position to fix that in most cases? there is no option to change line or go back???
-
+// tommih 20200721 : usually "length" is too small (always 1), even though multiple chars have been typed since the completion event launch.
+// -> perhaps one could simply use the current caret-position to fix that in most cases? there is no option to change line or go back???
 			int length2 = editor.CaretOffset - start;
 Console.WriteLine("RoslynCompletionData.InsertCompletionText :: debug l=" + length + " l2=" + length2);
 			if (length2 > length) textChange = new TextChange( new TextSpan( start, length2 ), newText );
-
 Console.WriteLine("RoslynCompletionData.InsertCompletionText :: textChange s=" + textChange.Span.Start + " l=" + textChange.Span.Length + " nt='" + textChange.NewText + "'");
-
 			editor.ApplyTextChanges ( new [] { textChange } );
 
 		//oe	var currentBuffer = editor.GetPlatformTextBuffer ();

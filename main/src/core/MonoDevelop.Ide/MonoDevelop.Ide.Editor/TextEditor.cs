@@ -981,6 +981,7 @@ namespace MonoDevelop.Ide.Editor
 				provider.Dispose ();
 			textEditorImpl.Dispose ();
 
+		// oe REMOVED...
 		//oe	this.TextView.Close();
 
 			base.Dispose (disposing);
