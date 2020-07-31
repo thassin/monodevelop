@@ -1,5 +1,5 @@
 ﻿//
-// SourceEditorView.IEditorOperations.cs
+// SourceEditorView.IEditorOperationsMD.cs
 //
 // Author:
 //       Mike Krüger <mikkrg@microsoft.com>
@@ -25,32 +25,36 @@
 // THE SOFTWARE.
 
 using System;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Formatting;
-using Microsoft.VisualStudio.Text.Operations;
+//using Microsoft.VisualStudio.Text; oe removed...
+//using Microsoft.VisualStudio.Text.Editor; oe removed...
+//using Microsoft.VisualStudio.Text.Formatting; oe removed...
+//using Microsoft.VisualStudio.Text.Operations; oe removed...
 using Mono.TextEditor;
 using MonoDevelop.Ide.Editor;
+
+// oe NOTICE : convert each "IEditorOperations." => "IEditorOperationsMD." in this file.
+// oe NOTICE : convert each "IEditorOperations." => "IEditorOperationsMD." in this file.
+// oe NOTICE : convert each "IEditorOperations." => "IEditorOperationsMD." in this file.
 
 namespace MonoDevelop.SourceEditor
 {
 	partial class SourceEditorView : IMonoDevelopEditorOperations
 	{
-		bool IEditorOperations.CanPaste => this.EnablePaste;
+		bool IEditorOperationsMD.CanPaste => this.EnablePaste;
 
-		bool IEditorOperations.CanDelete => this.EnableDelete;
+		bool IEditorOperationsMD.CanDelete => this.EnableDelete;
 
-		bool IEditorOperations.CanCut => this.EnableCut;
+		bool IEditorOperationsMD.CanCut => this.EnableCut;
 
-		public ITextView TextView { get; set; }
+	//oe	public ITextView TextView { get; set; }
 
-		IEditorOptions IEditorOperations.Options => throw new NotImplementedException ();
+	//oe	IEditorOptions IEditorOperationsMD.Options => throw new NotImplementedException ();
 
-		ITrackingSpan IEditorOperations.ProvisionalCompositionSpan => throw new NotImplementedException ();
+	//oe	ITrackingSpan IEditorOperationsMD.ProvisionalCompositionSpan => throw new NotImplementedException ();
 
-		string IEditorOperations.SelectedText => TextEditor.SelectedText;
+		string IEditorOperationsMD.SelectedText => TextEditor.SelectedText;
 
-		void IEditorOperations.MoveLineDown (bool extendSelection)
+		void IEditorOperationsMD.MoveLineDown (bool extendSelection)
 		{
 			if (extendSelection) {
 				SelectionActions.MoveDown (TextEditor.GetTextEditorData ());
@@ -59,7 +63,7 @@ namespace MonoDevelop.SourceEditor
 			}
 		}
 
-		void IEditorOperations.MoveLineUp (bool extendSelection)
+		void IEditorOperationsMD.MoveLineUp (bool extendSelection)
 		{
 			if (extendSelection) {
 				SelectionActions.MoveUp (TextEditor.GetTextEditorData ());
@@ -68,7 +72,7 @@ namespace MonoDevelop.SourceEditor
 			}
 		}
 
-		void IEditorOperations.MoveToPreviousCharacter (bool extendSelection)
+		void IEditorOperationsMD.MoveToPreviousCharacter (bool extendSelection)
 		{
 			if (extendSelection) {
 				SelectionActions.MoveLeft (TextEditor.GetTextEditorData ());
@@ -77,7 +81,7 @@ namespace MonoDevelop.SourceEditor
 			}
 		}
 
-		void IEditorOperations.MoveToNextCharacter (bool extendSelection)
+		void IEditorOperationsMD.MoveToNextCharacter (bool extendSelection)
 		{
 			if (extendSelection) {
 				SelectionActions.MoveRight (TextEditor.GetTextEditorData ());
@@ -86,7 +90,7 @@ namespace MonoDevelop.SourceEditor
 			}
 		}
 
-		void IEditorOperations.MoveToEndOfLine (bool extendSelection)
+		void IEditorOperationsMD.MoveToEndOfLine (bool extendSelection)
 		{
 			if (extendSelection) {
 				SelectionActions.MoveLineEnd (TextEditor.GetTextEditorData ());
@@ -95,7 +99,7 @@ namespace MonoDevelop.SourceEditor
 			}
 		}
 
-		void IEditorOperations.MoveToStartOfLine (bool extendSelection)
+		void IEditorOperationsMD.MoveToStartOfLine (bool extendSelection)
 		{
 			if (extendSelection) {
 				TextEditor.RunAction (SelectionActions.MoveLineHome);
@@ -104,7 +108,7 @@ namespace MonoDevelop.SourceEditor
 			}
 		}
 
-		void IEditorOperations.MoveToStartOfDocument (bool extendSelection)
+		void IEditorOperationsMD.MoveToStartOfDocument (bool extendSelection)
 		{
 			if (extendSelection) {
 				TextEditor.RunAction (SelectionActions.MoveToDocumentStart);
@@ -113,7 +117,7 @@ namespace MonoDevelop.SourceEditor
 			}
 		}
 
-		void IEditorOperations.MoveToEndOfDocument (bool extendSelection)
+		void IEditorOperationsMD.MoveToEndOfDocument (bool extendSelection)
 		{
 			if (extendSelection) {
 				TextEditor.RunAction (SelectionActions.MoveToDocumentEnd);
@@ -122,66 +126,65 @@ namespace MonoDevelop.SourceEditor
 			}
 		}
 
-		bool IEditorOperations.Backspace ()
+		bool IEditorOperationsMD.Backspace ()
 		{
 			TextEditor.RunAction (DeleteActions.Backspace);
 			return true;
 		}
 
-		bool IEditorOperations.CopySelection ()
+		bool IEditorOperationsMD.CopySelection ()
 		{
 			TextEditor.RunAction (ClipboardActions.Copy);
 			return true;
 		}
 
-		bool IEditorOperations.CutSelection ()
+		bool IEditorOperationsMD.CutSelection ()
 		{
 			ClipboardActions.Cut (TextEditor.GetTextEditorData ());
 			return true;
 		}
 
-		bool IEditorOperations.Paste ()
+		bool IEditorOperationsMD.Paste ()
 		{
 			return ClipboardActions.PasteWithResult (TextEditor.GetTextEditorData ());
 		}
 
-		bool IEditorOperations.InsertNewLine ()
+		bool IEditorOperationsMD.InsertNewLine ()
 		{
 			TextEditor.RunAction (MiscActions.InsertNewLine);
 			return true;
 		}
 
-		bool IEditorOperations.Tabify ()
+		bool IEditorOperationsMD.Tabify ()
 		{
 			TextEditor.RunAction (MiscActions.InsertTab);
 			return true;
 		}
 
-		bool IEditorOperations.Untabify ()
+		bool IEditorOperationsMD.Untabify ()
 		{
 			TextEditor.RunAction (MiscActions.RemoveTab);
 			return true;
 		}
 
-		bool IEditorOperations.DeleteWordToLeft ()
+		bool IEditorOperationsMD.DeleteWordToLeft ()
 		{
 			TextEditor.RunAction (DeleteActions.PreviousWord);
 			return true;
 		}
 
-		bool IEditorOperations.DeleteWordToRight ()
+		bool IEditorOperationsMD.DeleteWordToRight ()
 		{
 			TextEditor.RunAction (DeleteActions.NextWord);
 			return true;
 		}
 
-		void IEditorOperations.ScrollLineCenter ()
+		void IEditorOperationsMD.ScrollLineCenter ()
 		{
 			TextEditor.RunAction (MiscActions.RecenterEditor);
 		}
 
-
-		void IEditorOperations.MoveToNextWord (bool extendSelection)
+		void IEditorOperationsMD.MoveToNextWord (bool extendSelection)
 		{
 			if (extendSelection) {
 				TextEditor.RunAction (SelectionActions.MoveNextWord);
@@ -190,7 +193,7 @@ namespace MonoDevelop.SourceEditor
 			}
 		}
 
-		void IEditorOperations.MoveToPreviousWord (bool extendSelection)
+		void IEditorOperationsMD.MoveToPreviousWord (bool extendSelection)
 		{
 			if (extendSelection) {
 				TextEditor.RunAction (SelectionActions.MovePreviousWord);
@@ -199,7 +202,7 @@ namespace MonoDevelop.SourceEditor
 			}
 		}
 
-		void IEditorOperations.PageUp (bool extendSelection)
+		void IEditorOperationsMD.PageUp (bool extendSelection)
 		{
 			if (extendSelection) {
 				TextEditor.RunAction (SelectionActions.MovePageUp);
@@ -208,7 +211,7 @@ namespace MonoDevelop.SourceEditor
 			}
 		}
 
-		void IEditorOperations.PageDown (bool extendSelection)
+		void IEditorOperationsMD.PageDown (bool extendSelection)
 		{
 			if (extendSelection) {
 				TextEditor.RunAction (SelectionActions.MovePageDown);
@@ -217,39 +220,39 @@ namespace MonoDevelop.SourceEditor
 			}
 		}
 
-		bool IEditorOperations.DeleteFullLine ()
+		bool IEditorOperationsMD.DeleteFullLine ()
 		{
 			TextEditor.RunAction (DeleteActions.CaretLine);
 			return true;
 		}
 
-		bool IEditorOperations.DeleteToEndOfLine ()
+		bool IEditorOperationsMD.DeleteToEndOfLine ()
 		{
 			TextEditor.RunAction (DeleteActions.CaretLineToEnd);
 			return true;
 		}
 
-		void IEditorOperations.ScrollLineTop ()
+		void IEditorOperationsMD.ScrollLineTop ()
 		{
 			TextEditor.RunAction (ScrollActions.Up);
 		}
 
-		void IEditorOperations.ScrollLineBottom ()
+		void IEditorOperationsMD.ScrollLineBottom ()
 		{
 			TextEditor.RunAction (ScrollActions.Down);
 		}
 
-		void IEditorOperations.ScrollPageUp ()
+		void IEditorOperationsMD.ScrollPageUp ()
 		{
 			TextEditor.RunAction (ScrollActions.PageUp);
 		}
 
-		void IEditorOperations.ScrollPageDown ()
+		void IEditorOperationsMD.ScrollPageDown ()
 		{
 			TextEditor.RunAction (ScrollActions.PageDown);
 		}
 
-		bool IEditorOperations.Indent ()
+		bool IEditorOperationsMD.Indent ()
 		{
 			if (widget.TextEditor.IsSomethingSelected) {
 				MiscActions.IndentSelection (widget.TextEditor.GetTextEditorData ());
@@ -260,28 +263,28 @@ namespace MonoDevelop.SourceEditor
 			return true;
 		}
 
-		bool IEditorOperations.Unindent ()
+		bool IEditorOperationsMD.Unindent ()
 		{
 			MiscActions.RemoveTab (widget.TextEditor.GetTextEditorData ());
 			return true;
 		}
 
-		void IEditorOperations.SelectAndMoveCaret (VirtualSnapshotPoint anchorPoint, VirtualSnapshotPoint activePoint)
-		{
-			throw new NotImplementedException ();
-		}
+	//oe	void IEditorOperationsMD.SelectAndMoveCaret (VirtualSnapshotPoint anchorPoint, VirtualSnapshotPoint activePoint)
+	//oe	{
+	//oe		throw new NotImplementedException ();
+	//oe	}
 
-		void IEditorOperations.SelectAndMoveCaret (VirtualSnapshotPoint anchorPoint, VirtualSnapshotPoint activePoint, TextSelectionMode selectionMode)
-		{
-			throw new NotImplementedException ();
-		}
+	//oe	void IEditorOperationsMD.SelectAndMoveCaret (VirtualSnapshotPoint anchorPoint, VirtualSnapshotPoint activePoint, TextSelectionMode selectionMode)
+	//oe	{
+	//oe		throw new NotImplementedException ();
+	//oe	}
 
-		void IEditorOperations.SelectAndMoveCaret (VirtualSnapshotPoint anchorPoint, VirtualSnapshotPoint activePoint, TextSelectionMode selectionMode, EnsureSpanVisibleOptions? scrollOptions)
-		{
-			throw new NotImplementedException ();
-		}
+	//oe	void IEditorOperationsMD.SelectAndMoveCaret (VirtualSnapshotPoint anchorPoint, VirtualSnapshotPoint activePoint, TextSelectionMode selectionMode, EnsureSpanVisibleOptions? scrollOptions)
+	//oe	{
+	//oe		throw new NotImplementedException ();
+	//oe	}
 
-		void IEditorOperations.MoveToHome (bool extendSelection)
+		void IEditorOperationsMD.MoveToHome (bool extendSelection)
 		{
 			if (extendSelection) {
 				TextEditor.RunAction (SelectionActions.MoveLineHome);
@@ -290,290 +293,291 @@ namespace MonoDevelop.SourceEditor
 			}
 		}
 
-		void IEditorOperations.GotoLine (int lineNumber)
+		void IEditorOperationsMD.GotoLine (int lineNumber)
 		{
 			TextEditor.Caret.Line = lineNumber;
 			TextEditor.ScrollToCaret ();
 		}
 
-		void IEditorOperations.MoveCurrentLineToTop ()
+		void IEditorOperationsMD.MoveCurrentLineToTop ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.MoveCurrentLineToBottom ()
+		void IEditorOperationsMD.MoveCurrentLineToBottom ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.MoveToStartOfLineAfterWhiteSpace (bool extendSelection)
+		void IEditorOperationsMD.MoveToStartOfLineAfterWhiteSpace (bool extendSelection)
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.MoveToStartOfNextLineAfterWhiteSpace (bool extendSelection)
+		void IEditorOperationsMD.MoveToStartOfNextLineAfterWhiteSpace (bool extendSelection)
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.MoveToStartOfPreviousLineAfterWhiteSpace (bool extendSelection)
+		void IEditorOperationsMD.MoveToStartOfPreviousLineAfterWhiteSpace (bool extendSelection)
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.MoveToLastNonWhiteSpaceCharacter (bool extendSelection)
+		void IEditorOperationsMD.MoveToLastNonWhiteSpaceCharacter (bool extendSelection)
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.MoveToTopOfView (bool extendSelection)
+		void IEditorOperationsMD.MoveToTopOfView (bool extendSelection)
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.MoveToBottomOfView (bool extendSelection)
+		void IEditorOperationsMD.MoveToBottomOfView (bool extendSelection)
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.SwapCaretAndAnchor ()
+		void IEditorOperationsMD.SwapCaretAndAnchor ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.DeleteToBeginningOfLine ()
+		bool IEditorOperationsMD.DeleteToBeginningOfLine ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.DeleteBlankLines ()
+		bool IEditorOperationsMD.DeleteBlankLines ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.DeleteHorizontalWhiteSpace ()
+		bool IEditorOperationsMD.DeleteHorizontalWhiteSpace ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.OpenLineAbove ()
+		bool IEditorOperationsMD.OpenLineAbove ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.OpenLineBelow ()
+		bool IEditorOperationsMD.OpenLineBelow ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.IncreaseLineIndent ()
+		bool IEditorOperationsMD.IncreaseLineIndent ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.DecreaseLineIndent ()
+		bool IEditorOperationsMD.DecreaseLineIndent ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.InsertText (string text)
+		bool IEditorOperationsMD.InsertText (string text)
 		{
 			TextEditor.InsertAtCaret (text);
 			return true;
 		}
 
-		bool IEditorOperations.InsertTextAsBox (string text, out VirtualSnapshotPoint boxStart, out VirtualSnapshotPoint boxEnd)
+	//oe	bool IEditorOperationsMD.InsertTextAsBox (string text, out VirtualSnapshotPoint boxStart, out VirtualSnapshotPoint boxEnd)
+	//oe	{
+	//oe		throw new NotImplementedException ();
+	//oe	}
+
+		bool IEditorOperationsMD.InsertProvisionalText (string text)
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.InsertProvisionalText (string text)
-		{
-			throw new NotImplementedException ();
-		}
-
-		bool IEditorOperations.Delete ()
+		bool IEditorOperationsMD.Delete ()
 		{
 			TextEditor.RunAction (DeleteActions.Delete);
 			return true;
 		}
 
-		bool IEditorOperations.ReplaceSelection (string text)
+		bool IEditorOperationsMD.ReplaceSelection (string text)
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.TransposeCharacter ()
+		bool IEditorOperationsMD.TransposeCharacter ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.TransposeLine ()
+		bool IEditorOperationsMD.TransposeLine ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.TransposeWord ()
+		bool IEditorOperationsMD.TransposeWord ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.MakeLowercase ()
+		bool IEditorOperationsMD.MakeLowercase ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.MakeUppercase ()
+		bool IEditorOperationsMD.MakeUppercase ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.ToggleCase ()
+		bool IEditorOperationsMD.ToggleCase ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.Capitalize ()
+		bool IEditorOperationsMD.Capitalize ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.ReplaceText (Span replaceSpan, string text)
+	//oe	bool IEditorOperationsMD.ReplaceText (Span replaceSpan, string text)
+	//oe	{
+	//oe		throw new NotImplementedException ();
+	//oe	}
+
+		int IEditorOperationsMD.ReplaceAllMatches (string searchText, string replaceText, bool matchCase, bool matchWholeWord, bool useRegularExpressions)
 		{
 			throw new NotImplementedException ();
 		}
 
-		int IEditorOperations.ReplaceAllMatches (string searchText, string replaceText, bool matchCase, bool matchWholeWord, bool useRegularExpressions)
+		bool IEditorOperationsMD.InsertFile (string filePath)
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.InsertFile (string filePath)
+		bool IEditorOperationsMD.ConvertSpacesToTabs ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.ConvertSpacesToTabs ()
+		bool IEditorOperationsMD.ConvertTabsToSpaces ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.ConvertTabsToSpaces ()
+		bool IEditorOperationsMD.NormalizeLineEndings (string replacement)
 		{
 			throw new NotImplementedException ();
 		}
 
-		bool IEditorOperations.NormalizeLineEndings (string replacement)
+		void IEditorOperationsMD.SelectCurrentWord ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.SelectCurrentWord ()
+		void IEditorOperationsMD.SelectEnclosing ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.SelectEnclosing ()
+		void IEditorOperationsMD.SelectFirstChild ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.SelectFirstChild ()
+		void IEditorOperationsMD.SelectNextSibling (bool extendSelection)
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.SelectNextSibling (bool extendSelection)
+		void IEditorOperationsMD.SelectPreviousSibling (bool extendSelection)
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.SelectPreviousSibling (bool extendSelection)
-		{
-			throw new NotImplementedException ();
-		}
+	//oe	void IEditorOperationsMD.SelectLine (ITextViewLine viewLine, bool extendSelection)
+	//oe	{
+	//oe		throw new NotImplementedException ();
+	//oe	}
 
-		void IEditorOperations.SelectLine (ITextViewLine viewLine, bool extendSelection)
-		{
-			throw new NotImplementedException ();
-		}
-
-		void IEditorOperations.SelectAll ()
+		void IEditorOperationsMD.SelectAll ()
 		{
 			TextEditor.RunAction (SelectionActions.SelectAll);
 		}
 
-		void IEditorOperations.ExtendSelection (int newEnd)
+		void IEditorOperationsMD.ExtendSelection (int newEnd)
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.MoveCaret (ITextViewLine textLine, double horizontalOffset, bool extendSelection)
-		{
-			throw new NotImplementedException ();
-		}
+	//oe	void IEditorOperationsMD.MoveCaret (ITextViewLine textLine, double horizontalOffset, bool extendSelection)
+	//oe	{
+	//oe		throw new NotImplementedException ();
+	//oe	}
 
-		void IEditorOperations.ResetSelection ()
+		void IEditorOperationsMD.ResetSelection ()
 		{
 			TextEditor.RunAction (SelectionActions.ClearSelection);
 		}
 
-		bool IEditorOperations.CutFullLine ()
+		bool IEditorOperationsMD.CutFullLine ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.ScrollUpAndMoveCaretIfNecessary ()
+		void IEditorOperationsMD.ScrollUpAndMoveCaretIfNecessary ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.ScrollDownAndMoveCaretIfNecessary ()
+		void IEditorOperationsMD.ScrollDownAndMoveCaretIfNecessary ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.ScrollColumnLeft ()
+		void IEditorOperationsMD.ScrollColumnLeft ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.ScrollColumnRight ()
+		void IEditorOperationsMD.ScrollColumnRight ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.AddBeforeTextBufferChangePrimitive ()
+		void IEditorOperationsMD.AddBeforeTextBufferChangePrimitive ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.AddAfterTextBufferChangePrimitive ()
+		void IEditorOperationsMD.AddAfterTextBufferChangePrimitive ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		void IEditorOperations.ZoomIn ()
+		void IEditorOperationsMD.ZoomIn ()
 		{
 			TextEditor.Options.ZoomIn ();
 		}
 
-		void IEditorOperations.ZoomOut ()
+		void IEditorOperationsMD.ZoomOut ()
 		{
 			TextEditor.Options.ZoomOut ();
 		}
 
-		void IEditorOperations.ZoomTo (double zoomLevel)
+		void IEditorOperationsMD.ZoomTo (double zoomLevel)
 		{
 			TextEditor.Options.Zoom = zoomLevel;
 		}
 
-		string IEditorOperations.GetWhitespaceForVirtualSpace (VirtualSnapshotPoint point)
-		{
-			throw new NotImplementedException ();
-		}
+	//oe	string IEditorOperationsMD.GetWhitespaceForVirtualSpace (VirtualSnapshotPoint point)
+	//oe	{
+	//oe		throw new NotImplementedException ();
+	//oe	}
 
-		#region IMonoDevelopEditorOperations members
+#region IMonoDevelopEditorOperations members
+
 		void IMonoDevelopEditorOperations.SwitchCaretMode ()
 		{
 			TextEditor.RunAction (MiscActions.SwitchCaretMode);
@@ -637,6 +641,8 @@ namespace MonoDevelop.SourceEditor
 			TextEditor.SelectionMode = TextEditor.SelectionMode == MonoDevelop.Ide.Editor.SelectionMode.Normal ? MonoDevelop.Ide.Editor.SelectionMode.Block : MonoDevelop.Ide.Editor.SelectionMode.Normal;
 			TextEditor.QueueDraw ();
 		}
-  		#endregion
+
+#endregion
+
 	}
 }

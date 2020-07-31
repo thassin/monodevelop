@@ -23,11 +23,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-//
 
 using System;
 using System.Linq;
-using Microsoft.VisualStudio.Text;
+//using Microsoft.VisualStudio.Text; oe removed...
 using MonoDevelop.Core.Text;
 using MonoDevelop.Ide.Editor;
 
@@ -198,9 +197,9 @@ namespace Mono.TextEditor
 			DesiredColumn = DocumentLocation.MinColumn;
 			AutoUpdatePosition = true;
 
-			// Set up initial values
-			_caretAffinity = PositionAffinity.Successor;
-			insertionPoint = new VirtualSnapshotPoint (new SnapshotPoint (editor.Document.TextBuffer.CurrentSnapshot, 0));
+		//oe	// Set up initial values
+		//oe	_caretAffinity = PositionAffinity.Successor;
+		//oe	insertionPoint = new VirtualSnapshotPoint (new SnapshotPoint (editor.Document.TextBuffer.CurrentSnapshot, 0));
 		}
 
 		/// <summary>
@@ -329,7 +328,8 @@ namespace Mono.TextEditor
 		{
 			TextEditorData.Document.EnsureOffsetIsUnfolded (Offset);
 			base.OnPositionChanged (args);
-			PositionChanged_ITextCaret (args);
+
+		//oe	PositionChanged_ITextCaret (args);
 		}
 		
 		protected virtual void OnModeChanged ()

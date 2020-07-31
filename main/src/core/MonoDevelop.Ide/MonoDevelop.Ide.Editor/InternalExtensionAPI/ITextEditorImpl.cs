@@ -46,7 +46,9 @@ namespace MonoDevelop.Ide.Editor
 
 	interface ITextEditorImpl : IDisposable
 	{
-		Microsoft.VisualStudio.Text.Editor.ITextView TextView { get; set; }
+
+	// oe REMOVED...
+	//oe	Microsoft.VisualStudio.Text.Editor.ITextView TextView { get; set; }
 
 		ViewContent ViewContent { get; }
 

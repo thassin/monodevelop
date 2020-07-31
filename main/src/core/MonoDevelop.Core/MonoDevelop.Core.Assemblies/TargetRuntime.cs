@@ -410,6 +410,9 @@ namespace MonoDevelop.Core.Assemblies
 		
 		void BackgroundInitialize (object state)
 		{
+
+Console.WriteLine( "oe DEBUG : TargetRuntime.BackgroundInitialize" );
+
 			timer = Counters.TargetRuntimesLoading.BeginTiming ("Initializing Runtime " + Id);
 			lock (initLock) {
 				try {

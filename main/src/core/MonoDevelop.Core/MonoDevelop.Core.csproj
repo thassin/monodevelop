@@ -2,11 +2,9 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <Import Project="..\..\..\MonoDevelop.props" />
   <PropertyGroup>
-    <ReferencesVSEditorCopyToOutput>true</ReferencesVSEditorCopyToOutput>
     <ReferencesRoslynCopyToOutput>true</ReferencesRoslynCopyToOutput>
   </PropertyGroup>
   <Import Project="$(ReferencesRoslyn)" />
-  <Import Project="$(ReferencesVSEditor)" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -240,9 +238,6 @@
     </Reference>
     <Reference Include="System.Xml.XPath.XDocument">
       <HintPath>..\..\..\packages\System.Xml.XPath.XDocument.4.3.0\lib\net46\System.Xml.XPath.XDocument.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.CodingConventions">
-      <HintPath>..\..\..\packages\Microsoft.VisualStudio.CodingConventions.1.1.20180226.4\lib\netstandard1.3\Microsoft.VisualStudio.CodingConventions.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -34,8 +34,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
-using Microsoft.VisualStudio.Platform;
-using Microsoft.VisualStudio.Utilities;
+//using Microsoft.VisualStudio.Platform; oe removed...
+//using Microsoft.VisualStudio.Utilities; oe removed...
 
 using Mono.Addins;
 using MonoDevelop.Core;
@@ -297,23 +297,25 @@ namespace MonoDevelop.Ide.Desktop
 			}
 		}
 
-		static IFilePathRegistryService filePathRegistryService = CompositionManager.GetExportedValue<IFilePathRegistryService> ();
+	//oe	static IFilePathRegistryService filePathRegistryService = CompositionManager.GetExportedValue<IFilePathRegistryService> ();
+
 		MimeTypeNode FindMimeTypeForFile (string fileName)
 		{
-			try {
-				IContentType contentType = filePathRegistryService.GetContentTypeForPath (fileName);
-				if (contentType != PlatformCatalog.Instance.ContentTypeRegistryService.UnknownContentType) {
-					string mimeType = PlatformCatalog.Instance.MimeToContentTypeRegistryService.GetMimeType (contentType);
-					if (mimeType != null) {
-						MimeTypeNode mt = FindMimeType (mimeType);
-						if (mt != null) {
-							return mt;
-						}
-					}
-				}
-			} catch (Exception ex) {
-				LoggingService.LogError ("IFilePathRegistryService query failed", ex);
-			}
+
+		//eo	try {
+		//oe		IContentType contentType = filePathRegistryService.GetContentTypeForPath (fileName);
+		//oe		if (contentType != PlatformCatalog.Instance.ContentTypeRegistryService.UnknownContentType) {
+		//eo			string mimeType = PlatformCatalog.Instance.MimeToContentTypeRegistryService.GetMimeType (contentType);
+		//eo			if (mimeType != null) {
+		//eo				MimeTypeNode mt = FindMimeType (mimeType);
+		//eo				if (mt != null) {
+		//oe					return mt;
+		//oe				}
+		//oe			}
+		//oe		}
+		//oe	} catch (Exception ex) {
+		//oe		LoggingService.LogError ("IFilePathRegistryService query failed", ex);
+		//oe	}
 
 			foreach (MimeTypeNode mt in mimeTypeNodes) {
 				if (mt.SupportsFile (fileName))

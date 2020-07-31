@@ -1,6 +1,5 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <Import Project="..\..\..\MonoDevelop.props" />
-  <Import Project="$(ReferencesVSEditor)" />
   <Import Project="$(ReferencesRoslyn)" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -151,10 +150,6 @@
     </Reference>
     <Reference Include="System.ValueTuple">
       <HintPath>..\..\..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.CodingConventions">
-      <HintPath>..\..\..\build\bin\Microsoft.VisualStudio.CodingConventions.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -361,7 +356,6 @@
     <Compile Include="MonoDevelop.Ide.Completion.Presentation\ContainedDocumentPreserveFormattingRule.cs" />
     <Compile Include="MonoDevelop.Ide.Completion.Presentation\IMonoDevelopContainedLanguageHost.cs" />
     <Compile Include="MonoDevelop.Ide.Completion.Presentation\IMyRoslynCompletionDataProvider.cs" />
-    <Compile Include="MonoDevelop.Ide.Completion.Presentation\MonoDevelopContainedDocument.cs" />
     <Compile Include="MonoDevelop.Ide.Completion.Presentation\MonoDevelopFormattingRuleFactoryServiceFactory.cs" />
     <Compile Include="MonoDevelop.Ide.Completion.Presentation\MyCSharpCompletionData.cs" />
     <Compile Include="MonoDevelop.Ide.Completion.Presentation\MyCSharpCompletionDataProvider.cs" />

@@ -28,7 +28,7 @@ using MonoDevelop.Core;
 using MonoDevelop.Ide.Gui.Content;
 using MonoDevelop.Ide.Fonts;
 using MonoDevelop.Ide.Editor.Extension;
-using Microsoft.VisualStudio.CodingConventions;
+//using Microsoft.VisualStudio.CodingConventions; oe removed...
 using System.Threading.Tasks;
 
 namespace MonoDevelop.Ide.Editor
@@ -54,7 +54,9 @@ namespace MonoDevelop.Ide.Editor
 		static DefaultSourceEditorOptions instance;
 		//static TextStylePolicy defaultPolicy;
 		static bool inited;
-		ICodingConventionContext context;
+
+	// oe REMOVED...
+	//oe	ICodingConventionContext context;
 
 		public static DefaultSourceEditorOptions Instance {
 			get { return instance; }
@@ -291,51 +293,9 @@ namespace MonoDevelop.Ide.Editor
 			return result;
 		}
 
-		internal void SetContext (ICodingConventionContext context)
-		{
-			this.context = context;
-			context.CodingConventionsChangedAsync += UpdateContextOptions;
-			UpdateContextOptions (null, null);
-		}
-
-		private Task UpdateContextOptions (object sender, CodingConventionsChangedEventArgs arg)
-		{
-			if (context == null)
-				return Task.FromResult (false);
-
-			defaultEolMarkerFromContext = null;
-			if (context.CurrentConventions.UniversalConventions.TryGetLineEnding (out string eolMarker))
-				defaultEolMarkerFromContext = eolMarker;
-
-			tabsToSpacesFromContext = null;
-			if (context.CurrentConventions.UniversalConventions.TryGetIndentStyle (out Microsoft.VisualStudio.CodingConventions.IndentStyle result))
-				tabsToSpacesFromContext = result == Microsoft.VisualStudio.CodingConventions.IndentStyle.Spaces;
-
-			indentationSizeFromContext = null;
-			if (context.CurrentConventions.UniversalConventions.TryGetIndentSize (out int indentSize)) 
-				indentationSizeFromContext = indentSize;
-
-			removeTrailingWhitespacesFromContext = null;
-			if (context.CurrentConventions.UniversalConventions.TryGetAllowTrailingWhitespace (out bool allowTrailing))
-				removeTrailingWhitespacesFromContext = !allowTrailing;
-
-			tabSizeFromContext = null;
-			if (context.CurrentConventions.UniversalConventions.TryGetTabWidth (out int tSize))
-				tabSizeFromContext = tSize;
-
-			rulerColumnFromContext = null;
-			showRulerFromContext = null;
-			if (context.CurrentConventions.TryGetConventionValue<string> (EditorConfigService.MaxLineLengthConvention, out string maxLineLength)) {
-				if (maxLineLength != "off" && int.TryParse (maxLineLength, out int i)) {
-					rulerColumnFromContext = i;
-					showRulerFromContext = true;
-				} else {
-					showRulerFromContext = false;
-				}
-			}
-
-			return Task.FromResult (true);
-		}
+	// or REMOVED...
+	//oe	internal void SetContext (ICodingConventionContext context)
+	//oe	private Task UpdateContextOptions (object sender, CodingConventionsChangedEventArgs arg)
 
 		#region new options
 
@@ -469,11 +429,11 @@ namespace MonoDevelop.Ide.Editor
 
 		#region ITextEditorOptions
 		string defaultEolMarker = Environment.NewLine;
-		string defaultEolMarkerFromContext = null;
-
+	//oe	string defaultEolMarkerFromContext = null;
 		public string DefaultEolMarker {
 			get {
-				return defaultEolMarkerFromContext ?? defaultEolMarker;
+			//oe	return defaultEolMarkerFromContext ?? defaultEolMarker;
+				return defaultEolMarker;
 			}
 			set {
 				if (defaultEolMarker != value) {
@@ -523,10 +483,11 @@ namespace MonoDevelop.Ide.Editor
 		}
 		
 		bool tabsToSpaces = true;
-		bool? tabsToSpacesFromContext;
+	//oe	bool? tabsToSpacesFromContext;
 		public bool TabsToSpaces {
 			get {
-				return tabsToSpacesFromContext ?? tabsToSpaces;
+			//oe	return tabsToSpacesFromContext ?? tabsToSpaces;
+				return tabsToSpaces;
 			}
 			set {
 				if (tabsToSpaces != value) {
@@ -538,10 +499,11 @@ namespace MonoDevelop.Ide.Editor
 		}
 		
 		int indentationSize = 4;
-		int? indentationSizeFromContext;
+	//oe	int? indentationSizeFromContext;
 		public int IndentationSize {
 			get {
-				return indentationSizeFromContext ?? indentationSize;
+			//oe	return indentationSizeFromContext ?? indentationSize;
+				return indentationSize;
 			}
 			set {
 				if (indentationSize != value) {
@@ -559,10 +521,11 @@ namespace MonoDevelop.Ide.Editor
 			}
 		}
 
-		int? tabSizeFromContext;
+	//oe	int? tabSizeFromContext;
 		public int TabSize {
 			get {
-				return tabSizeFromContext ?? IndentationSize;
+			//oe	return tabSizeFromContext ?? IndentationSize;
+				return IndentationSize;
 			}
 			set {
 				IndentationSize = value;
@@ -570,11 +533,11 @@ namespace MonoDevelop.Ide.Editor
 		}
 
 		bool removeTrailingWhitespaces = true;
-		bool? removeTrailingWhitespacesFromContext;
-
+	//oe	bool? removeTrailingWhitespacesFromContext;
 		public bool RemoveTrailingWhitespaces {
 			get {
-				return removeTrailingWhitespacesFromContext ?? removeTrailingWhitespaces;
+			//oe	return removeTrailingWhitespacesFromContext ?? removeTrailingWhitespaces;
+				return removeTrailingWhitespaces;
 			}
 			set {
 				if (removeTrailingWhitespaces != value) {
@@ -655,12 +618,11 @@ namespace MonoDevelop.Ide.Editor
 		}
 
 		int  rulerColumn = 120;
-		int? rulerColumnFromContext;
-
-
+	//oe	int? rulerColumnFromContext;
 		public int RulerColumn {
 			get {
-				return rulerColumnFromContext ?? rulerColumn;
+			//	return rulerColumnFromContext ?? rulerColumn;
+				return rulerColumn;
 			}
 			set {
 				if (rulerColumn != value) {
@@ -672,10 +634,11 @@ namespace MonoDevelop.Ide.Editor
 		}
 		
 		ConfigurationProperty<bool> showRuler = ConfigurationProperty.Create ("ShowRuler", true);
-		bool? showRulerFromContext;
+	//oe	bool? showRulerFromContext;
 		public bool ShowRuler {
 			get {
-				return showRulerFromContext ?? showRuler;
+			//oe	return showRulerFromContext ?? showRuler;
+				return showRuler;
 			}
 			set {
 				if (showRuler.Set (value))
@@ -821,7 +784,6 @@ namespace MonoDevelop.Ide.Editor
 		public bool SmartBackspace{
 			get {
 				return smartBackspace;
-
 			}
 			set {
 				if (smartBackspace.Set (value))
@@ -834,8 +796,11 @@ namespace MonoDevelop.Ide.Editor
 		{
 			FontService.RemoveCallback (UpdateFont);
 			IdeApp.Preferences.ColorScheme.Changed -= OnColorSchemeChanged;
-			if (context != null)
-				context.CodingConventionsChangedAsync -= UpdateContextOptions;
+
+		// oe REMOVED...
+		//oe	if (context != null)
+		//oe		context.CodingConventionsChangedAsync -= UpdateContextOptions;
+
 		}
 
 		protected void OnChanged (EventArgs args)

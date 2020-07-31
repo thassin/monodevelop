@@ -23,12 +23,15 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using System;
 using MonoDevelop.Core.Text;
 
 namespace MonoDevelop.Ide.Editor
 {
-	interface IMonoDevelopEditorOperations : Microsoft.VisualStudio.Text.Operations.IEditorOperations
+
+//oe	interface IMonoDevelopEditorOperations : Microsoft.VisualStudio.Text.Operations.IEditorOperations
+	interface IMonoDevelopEditorOperations : IEditorOperationsMD
 	{
 		void SwitchCaretMode ();
 

@@ -236,6 +236,14 @@ namespace MonoDevelop.Projects.MSBuild
 				// Always start the remote process explicitly, even if it's using the current runtime and fx
 				// else it won't pick up the assembly redirects from the builder exe
 
+// tommih 20200604
+if ( toolsVersion == "15.0" )
+{
+	// this is a QUICK workaround for linux only -- for versions > 14.0 a windows configuration is always set? or something like that...
+	Console.WriteLine( "oe FIXME :: toolsVersion FALLBACK 15.0 => 14.0" );
+	toolsVersion = "14.0";
+}
+
 				var exe = GetExeLocation (runtime, toolsVersion, requiresMicrosoftBuild);
 				RemoteProcessConnection connection = null;
 
@@ -469,7 +477,16 @@ namespace MonoDevelop.Projects.MSBuild
 				toolsVersion = "dotnet." + toolsVersion;
 			}
 
+// tommih 20200604
+Console.WriteLine();
+Console.WriteLine( "oe DEBUG :: GetExeLocationInBundle :: toolsVersion=" + toolsVersion );
+
 			var exe = builderDir.Combine (toolsVersion, "MonoDevelop.Projects.Formats.MSBuild.exe");
+
+// tommih 20200604
+Console.WriteLine( "oe DEBUG :: GetExeLocationInBundle :: exe=" + exe );
+Console.WriteLine();
+
 			if (File.Exists (exe))
 				return exe;
 
@@ -543,6 +560,9 @@ namespace MonoDevelop.Projects.MSBuild
 
 		static void UpdateMSBuildExeConfigFile (TargetRuntime runtime, string sourceConfigFile, string destinationConfigFile, string mdResolverConfig, string binDir)
 		{
+
+Console.WriteLine( "oe DEBUG :: UpdateMSBuildExeConfigFile :: " + runtime.Id + " / " + runtime.Version + " : " + runtime.DisplayRuntimeName );
+
 			// Creates an MSBuild config file with the search paths registered by add-ins.
 
 			var doc = XDocument.Load (sourceConfigFile);
@@ -606,6 +626,9 @@ namespace MonoDevelop.Projects.MSBuild
 
 		static void SetMSBuildConfigProperty (XElement elem, string name, string value, bool append = false, bool insertBefore = false)
 		{
+
+Console.WriteLine( "oe DEBUG :: SetMSBuildConfigProperty :: " + name + " => " + value );
+
 			var prop = elem.Elements ("property").FirstOrDefault (p => p.Attribute ("name")?.Value == name);
 			if (prop != null) {
 				var val = prop.Attribute ("value")?.Value;

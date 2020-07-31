@@ -286,6 +286,8 @@ fi
 
 echo PACKAGE_VERSION=$PACKAGE_VERSION > monodevelop_version
 
+## oe : src/core/Mono.TextEditor.Platform/Makefile removed from AC_OUTPUT.
+
 AC_OUTPUT([
 build/Makefile
 build/MacOSX/Makefile
@@ -294,7 +296,6 @@ msbuild/Makefile
 src/Makefile
 src/core/Makefile
 src/core/Mono.Texteditor/Makefile
-src/core/Mono.TextEditor.Platform/Makefile
 src/core/Mono.TextEditor.Shared/Makefile
 src/core/MonoDevelop.Core/Makefile
 src/core/MonoDevelop.Projects.Formats.MSBuild/Makefile

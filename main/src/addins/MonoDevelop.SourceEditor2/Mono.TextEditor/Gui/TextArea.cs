@@ -63,7 +63,8 @@ namespace Mono.TextEditor
 		protected GutterMargin     gutterMargin;
 		protected FoldMarkerMargin foldMarkerMargin;
 
-		internal MdTextViewLineCollection TextViewLines { get; set; }
+	// oe REMOVED...
+	//oe	internal MdTextViewLineCollection TextViewLines { get; set; }
 
 		protected TextViewMargin   textViewMargin;
 
@@ -245,11 +246,11 @@ namespace Mono.TextEditor
 			oldVadjustment = value;
 			TextViewMargin.caretY -= delta;
 
-			int startLine = YToLine (this.textEditorData.VAdjustment.Value);
-			TextViewLines?.RemoveLinesBefore (startLine);
+		//oe	int startLine = YToLine (this.textEditorData.VAdjustment.Value);
+		//oe	TextViewLines?.RemoveLinesBefore (startLine);
 
-			int endlLine = YToLine (this.textEditorData.VAdjustment.Value + Allocation.Height);
-			TextViewLines?.RemoveLinesAfter (endlLine);
+		//oe	int endlLine = YToLine (this.textEditorData.VAdjustment.Value + Allocation.Height);
+		//oe	TextViewLines?.RemoveLinesAfter (endlLine);
 
 			if (System.Math.Abs (delta) >= Allocation.Height - this.LineHeight * 2 || this.TextViewMargin.InSelectionDrag) {
 				this.QueueDraw ();
@@ -2185,7 +2186,9 @@ namespace Mono.TextEditor
 					if (wrapper.IsUncached)
 						wrapper.Dispose ();
 				}
-				TextViewLines?.Add (logicalLineNumber, line);
+
+			//oe	TextViewLines?.Add (logicalLineNumber, line);
+
 				double lineHeight = GetLineHeight (line);
 				foreach (var margin in this.margins) {
 					if (!margin.IsVisible)

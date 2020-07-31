@@ -75,7 +75,8 @@ namespace MonoDevelop.Ide.TypeSystem
 
 		internal static HostServices HostServices {
 			get {
-				return CompositionManager.Instance.HostServices;
+			//oe	return CompositionManager.Instance.HostServices;
+				return CompositionManager.HostServices;
 			}
 		}
 
@@ -919,11 +920,12 @@ namespace MonoDevelop.Ide.TypeSystem
 			if (document == null)
 				return;
 
-			var hostDocument = MonoDevelopHostDocumentRegistration.FromDocument (document);
-			if (hostDocument != null) {
-				hostDocument.UpdateText (text);
-				return;
-			}
+		// oe REMOVED (with IMonoDevelopHostDocument.cs)...
+		//oe	var hostDocument = MonoDevelopHostDocumentRegistration.FromDocument (document);
+		//oe	if (hostDocument != null) {
+		//oe		hostDocument.UpdateText (text);
+		//oe		return;
+		//oe	}
 
 			bool isOpen;
 			var filePath = document.FilePath;

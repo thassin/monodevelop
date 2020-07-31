@@ -38,20 +38,24 @@ using MonoDevelop.Ide.Editor;
 using MonoDevelop.Ide.Editor.Extension;
 using MonoDevelop.Ide;
 using MonoDevelop.Ide.Gui;
-using Microsoft.VisualStudio.Platform;
-using Microsoft.VisualStudio.Text;
+//using Microsoft.VisualStudio.Platform; oe removed...
+//using Microsoft.VisualStudio.Text; oe removed...
 using MonoDevelop.Ide.CodeTemplates;
 using System.Linq;
 using System.Text;
 using MonoDevelop.Ide.Editor.Highlighting;
 using MonoDevelop.Ide.Fonts;
 
+// oe NOTICE this is file originates from:
+// main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.CodeCompletion/RoslynCompletionData.cs
+// original namespace MonoDevelop.Ide.CodeCompletion
+
 namespace MonoDevelop.Ide.Completion.Presentation
 {
 	public abstract class MyRoslynCompletionData : CompletionData
 	{
 		protected readonly Microsoft.CodeAnalysis.Document doc;
-		protected readonly ITextSnapshot triggerSnapshot;
+	//oe	protected readonly ITextSnapshot triggerSnapshot; removed...
 		protected readonly CompletionService completionService;
 
 		public CompletionItem CompletionItem { get; private set; }
@@ -91,10 +95,12 @@ namespace MonoDevelop.Ide.Completion.Presentation
 			}
 		}
 
-		public MyRoslynCompletionData (Microsoft.CodeAnalysis.Document document, ITextSnapshot triggerSnapshot, CompletionService completionService, CompletionItem completionItem)
+	// oe TODO parameter removed -- need to replace it??? also see CSharpCompletionData.
+	//oe	public MyRoslynCompletionData (Microsoft.CodeAnalysis.Document document, ITextSnapshot triggerSnapshot, CompletionService completionService, CompletionItem completionItem)
+		public MyRoslynCompletionData (Microsoft.CodeAnalysis.Document document, /* ITextSnapshot triggerSnapshot, */ CompletionService completionService, CompletionItem completionItem)
 		{
 			this.doc = document;
-			this.triggerSnapshot = triggerSnapshot;
+		//oe	this.triggerSnapshot = triggerSnapshot;
 			this.completionService = completionService;
 			CompletionItem = completionItem;
 		}
@@ -127,6 +133,9 @@ namespace MonoDevelop.Ide.Completion.Presentation
 
 		public override void InsertCompletionText (CompletionListWindow window, ref KeyActions ka, KeyDescriptor descriptor)
 		{
+
+Console.WriteLine("oe-TODO :: RoslynCompletionData.InsertCompletionText");
+
 			var document = IdeApp.Workbench.ActiveDocument;
 			var editor = document?.Editor;
 			if (editor == null || completionService == null) {
@@ -134,27 +143,38 @@ namespace MonoDevelop.Ide.Completion.Presentation
 				return;
 			}
 			var completionChange = completionService.GetChangeAsync (doc, CompletionItem, null, default (CancellationToken)).WaitAndGetResult (default (CancellationToken));
-
-			var currentBuffer = editor.GetPlatformTextBuffer ();
 			var textChange = completionChange.TextChange;
 
-			var triggerSnapshotSpan = new SnapshotSpan (triggerSnapshot, new Span (textChange.Span.Start, textChange.Span.Length));
-			
-			var mappedSpan = triggerSnapshotSpan.TranslateTo (triggerSnapshot.TextBuffer.CurrentSnapshot, SpanTrackingMode.EdgeInclusive);
+			// oe add...
+			int start = textChange.Span.Start;
+			int length = textChange.Span.Length;
+			string newText = textChange.NewText;
+// tommih 20200721 : usually "length" is too small (always 1), even though multiple chars have been typed since the completion event launch.
+// -> perhaps one could simply use the current caret-position to fix that in most cases? there is no option to change line or go back???
+			int length2 = editor.CaretOffset - start;
+Console.WriteLine("RoslynCompletionData.InsertCompletionText :: debug l=" + length + " l2=" + length2);
+			if (length2 > length) textChange = new TextChange( new TextSpan( start, length2 ), newText );
+Console.WriteLine("RoslynCompletionData.InsertCompletionText :: textChange s=" + textChange.Span.Start + " l=" + textChange.Span.Length + " nt='" + textChange.NewText + "'");
+			editor.ApplyTextChanges ( new [] { textChange } );
 
-			triggerSnapshot.TextBuffer.Replace (mappedSpan, completionChange.TextChange.NewText);
-//			editor.ReplaceText (mappedSpan.Start, mappedSpan.Length, completionChange.TextChange.NewText);
+		//oe	var currentBuffer = editor.GetPlatformTextBuffer ();
+		//oe	var triggerSnapshotSpan = new SnapshotSpan (triggerSnapshot, new Span (textChange.Span.Start, textChange.Span.Length));
+		//oe	var mappedSpan = triggerSnapshotSpan.TranslateTo (triggerSnapshot.TextBuffer.CurrentSnapshot, SpanTrackingMode.EdgeInclusive);
+		//oe	triggerSnapshot.TextBuffer.Replace (mappedSpan, completionChange.TextChange.NewText);
+		//oe	//editor.ReplaceText (mappedSpan.Start, mappedSpan.Length, completionChange.TextChange.NewText);
 
 			if (completionChange.NewPosition.HasValue)
 				editor.CaretOffset = completionChange.NewPosition.Value;
 
-			if (CompletionItem.Rules.FormatOnCommit) {
-				var endOffset = mappedSpan.Start + completionChange.TextChange.NewText.Length;
-				Format (editor, document, mappedSpan.Start, endOffset);
-			}
+		//oe	if (CompletionItem.Rules.FormatOnCommit) {
+		//oe		var endOffset = mappedSpan.Start + completionChange.TextChange.NewText.Length;
+		//oe		Format (editor, document, mappedSpan.Start, endOffset);
+		//oe	}
+
 		}
 
-		protected abstract void Format (TextEditor editor, Ide.Gui.Document document, SnapshotPoint start, SnapshotPoint end);
+	//oe	protected abstract void Format (TextEditor editor, Ide.Gui.Document document, SnapshotPoint start, SnapshotPoint end);
+		protected abstract void Format (TextEditor editor, Ide.Gui.Document document, int start, int end);
 
 		public override async Task<TooltipInformation> CreateTooltipInformation (bool smartWrap, CancellationToken cancelToken)
 		{
@@ -170,8 +190,7 @@ namespace MonoDevelop.Ide.Completion.Presentation
 			}
 			if (i + 1 >= taggedParts.Length) {
 				markup.AppendTaggedText (theme, taggedParts);
-			}
-			else {
+			} else {
 				markup.AppendTaggedText (theme, taggedParts.Take (i));
 				markup.Append ("<span font='" + FontService.SansFontName + "' size='small'>");
 				markup.AppendLine ();

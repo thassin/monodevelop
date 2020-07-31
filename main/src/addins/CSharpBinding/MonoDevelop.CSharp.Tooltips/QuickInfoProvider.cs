@@ -23,6 +23,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using System;
 using MonoDevelop.Ide.TypeSystem;
 using MonoDevelop.Ide;
@@ -39,10 +40,10 @@ using Microsoft.CodeAnalysis.ErrorReporting;
 using Microsoft.CodeAnalysis.LanguageServices;
 using Microsoft.CodeAnalysis.Shared.Extensions;
 using Microsoft.CodeAnalysis.Shared.Utilities;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Projection;
-using Microsoft.VisualStudio.Utilities;
+//using Microsoft.VisualStudio.Text; oe removed...
+//using Microsoft.VisualStudio.Text.Editor; oe removed...
+//using Microsoft.VisualStudio.Text.Projection; oe removed...
+//using Microsoft.VisualStudio.Utilities; oe removed...
 using MonoDevelop.Projects;
 using MonoDevelop.Ide.Editor;
 using MonoDevelop.Core.Text;
@@ -106,7 +107,6 @@ namespace MonoDevelop.SourceEditor
 				}
 			}
 
-
 			if (sections.TryGetValue (SymbolDescriptionGroups.Exceptions, out parts)) {
 				if (!parts.IsDefaultOrEmpty) {
 					sb.AppendLine ();
@@ -120,6 +120,7 @@ namespace MonoDevelop.SourceEditor
 					TaggedTextUtil.AppendTaggedText (sb, theme, parts);
 				}
 			}
+
 			sb.Append ("</span>");
 
 			tooltipInfo.SignatureMarkup = StringBuilderCache.ReturnAndFree (sb);

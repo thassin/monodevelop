@@ -57,7 +57,7 @@ using MonoDevelop.Ide.TypeSystem;
 using MonoDevelop.Refactoring;
 using Microsoft.CodeAnalysis.Completion;
 using Microsoft.CodeAnalysis.Host.Mef;
-using Microsoft.VisualStudio.Platform;
+//using Microsoft.VisualStudio.Platform; oe removed...
 
 using Counters = MonoDevelop.Ide.Counters;
 using Microsoft.CodeAnalysis.CSharp.Completion.Providers;
@@ -307,7 +307,7 @@ namespace MonoDevelop.CSharp.Completion
 				syntaxTree.GetContainingTypeOrEnumDeclaration (position, cancellationToken) is EnumDeclarationSyntax ||
 				syntaxTree.IsPreProcessorDirectiveContext (position, cancellationToken))
 				return;
-			
+
 			var extensionMethodImport = syntaxTree.IsRightOfDotOrArrowOrColonColon (position, cancellationToken);
 			ITypeSymbol extensionType = null;
 
@@ -441,7 +441,7 @@ namespace MonoDevelop.CSharp.Completion
 				kind = CompletionTriggerKind.Insertion;
 				break;
 			}
-			var triggerSnapshot = Editor.GetPlatformTextBuffer ().CurrentSnapshot;
+		//oe	var triggerSnapshot = Editor.GetPlatformTextBuffer ().CurrentSnapshot;
 			var trigger = new CompletionTrigger(kind, triggerInfo.TriggerCharacter.HasValue ? triggerInfo.TriggerCharacter.Value : '\0');
 			if (triggerInfo.CompletionTriggerReason == CompletionTriggerReason.CharTyped) {
 				if (!cs.ShouldTriggerCompletion (sourceText, completionContext.TriggerOffset, trigger, null)) {
@@ -467,7 +467,11 @@ namespace MonoDevelop.CSharp.Completion
 			foreach (var item in completionList.Items) {
 				if (string.IsNullOrEmpty (item.DisplayText))
 					continue;
-				var data = new CSharpCompletionData (analysisDocument, triggerSnapshot, cs, item);
+
+			// oe TODO parameter removed -- need to to replace it??? also see RoslynCompletionData.
+			//oe	var data = new CSharpCompletionData (analysisDocument, triggerSnapshot, cs, item);
+				var data = new CSharpCompletionData (analysisDocument, /* triggerSnapshot, */ cs, item);
+
 				if (first) {
 					first = false;
 					addProtocolCompletion = data.Provider is OverrideCompletionProvider;
@@ -495,7 +499,11 @@ namespace MonoDevelop.CSharp.Completion
 				foreach (var item in protocolMemberContext.Items) {
 					if (string.IsNullOrEmpty (item.DisplayText))
 						continue;
-					var data = new CSharpCompletionData (analysisDocument, triggerSnapshot, cs, item);
+
+				// oe TODO parameter removed -- need to to replace it??? also see RoslynCompletionData.
+				//oe	var data = new CSharpCompletionData (analysisDocument, triggerSnapshot, cs, item);
+					var data = new CSharpCompletionData (analysisDocument, /* triggerSnapshot, */ cs, item);
+
 					result.Add (data);
 				}
 			}
