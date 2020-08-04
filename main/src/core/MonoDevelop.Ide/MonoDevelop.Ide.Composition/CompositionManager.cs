@@ -78,8 +78,18 @@ namespace MonoDevelop.Ide.Composition
 		public static T GetExportedValue<T> ()
 		{
 		//oe	return Instance.ExportProvider.GetExportedValue<T> ();
-			Console.WriteLine( "CompositionManager.GetExportedValue :: " + typeof(T).FullName );
+			Console.WriteLine( "oeDEBUG CompositionManager.GetExportedValue :: " + typeof(T).FullName );
 			return ExportProviderMD.GetExport<T>();
+		}
+
+		/// <summary>
+		/// Returns all instance of type T that are exported by some composition part. The instances are shared (singletons).
+		/// </summary>
+		public static IEnumerable<T> GetExportedValues<T> ()
+		{
+		//oe	return Instance.ExportProvider.GetExportedValues<T> ();
+			Console.WriteLine( "oeDEBUG CompositionManager.GetExportedValues :: " + typeof(T).FullName );
+			return ExportProviderMD.GetExports<T>();
 		}
 
 	// oe REMOVED...

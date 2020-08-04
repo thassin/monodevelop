@@ -37,10 +37,15 @@ namespace MonoDevelop.Refactoring
 	{
 		protected override async Task UpdateAsync (CommandArrayInfo info, CancellationToken cancelToken)
 		{
+// this is not directly called, see main/src/addins/MonoDevelop.Refactoring/MonoDevelop.Refactoring.addin.xml
+Console.WriteLine( "oeDEBUG : QuickFixMenuHandler.UpdateAsync ##1" );
+
 			var editor = IdeApp.Workbench.ActiveDocument?.Editor;
 			var ext = editor?.GetContent<CodeActionEditorExtension> ();
+Console.WriteLine( "oeDEBUG : QuickFixMenuHandler.UpdateAsync ##1 test " + (editor != null ? "1" : "0") + (ext != null ? "1" : "0") );
 			if (ext == null)
 				return;
+Console.WriteLine( "oeDEBUG : QuickFixMenuHandler.UpdateAsync ##1 debug-1" );
 			try {
 				info.Add (new CommandInfo (GettextCatalog.GetString ("Loading..."), false, false), null);
 				var currentFixes = await ext.GetCurrentFixesAsync (cancelToken);
@@ -53,9 +58,12 @@ namespace MonoDevelop.Refactoring
 					info.Add (new CommandInfo (GettextCatalog.GetString ("No code fixes available"), false, false), null);
 				}
 				info.NotifyChanged ();
+Console.WriteLine( "oeDEBUG : QuickFixMenuHandler.UpdateAsync ##1 debug-2" );
 			} catch (OperationCanceledException) {
+Console.WriteLine( "oeDEBUG : QuickFixMenuHandler.UpdateAsync ##1 debug-3" );
 				
 			} catch (Exception e) {
+Console.WriteLine( "oeDEBUG : QuickFixMenuHandler.UpdateAsync ##1 debug-4 " + e.ToString() );
 				LoggingService.LogError ("Error while creating quick fix menu.", e); 
 				info.Clear ();
 				info.Add (new CommandInfo (GettextCatalog.GetString ("No code fixes available"), false, false), null);

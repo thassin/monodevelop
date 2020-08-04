@@ -28,7 +28,18 @@ namespace MonoDevelop.Ide.Composition
 		{
 			if ( container == null ) throw new InvalidOperationException( "not initialized!" );
 
-			return container.GetExport<T>();
+			T result = container.GetExport<T>();
+if ( result == null) Console.WriteLine( "oeDEBUG ExportProviderMD.GetExport :: ERROR NOT FOUND : " + typeof(T).FullName );
+			return result;
+		}
+
+		public static IEnumerable<T> GetExports<T>()
+		{
+			if ( container == null ) throw new InvalidOperationException( "not initialized!" );
+
+			IEnumerable<T> result = container.GetExports<T>();
+if ( result == null || result.Count() < 1 ) Console.WriteLine( "oeDEBUG ExportProviderMD.GetExports :: ERROR NOT FOUND : " + typeof(T).FullName );
+			return result;
 		}
 	}
 }

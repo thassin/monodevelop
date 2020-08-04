@@ -52,7 +52,7 @@ namespace MonoDevelop.Ide.Editor
 		readonly ITextEditorImpl textEditorImpl;
 
 	// oe REMOVED...
-	//	public Microsoft.VisualStudio.Text.Editor.ITextView TextView { get; }
+	//oe	public Microsoft.VisualStudio.Text.Editor.ITextView TextView { get; }
 
 		IReadonlyTextDocument ReadOnlyTextDocument { get { return textEditorImpl.Document; } }
 
@@ -1054,6 +1054,7 @@ namespace MonoDevelop.Ide.Editor
 			MimeTypeChanged += TextEditor_MimeTypeChanged;
 			TextEditor_MimeTypeChanged (null, null);
 
+		// oe REMOVED...
 		//oe	this.TextView = Microsoft.VisualStudio.Platform.PlatformCatalog.Instance.TextEditorFactoryService.CreateTextView(this);
 		}
 
@@ -1212,16 +1213,22 @@ namespace MonoDevelop.Ide.Editor
 
 		public T GetContent<T>() where T : class
 		{
-			return GetContents<T> ().FirstOrDefault ();
+		//oe	return GetContents<T> ().FirstOrDefault ();
+			T result = GetContents<T> ().FirstOrDefault ();
+if ( result == null) Console.WriteLine( "oeDEBUG TextEditor.GetContent :: ERROR NOT FOUND : " + typeof(T).FullName );
+			return result;
 		}
 
 		public IEnumerable<T> GetContents<T>() where T : class
 		{
+Console.WriteLine( "oeDEBUG TextEditor.GetContents for " + typeof(T).FullName );
 			T result = textEditorImpl as T;
 			if (result != null)
 				yield return result;
+Console.WriteLine( "oeDEBUG TextEditor.GetContents stage2" );
 			var ext = textEditorImpl.EditorExtension;
 			while (ext != null) {
+Console.WriteLine( "oeDEBUG TextEditor.GetContents stage2 TYPE " + ext.GetType().FullName );
 				result = ext as T;
 				if (result != null)
 					yield return result;

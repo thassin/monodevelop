@@ -25,7 +25,6 @@
 //
 //
 
-
 using System;
 using MonoDevelop.Projects;
 using MonoDevelop.Ide.CodeCompletion;
@@ -108,6 +107,7 @@ namespace MonoDevelop.Ide.Editor.Extension
 
 		public void ShowCompletion (ICompletionDataList completionList)
 		{
+Console.WriteLine( "oeDEBUG :: CompletionTextEditorExtension.ShowCompletion" );
 			CurrentCompletionContext = CompletionWidget.CreateCodeCompletionContext (Editor.CaretOffset);
 			int cpos, wlen;
 			if (!GetCompletionCommandOffset (out cpos, out wlen)) {
@@ -348,6 +348,7 @@ namespace MonoDevelop.Ide.Editor.Extension
 
 		protected void ShowCompletion (ICompletionDataList completionList, int triggerWordLength, char keyChar)
 		{
+Console.WriteLine( "oeDEBUG :: CompletionTextEditorExtension.ShowCompletion protected" );
 			if (Editor.SelectionMode == SelectionMode.Block)
 				return;
 			if (CompletionWidget != null && CurrentCompletionContext == null) {
@@ -443,6 +444,7 @@ namespace MonoDevelop.Ide.Editor.Extension
 		[CommandHandler (TextEditorCommands.ShowCodeSurroundingsWindow)]
 		public virtual void RunShowCodeTemplatesWindow ()
 		{
+Console.WriteLine( "oeDEBUG :: CompletionTextEditorExtension.RunShowCodeTemplatesWindow" );
 			Editor.EnsureCaretIsNotVirtual ();
 			ICompletionDataList completionList = null;
 			int cpos, wlen;
@@ -465,6 +467,7 @@ namespace MonoDevelop.Ide.Editor.Extension
 		[CommandUpdateHandler(TextEditorCommands.ShowCodeTemplateWindow)]
 		internal void OnUpdateShowCodeTemplatesWindow (CommandInfo info)
 		{
+Console.WriteLine( "oeDEBUG :: CompletionTextEditorExtension.OnUpdateShowCodeTemplatesWindow ##2" );
 			info.Enabled = !Editor.IsSomethingSelected;
 			info.Bypass = !IsActiveExtension () || !info.Enabled;
 			if (info.Enabled) {
@@ -479,6 +482,7 @@ namespace MonoDevelop.Ide.Editor.Extension
 
 					info.Bypass = ShowCodeTemplatesCommand (ctx) == null;
 				} catch (Exception e) {
+Console.WriteLine( "oeDEBUG :: CompletionTextEditorExtension.OnUpdateShowCodeTemplatesWindow : error " + e.ToString() );
 					LoggingService.LogError ("Error while update show code templates window", e);
 					info.Bypass = true;
 				}
