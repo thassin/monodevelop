@@ -173,7 +173,7 @@ namespace MonoDevelop.Ide
 			
 			ProgressMonitor monitor = new MonoDevelop.Core.ProgressMonitoring.ConsoleProgressMonitor ();
 
-// tommih 20200727 : the startup sometimes fails, because the platform-addin has not yet been loaded:
+// tommih 20200727 : the startup sometimes fails, because the platform-service -addin has not yet been loaded:
 //
 // INFO [2020-07-15 16:44:34Z]: Add-in loaded: MonoDevelop.Core
 // WARNING [2020-07-15 16:44:35Z]: No proxy credential provider was found
@@ -183,11 +183,21 @@ namespace MonoDevelop.Ide
 // FATAL ERROR [2020-07-15 16:44:35Z]: MonoDevelop failed to start. Some of the assemblies required to run MonoDevelop (for example gtk-sharp)may not be properly installed in the GAC.
 // System.InvalidOperationException: Extension node not found in path: /MonoDevelop/Core/PlatformService
 //  at Mono.Addins.ExtensionContext.GetExtensionObjects (System.String path, System.Type arrayElementType, System.Boolean reuseCachedInstance) [0x0001c] in <be54d63a3c6f46368c4a923741d7d282>:0 
+//
+// since there seems to be no other mechanism, just add a small delay here so that the addins have a chance to get ready.
 
-// -> since there seems to be no other mechanism, just add a small delay here so that the addins have a chance to get ready.
-// NOTICE 2020-07-28 : now that CompositionManager is loaded syncronously, this is perhaps not even needed....
-	Console.WriteLine( "WAITING 2 seconds in IdeStartup.Run (must have the platform-addin loaded before app start)..." );
-	Thread.Sleep( 2000 ); // no longer needed, as CompositionManager is initialized synchronously???
+	Console.WriteLine( "oeDEBUG :: WAITING 2 seconds in IdeStartup.Run (must have extension /MonoDevelop/Core/PlatformService loaded)..." );
+	Thread.Sleep( 2000 );
+	Console.WriteLine( "oeDEBUG :: WAITING 2 seconds in IdeStartup.Run COMPLETED NOW and startup continues..." );
+	Console.Out.Flush();
+
+/*	int addinCount; // oe TODO is this any better solution???
+	const int addinCountExpected = 10; // the total count expected is 30, no idea why 10 is loaded at this stage.
+	while ( ( addinCount = MonoDevelop.Core.Runtime.GetAddinsLoadedCount() ) < addinCountExpected )
+	{
+		Console.WriteLine( "oeDEBUG :: WAITING for loaded add-ins count to reach " + addinCountExpected + " (current count = " + addinCount + ")." );
+		Thread.Sleep( 500 );
+	}	*/
 
 			monitor.BeginTask (GettextCatalog.GetString ("Starting {0}", BrandingService.ApplicationName), 2);
 

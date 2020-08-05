@@ -214,12 +214,20 @@ namespace MonoDevelop.Core
 		static void OnLoad (object s, AddinEventArgs args)
 		{
 			Counters.AddinsLoaded.Inc ("Add-in loaded: " + args.AddinId, new Dictionary<string,string> { { "AddinId", args.AddinId } });
+_oe_addinsLoadedCount++; // oe add...
+Console.WriteLine( "oeDEBUG :: total add-ins loaded = " + GetAddinsLoadedCount() );
 		}
 		
 		static void OnUnload (object s, AddinEventArgs args)
 		{
 			Counters.AddinsLoaded.Dec ("Add-in unloaded: " + args.AddinId);
+_oe_addinsLoadedCount--; // oe add...
 		}
+		
+		// oe add...
+		// use a separate counter (Counters.AddinsLoaded.Count just returns zero always).
+		public static int GetAddinsLoadedCount() { return _oe_addinsLoadedCount; }
+		private static int _oe_addinsLoadedCount = 0;
 		
 		internal static bool Initialized {
 			get { return initialized; }
