@@ -332,8 +332,8 @@ namespace Mono.TextEditor
 		bool wasReplaced = false;
 
 	// oe REMOVED...
-	//	static readonly object _linkEditTag = new object();
-	//	void UpdateLinksOnTextReplace (object sender, Microsoft.VisualStudio.Text.TextContentChangedEventArgs e)
+	//oe	static readonly object _linkEditTag = new object();
+	//oe	void UpdateLinksOnTextReplace (object sender, Microsoft.VisualStudio.Text.TextContentChangedEventArgs e)
 
 		// oe add...
 		void UpdateLinksOnTextReplace (object sender, TextChangeEventArgs e)

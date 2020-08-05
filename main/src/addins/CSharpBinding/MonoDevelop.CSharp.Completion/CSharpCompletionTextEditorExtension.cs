@@ -464,14 +464,17 @@ namespace MonoDevelop.CSharp.Completion
 			foreach (var item in completionList.Items) {
 				if (string.IsNullOrEmpty (item.DisplayText))
 					continue;
+
 			//oe	var data = new CSharpCompletionData (analysisDocument, triggerSnapshot, cs, item);
 				var data = new CSharpCompletionData (analysisDocument, /* triggerSnapshot, */ cs, item); // oe NOTICE one parameter removed here...
+
 				result.Add (data);
 				if (item.Rules.MatchPriority > 0) {
 					if (defaultCompletionData == null || defaultCompletionData.Rules.MatchPriority < item.Rules.MatchPriority)
 						defaultCompletionData = data;
 				}
 			}
+
 			result.AutoCompleteUniqueMatch = (triggerInfo.CompletionTriggerReason == CompletionTriggerReason.CompletionCommand);
 
 			var partialDoc = analysisDocument.WithFrozenPartialSemantics (token);

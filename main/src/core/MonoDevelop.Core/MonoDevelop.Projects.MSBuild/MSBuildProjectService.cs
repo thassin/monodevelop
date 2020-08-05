@@ -1086,7 +1086,7 @@ namespace MonoDevelop.Projects.MSBuild
 				binDir = runtime.GetMSBuildBinPath (toolsVersion);
 				if (binDir != null) {
 
-Console.WriteLine( "toolsVersion OK :: " + toolsVersion ); // oe debug...
+Console.WriteLine( "oeDEBUG :: toolsVersion OK : " + toolsVersion ); // oe debug...
 
 					return toolsVersion;
 				}

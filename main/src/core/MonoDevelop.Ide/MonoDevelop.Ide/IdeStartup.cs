@@ -163,7 +163,7 @@ namespace MonoDevelop.Ide
 			var cm = Composition.CompositionManager.Instance; // no longer async.
 			if ( cm == null ) throw new InvalidOperationException( "CompositionManager init failed!" );
 	long  milliseconds = sw.ElapsedMilliseconds;
-	Console.WriteLine( "CompositionManager init took " + milliseconds + " ms." );
+	Console.WriteLine( "oeDEBUG :: CompositionManager init took " + milliseconds + " ms." );
 
 			IdeApp.Customizer.OnCoreInitialized ();
 
