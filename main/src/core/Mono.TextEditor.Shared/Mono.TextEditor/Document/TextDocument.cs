@@ -231,7 +231,7 @@ namespace Mono.TextEditor
 		// oe REPLACE method...
 		protected void Initialize(Encoding encoding, string fileName, ImmutableText buffer, ILineSplitter splitter)
 		{
-Console.WriteLine( "debug Initialize :: '" + fileName + "' enc=" + encoding + " len=" +  buffer.Length);
+Console.WriteLine( "oeDEBUG TextDocument.Initialize :: '" + fileName + "' enc=" + encoding + " len=" +  buffer.Length);
 
 			this.buffer = buffer;
 			this.splitter = splitter;
@@ -245,7 +245,7 @@ Console.WriteLine( "debug Initialize :: '" + fileName + "' enc=" + encoding + " 
 
 			this.diffTracker.SetTrackDocument(this);
 
-Console.WriteLine( "debug Initialize completed" );
+Console.WriteLine( "oeDEBUG TextDocument.Initialize completed" );
 		}
 
 		public void Dispose()
@@ -258,7 +258,7 @@ Console.WriteLine( "debug Initialize completed" );
 		//oe	this.VsTextDocument.FileActionOccurred -= this.OnTextDocumentFileActionOccured;
 
 // TODO what to do here??? is this needed at all???
-Console.WriteLine( "tommih : TextDocument Disposed" );
+Console.WriteLine( "oeDEBUG :: TextDocument Disposed" );
 
 			SyntaxMode = null;
 		}
@@ -280,7 +280,7 @@ Console.WriteLine( "tommih : TextDocument Disposed" );
 
 		public TextDocument (string fileName, string mimeType)
 		{
-Console.WriteLine( "debug TextDocument ctor1 :: " + fileName + " : " + mimeType );
+Console.WriteLine( "oeDEBUG TextDocument ctor1 :: " + fileName + " : " + mimeType );
 
 			Encoding enc;
 			var text = TextFileUtility.GetText (fileName, out enc);
@@ -299,7 +299,7 @@ Text = text;	// must set the Text property...
 		{
 string info = "<null>";
 if ( text != null ) info = "len=" + text.Length;
-Console.WriteLine( "debug TextDocument ctor2 :: " + info );
+Console.WriteLine( "oeDEBUG TextDocument ctor2 :: " + info );
 
 // TODO how to detect the encoding from string???
 Encoding enc = MonoDevelop.Core.Text.TextFileUtility.DefaultEncoding;
@@ -317,7 +317,7 @@ Text = text;	// must set the Text property...
 
 		public TextDocument (string text, ILineSplitter splitter)
 		{
-Console.WriteLine( "debug TextDocument ctor3 SNAPSHOT :: len=" + text.Length );
+Console.WriteLine( "oeDEBUG TextDocument ctor3 SNAPSHOT :: len=" + text.Length );
 
 // TODO how to detect the encoding from string???
 Encoding enc = MonoDevelop.Core.Text.TextFileUtility.DefaultEncoding;
@@ -366,7 +366,7 @@ ImmutableText buffer = new ImmutableText (text);
 				return completeText;
 			}
 			set {
-Console.WriteLine( "Text setter called" );
+Console.WriteLine( "oeDEBUG :: Text setter called" );
 
 				var tmp = IsReadOnly;
 				IsReadOnly = false;
@@ -461,7 +461,7 @@ Console.WriteLine( "Text setter called" );
 			
 			OnTextReplacing (args);
 
-Console.WriteLine( "ReplaceText :: args.TextChanges.Count=" + args.TextChanges.Count );
+Console.WriteLine( "oeDEBUG :: ReplaceText args.TextChanges.Count=" + args.TextChanges.Count );
 
 // tommih 20200617 : TextChangeEventArgs has been splitted to TextChangeEventArgs + TextChange...
 if ( args.TextChanges.Count != 1 ) throw new InvalidOperationException("args.TextChanges.Count is not valid : " + args.TextChanges.Count);
@@ -497,7 +497,7 @@ if ( args.TextChanges.Count != 1 ) throw new InvalidOperationException("args.Tex
 				string newtext = change.InsertedText.Text;
 				if ( newtext == null ) newtext = "";
 
-				Console.WriteLine ("TextDocument.ApplyTextChanges_old() :: s=" + start + " l=" + length + " ot='" + oldtext + "' nt='" + newtext + "' l2=" + newtext.Length);
+				Console.WriteLine ("oeDEBUG :: TextDocument.ApplyTextChanges_old() s=" + start + " l=" + length + " ot='" + oldtext + "' nt='" + newtext + "' l2=" + newtext.Length);
 
 				if ( newtext.Length < 1 ) newtext = null;
 				ReplaceText (start, length, newtext);
@@ -507,7 +507,7 @@ if ( args.TextChanges.Count != 1 ) throw new InvalidOperationException("args.Tex
 		public void ApplyTextChanges (IEnumerable<Microsoft.CodeAnalysis.Text.TextChange> changes)
 		{
 
-Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
+Console.WriteLine( "oeDEBUG :: TextDocument.ApplyTextChanges() start" );
 
 			if (changes == null)
 				throw new ArgumentNullException(nameof(changes));
@@ -522,7 +522,7 @@ Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
 				int length = change.Span.Length;
 
 				if ( prevStart.HasValue && start >= prevStart.Value ) {
-					Console.WriteLine( "TextDocument.ApplyTextChanges() changes has BAD ordering : prevStart=" + prevStart.Value + " start=" + start );
+					Console.WriteLine( "oeDEBUG :: TextDocument.ApplyTextChanges() changes has BAD ordering : prevStart=" + prevStart.Value + " start=" + start );
 				}
 
 				prevStart = start;
@@ -531,7 +531,7 @@ Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
 				string newtext = change.NewText;
 				if ( newtext == null ) newtext = "";
 
-				Console.WriteLine ("TextDocument.ApplyTextChanges() :: s=" + start + " l=" + length + " ot='" + oldtext + "' nt='" + newtext + "' l2=" + newtext.Length);
+				Console.WriteLine ("oeDEBUG :: TextDocument.ApplyTextChanges() s=" + start + " l=" + length + " ot='" + oldtext + "' nt='" + newtext + "' l2=" + newtext.Length);
 
 			/*	if (length > 0) {	// this works but requires 2 operations...
 					RemoveText (start, length);
@@ -2256,7 +2256,7 @@ Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
 
 			public SnapshotDocument (TextDocument doc) : base (doc.buffer.ToString(), new LazyLineSplitter (doc.LineCount))
 			{
-Console.WriteLine( "SnapshotDocument ctor" );
+Console.WriteLine( "oeDEBUG :: SnapshotDocument ctor" );
 				this.version = doc.Version;
 				((LazyLineSplitter)splitter).src = this;
 				fileName = doc.fileName;

@@ -83,7 +83,7 @@ namespace MonoDevelop.Ide.Composition
 		}
 
 		/// <summary>
-		/// Returns all instance of type T that are exported by some composition part. The instances are shared (singletons).
+		/// Returns all instances of type T that are exported by some composition part. The instances are shared (singletons).
 		/// </summary>
 		public static IEnumerable<T> GetExportedValues<T> ()
 		{
@@ -101,10 +101,11 @@ namespace MonoDevelop.Ide.Composition
 	//oe	internal CompositionManager ()
 	//oe	static async Task<CompositionManager> CreateInstanceAsync ()
 
-		static CompositionManager ()
+	//oe	async Task InitializeInstanceAsync ()
+		static CompositionManager () // oe NOTICE name changed...
 		{
 
-Console.WriteLine( "CompositionManager.ctor :: start" );
+Console.WriteLine( "oeDEBUG CompositionManager.ctor :: start" );
 
 		//oe	ComposableCatalog catalog = ComposableCatalog.Create (StandardResolver)
 		//oe		.WithCompositionService ()
@@ -116,7 +117,7 @@ Console.WriteLine( "CompositionManager.ctor :: start" );
 			assemblies.Add ( typeof ( MonoDevelop.Ide.TypeSystem.MonoDevelopWorkspace ).Assembly );
 			foreach (var asmName in mefHostServices) {
 
-Console.WriteLine( "CompositionManager :: INIT-1 " + asmName );
+Console.WriteLine( "oeDEBUG CompositionManager :: INIT-1 " + asmName );
 
 				try {
 					var asm = Assembly.Load (asmName);
@@ -128,11 +129,11 @@ Console.WriteLine( "CompositionManager :: INIT-1 " + asmName );
 				}
 			}
 
-Console.WriteLine( "CompositionManager :: INIT-addins-from-path " + "/MonoDevelop/Ide/TypeService/PlatformMefHostServices" );
+Console.WriteLine( "oeDEBUG CompositionManager :: INIT-addins-from-path " + "/MonoDevelop/Ide/TypeService/PlatformMefHostServices" );
 			ReadAssembliesFromAddins (assemblies, "/MonoDevelop/Ide/TypeService/PlatformMefHostServices");
-Console.WriteLine( "CompositionManager :: INIT-addins-from-path " + "/MonoDevelop/Ide/TypeService/MefHostServices" );
+Console.WriteLine( "oeDEBUG CompositionManager :: INIT-addins-from-path " + "/MonoDevelop/Ide/TypeService/MefHostServices" );
 			ReadAssembliesFromAddins (assemblies, "/MonoDevelop/Ide/TypeService/MefHostServices");
-Console.WriteLine( "CompositionManager :: INIT-addins-from-path " + "/MonoDevelop/Ide/Composition" );
+Console.WriteLine( "oeDEBUG CompositionManager :: INIT-addins-from-path " + "/MonoDevelop/Ide/Composition" );
 			ReadAssembliesFromAddins (assemblies, "/MonoDevelop/Ide/Composition");
 
 		//oe	// spawn discovery tasks in parallel for each assembly
@@ -169,7 +170,7 @@ Console.WriteLine( "CompositionManager :: INIT-addins-from-path " + "/MonoDevelo
 
 			ExportProviderMD.Init( assemblies.ToArray() );
 
-Console.WriteLine( "CompositionManager.ctor :: completed" );
+Console.WriteLine( "oeDEBUG CompositionManager.ctor :: completed" );
 
 		}
 
@@ -187,7 +188,7 @@ Console.WriteLine( "CompositionManager.ctor :: completed" );
 						var assemblyFilePath = assemblyNode.Addin.GetFilePath (assemblyNode.FileName);
 						var assembly = Runtime.SystemAssemblyService.LoadAssemblyFrom (assemblyFilePath);
 
-Console.WriteLine( "CompositionManager :: INIT-2 " + assembly );
+Console.WriteLine( "oeDEBUG CompositionManager :: INIT-2 " + assembly );
 
 						assemblies.Add (assembly);
 					}
