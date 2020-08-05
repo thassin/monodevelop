@@ -74,7 +74,8 @@ namespace MonoDevelop.Ide.TypeSystem
 
 		internal static HostServices HostServices {
 			get {
-				return CompositionManager.Instance.HostServices;
+			//oe	return CompositionManager.Instance.HostServices;
+				return CompositionManager.HostServices; // now static...
 			}
 		}
 

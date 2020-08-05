@@ -120,7 +120,8 @@ namespace MonoDevelop.Ide.TypeSystem
 			get {
 				if (currentText == null) {
 					if (editor.TryGetTarget (out var ed)) {
-						currentText = MonoDevelopSourceText.Create (ed, this);
+					//oe	currentText = MonoDevelopSourceText.Create (ed, this);
+						currentText = new MonoDevelopSourceText (ed.CreateDocumentSnapshot ());
 					}
 				}
 				return currentText;

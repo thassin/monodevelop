@@ -31,7 +31,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Linq;
 using MonoDevelop.Ide.Editor;
-using Microsoft.VisualStudio.Text.Implementation;
+//using Microsoft.VisualStudio.Text.Implementation; oe removed...
 using Microsoft.CodeAnalysis.Text;
 
 namespace Mono.TextEditor
