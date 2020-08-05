@@ -60,6 +60,7 @@ namespace MonoDevelop.Refactoring
 
 		RefactoringPreviewTooltipWindow (TextEditor editor, CodeAction codeAction)
 		{
+Console.WriteLine( "oeDEBUG :: RefactoringPreviewTooltipWindow" );
 			this.editor = editor;
 			this.documentContext = documentContext = editor.DocumentContext;
 			this.codeAction = codeAction;

@@ -66,6 +66,7 @@ namespace MonoDevelop.Ide.CodeCompletion
 
 		public CompletionListWindowGtk (WindowType type = WindowType.Popup) : base (type)
 		{
+Console.WriteLine( "oeDEBUG :: CompletionListWindowGtk" );
 			vbox = new VBox ();
 			list = new ListWidget (this);
 			list.ScrollEvent += OnScrolled;

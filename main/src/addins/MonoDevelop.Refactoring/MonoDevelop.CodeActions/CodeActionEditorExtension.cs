@@ -173,6 +173,8 @@ namespace MonoDevelop.CodeActions
 
 		async void PopupQuickFixMenu (Gdk.EventButton evt, Action<CodeFixMenu> menuAction)
 		{
+Console.WriteLine( "oeDEBUG :: PopupQuickFixMenu ##4 -- the QuickFix menu was opened" );
+
 			var token = quickFixCancellationTokenSource.Token;
 
 			var fixes = await GetCurrentFixesAsync (token);
@@ -202,6 +204,8 @@ namespace MonoDevelop.CodeActions
 
 		bool ShowFixesMenu (Widget parent, Gdk.Rectangle evt, CodeFixMenu entrySet)
 		{
+Console.WriteLine( "oeDEBUG :: ShowFixesMenu ##5" );
+
 			if (parent == null || parent.GdkWindow == null) {
 				Editor.SuppressTooltips = false;
 				return true;
@@ -229,6 +233,8 @@ namespace MonoDevelop.CodeActions
 
 		ContextMenu CreateContextMenu (CodeFixMenu entrySet)
 		{
+Console.WriteLine( "oeDEBUG :: CreateContextMenu ##6" );
+
 			var menu = new ContextMenu ();
 			foreach (var item in entrySet.Items) {
 				if (item == CodeFixMenuEntry.Separator) {
@@ -240,16 +246,19 @@ namespace MonoDevelop.CodeActions
 				menuItem.Context = item.Action;
 				var subMenu = item as CodeFixMenu;
 				if (subMenu != null) {
+Console.WriteLine( "oeDEBUG :: CreateContextMenu ##6 submenu" );
 					menuItem.SubMenu = CreateContextMenu (subMenu);
 					menuItem.Selected += delegate {
 						RefactoringPreviewTooltipWindow.HidePreviewTooltip ();
 					};
 					menuItem.Deselected += delegate { RefactoringPreviewTooltipWindow.HidePreviewTooltip (); };
 				} else {
+Console.WriteLine( "oeDEBUG :: CreateContextMenu ##6 item : " + ( item.ShowPreviewTooltip != null ? "1" : "0" ) );
 					menuItem.Clicked += (sender, e) => ((System.Action)((ContextMenuItem)sender).Context) ();
 					menuItem.Selected += (sender, e) => {
 						RefactoringPreviewTooltipWindow.HidePreviewTooltip ();
 						if (item.ShowPreviewTooltip != null) {
+Console.WriteLine( "oeDEBUG :: showpreviewtooltip NOW" );
 							item.ShowPreviewTooltip (e);
 						}
 					};

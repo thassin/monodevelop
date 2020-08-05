@@ -78,7 +78,7 @@ namespace MonoDevelop.Ide.Composition
 		public static T GetExportedValue<T> ()
 		{
 		//oe	return Instance.ExportProvider.GetExportedValue<T> ();
-			Console.WriteLine( "CompositionManager.GetExportedValue :: " + typeof(T).FullName );
+			Console.WriteLine( "oeDEBUG CompositionManager.GetExportedValue :: " + typeof(T).FullName );
 			return ExportProviderMD.GetExport<T>();
 		}
 
@@ -88,7 +88,7 @@ namespace MonoDevelop.Ide.Composition
 		public static IEnumerable<T> GetExportedValues<T> ()
 		{
 		//oe	return Instance.ExportProvider.GetExportedValues<T> ();
-			Console.WriteLine( "CompositionManager.GetExportedValues :: " + typeof(T).FullName );
+			Console.WriteLine( "oeDEBUG CompositionManager.GetExportedValues :: " + typeof(T).FullName );
 			return ExportProviderMD.GetExports<T>();
 		}
 
@@ -106,7 +106,7 @@ namespace MonoDevelop.Ide.Composition
 		static CompositionManager ()
 		{
 
-Console.WriteLine( "CompositionManager.ctor :: start" );
+Console.WriteLine( "oeDEBUG :: CompositionManager.ctor :: start" );
 
 		//oe	ComposableCatalog catalog = ComposableCatalog.Create (StandardResolver)
 		//oe		.WithCompositionService ()
@@ -118,7 +118,7 @@ Console.WriteLine( "CompositionManager.ctor :: start" );
 			assemblies.Add ( typeof ( MonoDevelop.Ide.TypeSystem.MonoDevelopWorkspace ).Assembly );
 			foreach (var asmName in mefHostServices) {
 
-Console.WriteLine( "CompositionManager :: INIT-1 " + asmName );
+Console.WriteLine( "oeDEBUG :: CompositionManager :: INIT-1 " + asmName );
 
 				try {
 					var asm = Assembly.Load (asmName);
@@ -130,11 +130,11 @@ Console.WriteLine( "CompositionManager :: INIT-1 " + asmName );
 				}
 			}
 
-Console.WriteLine( "CompositionManager :: INIT-addins-from-path " + "/MonoDevelop/Ide/TypeService/PlatformMefHostServices" );
+Console.WriteLine( "oeDEBUG :: CompositionManager :: INIT-addins-from-path " + "/MonoDevelop/Ide/TypeService/PlatformMefHostServices" );
 			ReadAssembliesFromAddins (assemblies, "/MonoDevelop/Ide/TypeService/PlatformMefHostServices");
-Console.WriteLine( "CompositionManager :: INIT-addins-from-path " + "/MonoDevelop/Ide/TypeService/MefHostServices" );
+Console.WriteLine( "oeDEBUG :: CompositionManager :: INIT-addins-from-path " + "/MonoDevelop/Ide/TypeService/MefHostServices" );
 			ReadAssembliesFromAddins (assemblies, "/MonoDevelop/Ide/TypeService/MefHostServices");
-Console.WriteLine( "CompositionManager :: INIT-addins-from-path " + "/MonoDevelop/Ide/Composition" );
+Console.WriteLine( "oeDEBUG :: CompositionManager :: INIT-addins-from-path " + "/MonoDevelop/Ide/Composition" );
 			ReadAssembliesFromAddins (assemblies, "/MonoDevelop/Ide/Composition");
 
 		//oe	// spawn discovery tasks in parallel for each assembly
@@ -174,7 +174,7 @@ Console.WriteLine( "CompositionManager :: INIT-addins-from-path " + "/MonoDevelo
 
 			ExportProviderMD.Init( assemblies.ToArray() );
 
-Console.WriteLine( "CompositionManager.ctor :: completed" );
+Console.WriteLine( "oeDEBUG :: CompositionManager.ctor :: completed" );
 
 		}
 
@@ -196,19 +196,31 @@ Console.WriteLine( "CompositionManager.ctor :: completed" );
 //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 // earlier version (with no problems):	Microsoft.CodeAnalysis.Features, Version=2.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35
 // the current one (blocking needed):	Microsoft.CodeAnalysis.Features, Version=2.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35
-// -> plus the other "Microsoft.CodeAnalysis..." packages...
+// -> plus the other "Microsoft.CodeAnalysis..." packages :: Microsoft.CodeAnalysis... 2.8.0-beta3-62728-05
 
 //if ( assemblyNode.FileName.StartsWith( "RefactoringEssentials") ) continue; this is OK (BTW blocking this will affect/impair completions).
 
 if ( assemblyNode.FileName.StartsWith( "Microsoft.CodeAnalysis.EditorFeatures") ) continue;
 if ( assemblyNode.FileName.StartsWith( "Microsoft.CodeAnalysis.CSharp.EditorFeatures") ) continue;
+	// 20200804 :: if the above are allowed, we get this:
+	// FATAL ERROR [2020-08-04 21:49:39Z]: MonoDevelop failed to start. Some of the assemblies required to run MonoDevelop (for example gtk-sharp)may not be properly installed in the GAC.
+	// System.TypeInitializationException: The type initializer for 'MonoDevelop.Ide.Composition.CompositionManager' threw an exception. ---> System.Reflection.ReflectionTypeLoadException: Exception of type 'System.Reflection.ReflectionTypeLoadException' was thrown.
+	// Could not load file or assembly 'Microsoft.VisualStudio.Text.Logic, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' or one of its dependencies.
+	// Could not load file or assembly 'Microsoft.VisualStudio.Text.UI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' or one of its dependencies.
 
 if ( assemblyNode.FileName.StartsWith( "Microsoft.CodeAnalysis.Workspaces.Desktop") ) continue;
 	// 20200731 NOTICE allowing this will cause the app CRASH soon after opening a project (since we no longer have the classes required):
 	// ERROR [2020-07-31 11:25:46Z]: Add-in error (MonoDevelop.CSharpBinding,7.6): Error while getting object for node in path '/MonoDevelop/Ide/TypeService/OptionProviders'.
 	// System.InvalidOperationException: Type 'MonoDevelop.CSharp.OptionProvider.EditorConfigDocumentOptionsProviderFactory' not found in add-in 'MonoDevelop.CSharpBinding,7.6'
 
-Console.WriteLine( "CompositionManager :: INIT-2 " + assembly );
+// 20200805 : NOTE that the above problems are caused by the fact that Microsoft.CodeAnalysis.EditorFeatures contains (or is based on)
+// dependencies to Microsoft.VisualStudio.* packages. in earlier MD versions Microsoft.CodeAnalysis.EditorFeatures has not been used.
+
+// THEREFORE THIS APP VERSION IS A BIT BROKEN, no need to further study why the QuickFix menu is not working as it should...
+// THEREFORE THIS APP VERSION IS A BIT BROKEN, no need to further study why the QuickFix menu is not working as it should...
+// THEREFORE THIS APP VERSION IS A BIT BROKEN, no need to further study why the QuickFix menu is not working as it should...
+
+Console.WriteLine( "oeDEBUG :: CompositionManager :: INIT-2 " + assembly );
 
 						assemblies.Add (assembly);
 					}
@@ -237,6 +249,14 @@ Console.WriteLine( "CompositionManager :: INIT-2 " + assembly );
 			"Microsoft.CodeAnalysis.VisualBasic",
 			"Microsoft.CodeAnalysis.VisualBasic.Workspaces",
 			"Microsoft.CodeAnalysis.VisualBasic.Features",
+
+			// oe ADDED these trying to get QuickFix menu working (oe-20180416-7.6-build551).
+			"Microsoft.CodeAnalysis.Diagnostics",
+			"Microsoft.CodeAnalysis.ICodeFixService"
+
+// oe NOTICE : not sure if there is real need to add anything here.
+// -> see ReadAssembliesFromAddins() above...
+
 		};
 
 		// oe add...

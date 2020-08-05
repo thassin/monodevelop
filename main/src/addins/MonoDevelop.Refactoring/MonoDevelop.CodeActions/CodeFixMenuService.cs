@@ -171,6 +171,7 @@ namespace MonoDevelop.CodeActions
 				await new ContextActionRunner (editor, fix).Run ();
 			});
 
+Console.WriteLine( "oeDEBUG :: codefixmenuservice debug ##3 or update" );
 			item.ShowPreviewTooltip = delegate (Xwt.Rectangle rect) {
 				RefactoringPreviewTooltipWindow.ShowPreviewTooltip (editor, fix, rect);
 			};
