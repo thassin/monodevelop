@@ -126,6 +126,10 @@ namespace MonoDevelop.CodeActions
 	// oe REMOVED since using EditorFeatures...
 	//oe	static ICodeFixService codeFixService = Ide.Composition.CompositionManager.GetExportedValue<ICodeFixService> ();
 
+// MonoDevelop.CodeActions/CodeActionEditorExtension.cs(130,10): error CS0246: The type or namespace name 'ICodeFixService' could not be found (are you missing a using directive or an assembly reference?)
+// BUT according to http://sourceroslyn.io BOTH ICodeFixService AND ICodeRefactoringService should be in Microsoft.CodeAnalysis.Features.
+// -> perhaps this will change in later versions of Roslyn???
+
 		static ICodeRefactoringService codeRefactoringService = Ide.Composition.CompositionManager.GetExportedValue<ICodeRefactoringService> ();
 
 		internal Task<CodeActionContainer> GetCurrentFixesAsync (CancellationToken cancellationToken)
@@ -150,9 +154,13 @@ namespace MonoDevelop.CodeActions
 				// oe REMOVED since using EditorFeatures...
 	 			//oe	var fixes = await codeFixService.GetFixesAsync (ad, span, true, cancellationToken);
 
-// FIXME...
+// oe FIXME later...
+// -> either use ICodeFixService if available.
+// -> or look into "oe-20171024-7.4-build373" for older solution.
+
 ImmutableArray<CodeFixCollection> fixes = new ImmutableArray<CodeFixCollection>();
 
+// essentialy what we need here, is a collection of CodeFix objects???
 
 					var refactorings = await codeRefactoringService.GetRefactoringsAsync (ad, span, cancellationToken);
 
