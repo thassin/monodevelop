@@ -123,8 +123,11 @@ namespace MonoDevelop.CodeActions
 			}
 		}
 
-		static ICodeFixService codeFixService = Ide.Composition.CompositionManager.GetExportedValue<ICodeFixService> ();
+	// oe REMOVED since using EditorFeatures...
+	//oe	static ICodeFixService codeFixService = Ide.Composition.CompositionManager.GetExportedValue<ICodeFixService> ();
+
 		static ICodeRefactoringService codeRefactoringService = Ide.Composition.CompositionManager.GetExportedValue<ICodeRefactoringService> ();
+
 		internal Task<CodeActionContainer> GetCurrentFixesAsync (CancellationToken cancellationToken)
 		{
 			var loc = Editor.CaretOffset;
@@ -133,6 +136,7 @@ namespace MonoDevelop.CodeActions
 				return Task.FromResult (CodeActionContainer.Empty);
 			}
 			TextSpan span;
+
 			if (Editor.IsSomethingSelected) {
 				var selectionRange = Editor.SelectionRange;
 				span = selectionRange.Offset >= 0 ? TextSpan.FromBounds (selectionRange.Offset, selectionRange.EndOffset) : TextSpan.FromBounds (loc, loc);
@@ -142,7 +146,14 @@ namespace MonoDevelop.CodeActions
 
 			return Task.Run (async delegate {
 				try {
-					var fixes = await codeFixService.GetFixesAsync (ad, span, true, cancellationToken);
+
+				// oe REMOVED since using EditorFeatures...
+	 			//oe	var fixes = await codeFixService.GetFixesAsync (ad, span, true, cancellationToken);
+
+// FIXME...
+ImmutableArray<CodeFixCollection> fixes = new ImmutableArray<CodeFixCollection>();
+
+
 					var refactorings = await codeRefactoringService.GetRefactoringsAsync (ad, span, cancellationToken);
 
 					var codeActionContainer = new CodeActionContainer (fixes, refactorings);

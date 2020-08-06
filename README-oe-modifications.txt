@@ -33,15 +33,20 @@ main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.TypeSystem/IMonoDevelopHostDocumen
 
 	 modified:
 	^^^^^^^^^^^
-main/Directory.Build.props
 main/configure.ac
+main/Directory.Build.props
+
+main/msbuild/ReferencesRoslyn.props
 
 main/src/addins/CSharpBinding/CSharpBinding.csproj
+
 main/src/addins/CSharpBinding/MonoDevelop.CSharp.Completion/CSharpCompletionData.cs
 main/src/addins/CSharpBinding/MonoDevelop.CSharp.Completion/CSharpCompletionTextEditorExtension.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/HighlightUsagesExtension.cs
 main/src/addins/CSharpBinding/MonoDevelop.CSharp.OptionProvider/CSharpDocumentOptionsProvider.cs
 main/src/addins/CSharpBinding/MonoDevelop.CSharp.OptionProvider/OptionProviderFactory.cs
 main/src/addins/CSharpBinding/MonoDevelop.CSharp.Tooltips/QuickInfoProvider.cs
+
 main/src/addins/CSharpBinding/MonoDevelop.Ide.Completion.Presentation/IMyRoslynCompletionDataProvider.cs
 main/src/addins/CSharpBinding/MonoDevelop.Ide.Completion.Presentation/MonoDevelopFormattingRuleFactoryServiceFactory.cs
 main/src/addins/CSharpBinding/MonoDevelop.Ide.Completion.Presentation/MyCSharpCompletionData.cs
@@ -55,41 +60,55 @@ main/src/addins/CSharpBinding/MonoDevelop.Ide.Completion.Presentation/RoslynComp
 
 main/src/addins/MonoDevelop.Debugger/MonoDevelop.Debugger.csproj
 
-main/src/addins/MonoDevelop.SourceEditor2/Mono.TextEditor/Gui/TextArea.cs
+main/src/addins/MonoDevelop.Refactoring/MonoDevelop.Refactoring.csproj
+main/src/addins/MonoDevelop.Refactoring/MonoDevelop.CodeActions/CodeActionEditorExtension.cs
+
 main/src/addins/MonoDevelop.SourceEditor2/MonoDevelop.SourceEditor.csproj
-main/src/addins/MonoDevelop.SourceEditor2/MonoDevelop.SourceEditor/SourceEditorView.IMonoDevelopEditorOperations.cs
 main/src/addins/MonoDevelop.SourceEditor2/MonoDevelop.SourceEditor/SourceEditorView.cs
+main/src/addins/MonoDevelop.SourceEditor2/MonoDevelop.SourceEditor/SourceEditorView.IMonoDevelopEditorOperations.cs
+main/src/addins/MonoDevelop.SourceEditor2/Mono.TextEditor/Gui/TextArea.cs
 
 main/src/addins/VersionControl/MonoDevelop.VersionControl/MonoDevelop.VersionControl.csproj
 
 main/src/core/Makefile.am
-main/src/core/Mono.TextEditor.Shared/Mono.TextEditor.Shared.projitems
-main/src/core/Mono.TextEditor.Shared/Mono.TextEditor/Actions/MiscActions.cs
-main/src/core/Mono.TextEditor.Shared/Mono.TextEditor/CaretImpl.cs
-main/src/core/Mono.TextEditor.Shared/Mono.TextEditor/Document/TextDocument.cs
-main/src/core/Mono.TextEditor.Shared/Mono.TextEditor/TextLinkEditMode.cs
-main/src/core/MonoDevelop.Core/MonoDevelop.Core.Assemblies/TargetRuntime.cs
+
 main/src/core/MonoDevelop.Core/MonoDevelop.Core.csproj
+main/src/core/MonoDevelop.Core/MonoDevelop.Core.Assemblies/TargetRuntime.cs
 main/src/core/MonoDevelop.Core/MonoDevelop.Projects.MSBuild/MSBuildProjectService.cs
 main/src/core/MonoDevelop.Core/MonoDevelop.Projects.MSBuild/RemoteBuildEngineManager.cs
+
 main/src/core/MonoDevelop.Core/packages.config
+
 main/src/core/MonoDevelop.Ide/ExtensionModel/MonoDevelop.Ide.addin.xml
+
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.csproj
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.CodeCompletion/RoslynCompletionData.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/CompositionManager.cs
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/InlineRenameService.cs
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/PreviewFactoryService.cs
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/RoslynWaitIndicator.cs
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/StreamingFindUsagesPresenter.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Desktop/PlatformService.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/DefaultSourceEditorOptions.cs
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor.Extension/LineSeparatorTextEditorExtension.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/InternalExtensionAPI/IMonoDevelopEditorOperations.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/InternalExtensionAPI/ITextEditorImpl.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/TextEditor.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/TextEditorViewContent.cs
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide/IdeStartup.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Templates/SingleFileDescriptionTemplate.cs
-main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.TypeSystem/MonoDevelopSourceText.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.TypeSystem/MonoDevelopSourceTextContainer.cs
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.TypeSystem/MonoDevelopSourceText.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.TypeSystem/MonoDevelopTextLoader.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.TypeSystem/MonoDevelopWorkspace.cs
-main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.csproj
-main/src/core/MonoDevelop.Ide/MonoDevelop.Ide/IdeStartup.cs
+
 main/src/core/MonoDevelop.TextEditor.Tests/MonoDevelop.TextEditor.Tests.csproj
+
+main/src/core/Mono.TextEditor.Shared/Mono.TextEditor/Actions/MiscActions.cs
+main/src/core/Mono.TextEditor.Shared/Mono.TextEditor/CaretImpl.cs
+main/src/core/Mono.TextEditor.Shared/Mono.TextEditor/Document/TextDocument.cs
+main/src/core/Mono.TextEditor.Shared/Mono.TextEditor.Shared.projitems
+main/src/core/Mono.TextEditor.Shared/Mono.TextEditor/TextLinkEditMode.cs
 
 main/tests/MonoDevelop.Refactoring.Tests/CodeActionEditorExtensionTests.cs
 main/tests/MonoDevelop.Refactoring.Tests/ResultsEditorExtensionTests.cs
@@ -141,5 +160,6 @@ $ mono ./main/build/bin/MonoDevelop.exe
 
 	 known problems:
 	^^^^^^^^^^^^^^^^^
+*) the QuickFix menu is not working in editor.
 *) win10 wsl : the process seems to hang and keep running after closing the app.
 
