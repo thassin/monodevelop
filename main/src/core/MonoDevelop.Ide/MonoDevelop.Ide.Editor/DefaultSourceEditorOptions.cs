@@ -23,6 +23,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using System;
 using MonoDevelop.Core;
 using MonoDevelop.Ide.Gui.Content;
@@ -101,7 +102,7 @@ namespace MonoDevelop.Ide.Editor
 
 			#endregion
 
-			#region ITextEditorOptions implementation
+#region ITextEditorOptions implementation
 
 			WordFindStrategy ITextEditorOptions.WordFindStrategy {
 				get {
@@ -246,7 +247,8 @@ namespace MonoDevelop.Ide.Editor
 					return DefaultSourceEditorOptions.Instance.SmartBackspace;
 				}
 			}
-			#endregion
+
+#endregion
 
 
 		}
@@ -293,11 +295,11 @@ namespace MonoDevelop.Ide.Editor
 			return result;
 		}
 
-	// or REMOVED...
+	// oe REMOVED...
 	//oe	internal void SetContext (ICodingConventionContext context)
 	//oe	private Task UpdateContextOptions (object sender, CodingConventionsChangedEventArgs arg)
 
-		#region new options
+#region new options
 
 		public bool EnableAutoCodeCompletion {
 			get { return IdeApp.Preferences.EnableAutoCodeCompletion; }
@@ -414,7 +416,7 @@ namespace MonoDevelop.Ide.Editor
 			}
 		}
 
-		#endregion
+#endregion
 
 		ConfigurationProperty<bool> onTheFlyFormatting = ConfigurationProperty.Create ("OnTheFlyFormatting", true);
 		public bool OnTheFlyFormatting {
@@ -558,7 +560,7 @@ namespace MonoDevelop.Ide.Editor
 					OnChanged (EventArgs.Empty);
 			}
 		}
-		
+
 		ConfigurationProperty<bool> showFoldMargin = ConfigurationProperty.Create ("ShowFoldMargin", false);
 		public bool ShowFoldMargin {
 			get {
@@ -621,7 +623,7 @@ namespace MonoDevelop.Ide.Editor
 	//oe	int? rulerColumnFromContext;
 		public int RulerColumn {
 			get {
-			//	return rulerColumnFromContext ?? rulerColumn;
+			//oe	return rulerColumnFromContext ?? rulerColumn;
 				return rulerColumn;
 			}
 			set {
@@ -790,7 +792,8 @@ namespace MonoDevelop.Ide.Editor
 					OnChanged (EventArgs.Empty);
 			}
 		}
-		#endregion
+
+#endregion
 		
 		public void Dispose ()
 		{

@@ -91,7 +91,9 @@ namespace MonoDevelop.Ide.Tasks
 
 			MonoDevelopWorkspace.LoadingFinished += OnWorkspaceItemLoaded;
 			IdeApp.Workspace.WorkspaceItemUnloaded += OnWorkspaceItemUnloaded;
+
 			IdeApp.Workspace.LastWorkspaceItemClosed += LastWorkspaceItemClosed;
+
 			IdeApp.Workbench.DocumentOpened += WorkbenchDocumentOpened;
 			IdeApp.Workbench.DocumentClosed += WorkbenchDocumentClosed;
 
@@ -266,7 +268,7 @@ namespace MonoDevelop.Ide.Tasks
 				}
 			});
 		}
-		
+
 		void OnWorkspaceItemUnloaded (object sender, WorkspaceItemEventArgs e)
 		{
 			comments.RemoveItemTasks (e.Item, true);

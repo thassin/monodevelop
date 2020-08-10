@@ -252,8 +252,9 @@ Console.WriteLine("oe-TODO :: RoslynCompletionData.InsertCompletionText");
 				base.InsertCompletionText (window, ref ka, descriptor);
 				return;
 			}
+
 			var completionChange = Provider.GetChangeAsync (doc, CompletionItem, null, default (CancellationToken)).WaitAndGetResult (default (CancellationToken));
-			var textChange = completionChange.TextChange;
+			var textChange = completionChange.TextChange; // oe moved up...
 
 			// oe add...
 			int start = textChange.Span.Start;

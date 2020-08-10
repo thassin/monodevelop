@@ -109,6 +109,7 @@ namespace MonoDevelop.Ide.TypeSystem
 			// Trigger running compiler syntax and semantic errors via the diagnostic analyzer engine
 			Options = Options.WithChangedOption (Microsoft.CodeAnalysis.Diagnostics.InternalRuntimeDiagnosticOptions.Syntax, true)
 				.WithChangedOption (Microsoft.CodeAnalysis.Diagnostics.InternalRuntimeDiagnosticOptions.Semantic, true)
+
 			// Always use persistent storage regardless of solution size, at least until a consensus is reached
 			// https://github.com/mono/monodevelop/issues/4149 https://github.com/dotnet/roslyn/issues/25453
 				.WithChangedOption (Microsoft.CodeAnalysis.Storage.StorageOptions.SolutionSizeThreshold, 0);
@@ -808,6 +809,7 @@ namespace MonoDevelop.Ide.TypeSystem
 		}
 
 		List<MonoDevelopSourceTextContainer> openDocuments = new List<MonoDevelopSourceTextContainer>();
+
 		internal void InformDocumentOpen (DocumentId documentId, TextEditor editor)
 		{
 			var document = InternalInformDocumentOpen (documentId, editor);
@@ -896,13 +898,13 @@ namespace MonoDevelop.Ide.TypeSystem
 				}
 				OnDocumentClosed (analysisDocument, loader);
 				foreach (var linkedDoc in document.GetLinkedDocumentIds ()) {
-					OnDocumentClosed (linkedDoc, loader); 
+					OnDocumentClosed (linkedDoc, loader);
 				}
 			} catch (Exception e) {
-				LoggingService.LogError ("Exception while closing document.", e); 
+				LoggingService.LogError ("Exception while closing document.", e);
 			}
 		}
-		
+
 		public override void CloseDocument (DocumentId documentId)
 		{
 		}
@@ -1082,7 +1084,7 @@ namespace MonoDevelop.Ide.TypeSystem
 								case CSharpMethodKind:
 									insertionModeOperation = GettextCatalog.GetString ("Insert Method");
 									break;
-								case 8892: // C# property 
+								case 8892: // C# property
 									insertionModeOperation = GettextCatalog.GetString ("Insert Property");
 									break;
 								default:
@@ -1224,7 +1226,7 @@ namespace MonoDevelop.Ide.TypeSystem
 					tryApplyState_documentTextChangedContents.Clear ();
 					tryApplyState_documentTextChangedTasks.Clear ();
 					tryApplyState_changedProjects.Clear ();
-					freezeProjectModify = false; 
+					freezeProjectModify = false;
 				}
 			}
 		}
@@ -1484,7 +1486,7 @@ namespace MonoDevelop.Ide.TypeSystem
 
 		internal void RemoveProject (MonoDevelop.Projects.Project project)
 		{
-			var id = GetProjectId (project); 
+			var id = GetProjectId (project);
 			if (id != null) {
 				foreach (var docId in GetOpenDocumentIds (id).ToList ()) {
 					ClearOpenDocument (docId);

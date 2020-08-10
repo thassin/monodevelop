@@ -23,6 +23,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -320,6 +321,7 @@ namespace Mono.TextEditor
 			
 		//oe	Editor.Document.TextBuffer.Changed -= UpdateLinksOnTextReplace;
 			Editor.Document.TextChanged -= UpdateLinksOnTextReplace;
+
 			this.Editor.Caret.PositionChanged -= HandlePositionChanged;
 			if (undoDepth >= 0)
 				Editor.Document.StackUndoToDepth (undoDepth);
@@ -332,8 +334,8 @@ namespace Mono.TextEditor
 		bool wasReplaced = false;
 
 	// oe REMOVED...
-	//	static readonly object _linkEditTag = new object();
-	//	void UpdateLinksOnTextReplace (object sender, Microsoft.VisualStudio.Text.TextContentChangedEventArgs e)
+	//oe	static readonly object _linkEditTag = new object();
+	//oe	void UpdateLinksOnTextReplace (object sender, Microsoft.VisualStudio.Text.TextContentChangedEventArgs e)
 
 		// oe add...
 		void UpdateLinksOnTextReplace (object sender, TextChangeEventArgs e)

@@ -1,5 +1,5 @@
 ﻿//
-// SourceEditorView.IEditorOperationsMD.cs
+// SourceEditorView.IEditorOperations.cs
 //
 // Author:
 //       Mike Krüger <mikkrg@microsoft.com>

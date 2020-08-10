@@ -1155,6 +1155,7 @@ Console.WriteLine( "TextDocument.ApplyTextChanges() start" );
 		{
 			// oe add...
 			OptimizeTypedUndo ();
+
 			if (undoStack.Count > 0 && undoStack.Peek () is KeyboardStackUndo)
 				((KeyboardStackUndo)undoStack.Peek ()).IsClosed = true;
 

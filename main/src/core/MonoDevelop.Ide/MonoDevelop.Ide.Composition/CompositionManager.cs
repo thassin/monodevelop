@@ -48,6 +48,7 @@ namespace MonoDevelop.Ide.Composition
 	/// </summary>
 	public class CompositionManager
 	{
+		static CompositionManager instance; // oe moved up...
 
 	// oe REMOVED...
 	//oe	static Task<CompositionManager> creationTask;
@@ -55,8 +56,6 @@ namespace MonoDevelop.Ide.Composition
 	//oe	static readonly PartDiscovery Discovery = PartDiscovery.Combine (
 	//oe		new AttributedPartDiscoveryV1 (StandardResolver),
 	//oe		new AttributedPartDiscovery (StandardResolver, true));
-
-		static CompositionManager instance;
 
 		public static CompositionManager Instance {
 			get {
@@ -83,7 +82,7 @@ namespace MonoDevelop.Ide.Composition
 		}
 
 		/// <summary>
-		/// Returns all instance of type T that are exported by some composition part. The instances are shared (singletons).
+		/// Returns all instances of type T that are exported by some composition part. The instances are shared (singletons).
 		/// </summary>
 		public static IEnumerable<T> GetExportedValues<T> ()
 		{
@@ -248,11 +247,11 @@ Console.WriteLine( "oeDEBUG :: CompositionManager :: INIT-2 " + assembly );
 			"Microsoft.CodeAnalysis.CSharp.Features",
 			"Microsoft.CodeAnalysis.VisualBasic",
 			"Microsoft.CodeAnalysis.VisualBasic.Workspaces",
-			"Microsoft.CodeAnalysis.VisualBasic.Features",
+			"Microsoft.CodeAnalysis.VisualBasic.Features"
 
-			// oe ADDED these trying to get QuickFix menu working (oe-20180416-7.6-build551).
-			"Microsoft.CodeAnalysis.Diagnostics",
-			"Microsoft.CodeAnalysis.ICodeFixService"
+		//	// oe ADDED these trying to get QuickFix menu working (oe-20180416-7.6-build551).
+		//	"Microsoft.CodeAnalysis.Diagnostics",
+		//	"Microsoft.CodeAnalysis.ICodeFixService"
 
 // oe NOTICE : not sure if there is real need to add anything here.
 // -> see ReadAssembliesFromAddins() above...

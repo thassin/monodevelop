@@ -475,12 +475,12 @@ namespace MonoDevelop.Ide.Templates
 			string eolMarker = TextStylePolicy.GetEolMarker (textPolicy.EolMarker);
 
 		// oe REMOVED (with EditorConfigService.cs)...
-		//	var ctx = await EditorConfigService.GetEditorConfigContext (fileName);
-		//	if (ctx != null) {
-		//		ctx.CurrentConventions.UniversalConventions.TryGetEncoding (out encoding);
-		//		if (ctx.CurrentConventions.UniversalConventions.TryGetLineEnding (out string lineEnding))
-		//			eolMarker = lineEnding;
-		//	}
+		//oe	var ctx = await EditorConfigService.GetEditorConfigContext (fileName);
+		//oe	if (ctx != null) {
+		//oe		ctx.CurrentConventions.UniversalConventions.TryGetEncoding (out encoding);
+		//oe		if (ctx.CurrentConventions.UniversalConventions.TryGetLineEnding (out string lineEnding))
+		//oe			eolMarker = lineEnding;
+		//oe	}
 
 			if (encoding == null)
 				encoding = System.Text.Encoding.UTF8;
@@ -516,12 +516,12 @@ namespace MonoDevelop.Ide.Templates
 			}
 
 		// oe REMOVED (with EditorConfigService.cs)...
-		//	if (ctx != null && lastLine != null && lastLine.Length > 0) {
-		//		if (ctx.CurrentConventions.UniversalConventions.TryGetRequireFinalNewline (out bool requireNewLine)) {
-		//			if (requireNewLine)
-		//				ms.Write (eolMarkerBytes, 0, eolMarkerBytes.Length);
-		//		}
-		//	}
+		//oe	if (ctx != null && lastLine != null && lastLine.Length > 0) {
+		//oe		if (ctx.CurrentConventions.UniversalConventions.TryGetRequireFinalNewline (out bool requireNewLine)) {
+		//oe			if (requireNewLine)
+		//oe				ms.Write (eolMarkerBytes, 0, eolMarkerBytes.Length);
+		//oe		}
+		//oe	}
 
 			ms.Position = 0;
 			return ms;
