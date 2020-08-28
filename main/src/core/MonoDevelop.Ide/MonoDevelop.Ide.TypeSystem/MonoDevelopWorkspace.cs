@@ -80,6 +80,8 @@ namespace MonoDevelop.Ide.TypeSystem
 
 		static MonoDevelopWorkspace ()
 		{
+Console.WriteLine( "oeDEBUG :: MonoDevelopWorkspace static" );
+
 			Logger.SetLogger (AggregateLogger.Create (
 				new RoslynLogger (),
 				Logger.GetLogger ()

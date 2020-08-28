@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <NuGetVersionRoslyn>2.7.0</NuGetVersionRoslyn>
+  </PropertyGroup>
+</Project>

@@ -557,6 +557,13 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
                 }
             }
         }
+
+		// oe FIXME...
+		public ISpaceReservationManager GetSpaceReservationManager(string name)
+		{
+			throw new NotImplementedException();
+		}
+
     }
 }
 

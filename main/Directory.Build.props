@@ -3,10 +3,19 @@
   <PropertyGroup>
     <RootDirectory>$(MSBuildThisFileDirectory)</RootDirectory>
     <PackagesDirectory>$(RootDirectory)packages</PackagesDirectory>
+
+    <MdAddinsDirectory>$(MSBuildThisFileDirectory)..\..\md-addins\</MdAddinsDirectory>
+    <VSEditorCoreDirectory Condition="'$(VSEditorCoreDirectory)' == ''">$(MdAddinsDirectory)external\vs-editor-core\</VSEditorCoreDirectory>
+    <VSEditorApiDirectory Condition="'$(VSEditorApiDirectory)' == ''">$(MSBuildThisFileDirectory)external\vs-editor-api\</VSEditorApiDirectory>
+
     <ReferencesRoslyn>$(RootDirectory)\msbuild\ReferencesRoslyn.props</ReferencesRoslyn>
     <ReferencesVSEditor>$(RootDirectory)\msbuild\ReferencesVSEditor.props</ReferencesVSEditor>
-    <NuGetVersionRoslyn>2.7.0-beta3-62509-03</NuGetVersionRoslyn>
-    <NuGetVersionVSEditor>15.6.161-preview</NuGetVersionVSEditor>
+    <NuGetVersionRoslyn>2.7.0</NuGetVersionRoslyn>
+
+<!-- oe :: do NOT use any external VSEditor packages.
+    <NuGetVersionVSEditor>15.6.27740.dummy</NuGetVersionVSEditor>
+-->
+
   </PropertyGroup>
 
 </Project>

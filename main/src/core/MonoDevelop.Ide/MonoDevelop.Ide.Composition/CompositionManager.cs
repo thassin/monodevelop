@@ -111,13 +111,67 @@ namespace MonoDevelop.Ide.Composition
 				.WithDesktopSupport ();
 
 			var assemblies = new HashSet<Assembly> ();
+
+			string[] extraLibraries = new [] {
+
+				"MonoDevelop.Ide",	// PlaformCatalog
+
+			//	// for ContentTypeRegistryImpl etc...
+			//	"Microsoft.VisualStudio.CoreUtilityImplementation",
+			//	"Microsoft.VisualStudio.CoreUtilityImplementation
+
+			// TODO all needed???
+
+				"Microsoft.VisualStudio.CoreUtility",
+				"Microsoft.VisualStudio.CoreUtilityImplementation",
+				"Microsoft.VisualStudio.Language.Implementation",
+				"Microsoft.VisualStudio.Logic.Text.Classification.Aggregator.Implementation",
+				"Microsoft.VisualStudio.Logic.Text.Navigation.Implementation",
+				"Microsoft.VisualStudio.Logic.Text.Tagging.Aggregator.Implementation",
+				"Microsoft.VisualStudio.Text.BraceCompletion.Implementation",
+				"Microsoft.VisualStudio.Text.Data.Utilities",
+				"Microsoft.VisualStudio.Text.Differencing.Implementation",
+				"Microsoft.VisualStudio.Text.EditorOptions.Implementation",
+				"Microsoft.VisualStudio.Text.Model.Implementation",
+				"Microsoft.VisualStudio.Text.MultiCaret.Implementation",
+				"Microsoft.VisualStudio.Text.UI.Utilities",
+				"Microsoft.VisualStudio.UI.Text.Commanding.Implementation"
+
+			};
+
+			foreach (var asmName in extraLibraries) {
+
+Console.WriteLine( "oeDEBUG :: CompositionManager :: INIT-1 " + asmName );
+
+				try {
+					var asm = Assembly.Load (asmName);
+					if (asm == null)
+						continue;
+
+//	foreach ( Type t in asm.GetTypes() ) {
+//		Console.WriteLine( "oeDEBUG :: CompositionManager :: I1-type " + t.Name );
+//	}
+
+					assemblies.Add (asm);
+				} catch (Exception ex) {
+					LoggingService.LogError ("Error - can't load extra assembly: " + asmName, ex);
+				}
+			}
+
+Console.WriteLine( "oeDEBUG :: CompositionManager :: INIT-addins-start" );
+
 			ReadAssembliesFromAddins (assemblies, "/MonoDevelop/Ide/TypeService/PlatformMefHostServices");
 			ReadAssembliesFromAddins (assemblies, "/MonoDevelop/Ide/TypeService/MefHostServices");
 			ReadAssembliesFromAddins (assemblies, "/MonoDevelop/Ide/Composition");
 
+Console.WriteLine( "oeDEBUG :: CompositionManager :: INIT-addins-completed" );
+
 			// spawn discovery tasks in parallel for each assembly
 			var tasks = new List<Task<DiscoveredParts>> (assemblies.Count);
 			foreach (var assembly in assemblies) {
+
+Console.WriteLine( "oeDEBUG :: discovering " + assembly.FullName );
+
 				var task = Task.Run (() => Discovery.CreatePartsAsync (assembly));
 				tasks.Add (task);
 			}
@@ -139,9 +193,19 @@ namespace MonoDevelop.Ide.Composition
 
 				// For now while we're still transitioning to VSMEF it's useful to work
 				// even if the composition has some errors. TODO: re-enable this.
-				//var messages = errors.SelectMany (e => e).Select (e => e.Message);
-				//var text = string.Join (Environment.NewLine, messages);
+
+				var messages = errors.SelectMany (e => e).Select (e => e.Message);
+				var text = string.Join (Environment.NewLine, messages);
+
 				//Xwt.Clipboard.SetText (text);
+Console.WriteLine( "" );
+Console.WriteLine( "" );
+Console.WriteLine( "oeDEBUG :: SOME MEF PROBLEMS:" );
+Console.WriteLine( text );
+Console.WriteLine( "" );
+Console.WriteLine( "" );
+
+				// un-comment this to stop on errors:
 				//configuration.ThrowOnErrors ();
 			}
 

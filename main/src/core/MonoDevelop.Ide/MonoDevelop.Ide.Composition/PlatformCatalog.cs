@@ -29,14 +29,27 @@ using Microsoft.VisualStudio.Utilities;
 
 namespace Microsoft.VisualStudio.Platform
 {
+	[Export]
+	public class ExpTestClass1
+	{
+		public int foo = 5;
+	}
+
+
+
     [Export]
     public class PlatformCatalog
     {
 		static PlatformCatalog instance;
 		public static PlatformCatalog Instance {
 			get {
+
+Console.WriteLine( "oeDEBUG PlatformCatalog.Instance called" );
+Console.Out.Flush();
+
 				if (instance == null) {
 					instance = CompositionManager.GetExportedValue<PlatformCatalog> ();
+				//	instance = new PlatformCatalog();	just a test...
 				}
 
 				return instance;
@@ -51,8 +64,9 @@ namespace Microsoft.VisualStudio.Platform
 		[Import]
         internal ITextDocumentFactoryService TextDocumentFactoryService { get; private set; }
 
-        [Import]
-        internal ITextEditorFactoryService TextEditorFactoryService { get; private set; }
+// oe NOT IMPLEMENTED...
+//oe	[Import]
+//oe	internal ITextEditorFactoryService TextEditorFactoryService { get; private set; }
 
         [Import]
         internal IMimeToContentTypeRegistryService MimeToContentTypeRegistryService { get; private set; }
@@ -63,8 +77,10 @@ namespace Microsoft.VisualStudio.Platform
         [Import]
         internal IBufferTagAggregatorFactoryService BufferTagAggregatorFactoryService { get; private set; }
 
-        [Import]
-        internal IClassifierAggregatorService ClassifierAggregatorService { get; private set; }
+// oe NOT IMPLEMENTED...
+//oe	[Import]
+//oe	internal IClassifierAggregatorService ClassifierAggregatorService { get; private set; }
+
     }
 
     public interface IMimeToContentTypeRegistryService

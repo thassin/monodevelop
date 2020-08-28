@@ -37,7 +37,10 @@ namespace Microsoft.VisualStudio.Platform
     internal sealed class TagBasedSyntaxHighlighting : ISyntaxHighlighting
     {
         private ITextBuffer textBuffer { get; }
-        private IClassifier classifier { get; set; }
+
+// oe NOTICE not available from PlatformCatalog.Instance.ClassifierAggregatorService.
+//oe	private IClassifier classifier { get; set; }
+
         private MonoDevelop.Ide.Editor.ITextDocument textDocument { get; }
 
         internal TagBasedSyntaxHighlighting(ITextView textView)
@@ -48,11 +51,13 @@ namespace Microsoft.VisualStudio.Platform
 
         public Task<HighlightedLine> GetHighlightedLineAsync(IDocumentLine line, CancellationToken cancellationToken)
         {
+Console.WriteLine( "oeDEBUG :: TagBasedSyntaxHighlighting.GetHighlightedLineAsync()" );
+	/* oe DISABLED...
             ITextSnapshotLine snapshotLine = textBuffer.CurrentSnapshot.GetLineFromLineNumber (line.LineNumber - 1);
             if ((this.classifier == null) || (snapshotLine == null))
-            {
+            {	*/
                 return Task.FromResult(new HighlightedLine(line, new[] { new ColoredSegment(0, line.Length, ScopeStack.Empty) }));
-            }
+	/*  }
 
             List<ColoredSegment> coloredSegments = new List<ColoredSegment>();
 
@@ -86,7 +91,7 @@ namespace Microsoft.VisualStudio.Platform
             }
 
             HighlightedLine result = new HighlightedLine(line, coloredSegments);
-            return Task.FromResult(result);
+            return Task.FromResult(result);	*/
         }
 
         public Task<ScopeStack> GetScopeStackAsync(int offset, CancellationToken cancellationToken)
@@ -104,11 +109,13 @@ namespace Microsoft.VisualStudio.Platform
                     _highlightingStateChanged += value;
                 }
 
+Console.WriteLine( "oeDEBUG :: TagBasedSyntaxHighlighting.HighlightingStateChanged_add" );
+	/* oe DISABLED...
                 if (this.classifier == null)
                 {
                     this.classifier = PlatformCatalog.Instance.ClassifierAggregatorService.GetClassifier(this.textBuffer);
                     this.classifier.ClassificationChanged += this.OnClassificationChanged;
-                }
+                }	*/
             }
 
             remove
@@ -120,12 +127,14 @@ namespace Microsoft.VisualStudio.Platform
                     dispose = _highlightingStateChanged == null;
                 }
 
+Console.WriteLine( "oeDEBUG :: TagBasedSyntaxHighlighting.HighlightingStateChanged_remove" );
+	/* oe DISABLED...
                 if (dispose && (this.classifier != null))
                 {
                     this.classifier.ClassificationChanged -= this.OnClassificationChanged;
                     (this.classifier as IDisposable)?.Dispose();
                     this.classifier = null;
-                }
+                }	*/
             }
         }
 

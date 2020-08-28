@@ -13,12 +13,16 @@ namespace Microsoft.VisualStudio.Platform
     {
         public static ITextBuffer GetPlatformTextBuffer(this MonoDevelop.Ide.Editor.TextEditor textEditor)
         {
-            return textEditor.TextView.TextBuffer;
+Console.WriteLine( "oe FIXME :: PlarformExtensions.GetPlatformTextBuffer()" );
+		throw new NotImplementedException();
+	//oe	return textEditor.TextView.TextBuffer;
         }
 
         public static ITextView GetPlatformTextView(this MonoDevelop.Ide.Editor.TextEditor textEditor)
         {
-            return textEditor.TextView;
+Console.WriteLine( "oe FIXME :: PlarformExtensions.GetPlatformTextView()" );
+		throw new NotImplementedException();
+	//oe	return textEditor.TextView;
         }
 
         public static MonoDevelop.Ide.Editor.ITextDocument GetTextEditor(this ITextBuffer textBuffer)
