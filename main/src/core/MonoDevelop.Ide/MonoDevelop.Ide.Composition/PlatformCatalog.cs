@@ -29,14 +29,6 @@ using Microsoft.VisualStudio.Utilities;
 
 namespace Microsoft.VisualStudio.Platform
 {
-	[Export]
-	public class ExpTestClass1
-	{
-		public int foo = 5;
-	}
-
-
-
     [Export]
     public class PlatformCatalog
     {
@@ -49,7 +41,6 @@ Console.Out.Flush();
 
 				if (instance == null) {
 					instance = CompositionManager.GetExportedValue<PlatformCatalog> ();
-				//	instance = new PlatformCatalog();	just a test...
 				}
 
 				return instance;
