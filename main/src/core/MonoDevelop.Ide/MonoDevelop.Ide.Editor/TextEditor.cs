@@ -23,6 +23,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using System;
 using MonoDevelop.Core.Text;
 using System.Collections.Generic;
@@ -51,7 +52,15 @@ namespace MonoDevelop.Ide.Editor
 	{
 		readonly ITextEditorImpl textEditorImpl;
 
-	//oe	public Microsoft.VisualStudio.Text.Editor.ITextView TextView { get; }
+		public Microsoft.VisualStudio.Text.Editor.ITextView TextView { get; }
+
+// oe NOTICE : Microsoft.VisualStudio.Text.Editor.ITextView contains a property
+// "Microsoft.VisualStudio.Text.Editor.ITextBuffer TextBuffer" which PlatformExtensions.cs needs.
+
+// oe NOTICE : there are 2 separate "ITextDocument" classes:
+//	*) Microsoft.VisualStudio.Text.ITextDocument
+//	*) MonoDevelop.Ide.Editor.ITextDocument
+// Mono.TextEditor.TextDocument implements BOTH of them.
 
 		IReadonlyTextDocument ReadOnlyTextDocument { get { return textEditorImpl.Document; } }
 
@@ -980,7 +989,7 @@ namespace MonoDevelop.Ide.Editor
 				provider.Dispose ();
 			textEditorImpl.Dispose ();
 
-		//oe	this.TextView.Close();
+			this.TextView.Close();
 
 			base.Dispose (disposing);
 		}
@@ -1052,8 +1061,8 @@ namespace MonoDevelop.Ide.Editor
 			MimeTypeChanged += TextEditor_MimeTypeChanged;
 			TextEditor_MimeTypeChanged (null, null);
 
-		// oe NOTICE PlatformCatalog.Instance.TextEditorFactoryService is not implemented.
-		//oe	this.TextView = Microsoft.VisualStudio.Platform.PlatformCatalog.Instance.TextEditorFactoryService.CreateTextView(this);
+Console.WriteLine( "oeDEBUG :: TextEditorFactoryService.CreateTextView" );
+			this.TextView = Microsoft.VisualStudio.Platform.PlatformCatalog.Instance.TextEditorFactoryService.CreateTextView(this);
 		}
 
 		void TextEditor_FileNameChanged (object sender, EventArgs e)

@@ -218,6 +218,9 @@ Console.WriteLine( "" );
 
 		void ReadAssembliesFromAddins (HashSet<Assembly> assemblies, string extensionPath)
 		{
+
+Console.WriteLine( "oeDEBUG :: ReadAssembliesFromAddins : from extensionPath " + extensionPath );
+
 			foreach (var node in AddinManager.GetExtensionNodes (extensionPath)) {
 				var assemblyNode = node as AssemblyExtensionNode;
 				if (assemblyNode != null) {
@@ -227,6 +230,9 @@ Console.WriteLine( "" );
 						AddinManager.LoadAddin (null, assemblyNode.Addin.Id);
 
 						var assemblyFilePath = assemblyNode.Addin.GetFilePath (assemblyNode.FileName);
+
+Console.WriteLine( "oeDEBUG :: ReadAssembliesFromAddins " + assemblyFilePath );
+
 						var assembly = Runtime.SystemAssemblyService.LoadAssemblyFrom (assemblyFilePath);
 						assemblies.Add (assembly);
 					}

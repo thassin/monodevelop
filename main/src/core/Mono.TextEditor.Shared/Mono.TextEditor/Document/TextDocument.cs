@@ -297,28 +297,31 @@ namespace Mono.TextEditor
 			var contentType = GetContentTypeFromMimeType (mimeType);
 			Encoding enc;
 			var text = TextFileUtility.GetText (fileName, out enc);
-			var buffer = PlatformCatalog.Instance.TextBufferFactoryService.CreateTextBuffer (text ?? string.Empty,
-			                                                                                 PlatformCatalog.Instance.TextBufferFactoryService.InertContentType);
+			var buffer = PlatformCatalog.Instance.TextBufferFactoryService.CreateTextBuffer (text ?? string.Empty, PlatformCatalog.Instance.TextBufferFactoryService.InertContentType);
 			
 			this.VsTextDocument = PlatformCatalog.Instance.TextDocumentFactoryService.CreateTextDocument (buffer, fileName);
 			this.VsTextDocument.Encoding = enc;
 
+// called once for each opened editor window.
+Console.WriteLine( "oeDEBUG :: TextDocument_ctor_1 " + buffer.GetHashCode() + " " + this.VsTextDocument.GetHashCode() );
 			this.Initialize();
 		}
 
 		public TextDocument (string text = null)
 		{
-			var buffer = PlatformCatalog.Instance.TextBufferFactoryService.CreateTextBuffer(text ?? string.Empty,
-																							PlatformCatalog.Instance.TextBufferFactoryService.InertContentType);
+			var buffer = PlatformCatalog.Instance.TextBufferFactoryService.CreateTextBuffer(text ?? string.Empty, PlatformCatalog.Instance.TextBufferFactoryService.InertContentType);
 
 			this.VsTextDocument = PlatformCatalog.Instance.TextDocumentFactoryService.CreateTextDocument(buffer, string.Empty);
 			this.VsTextDocument.Encoding = MonoDevelop.Core.Text.TextFileUtility.DefaultEncoding;
 
+Console.WriteLine( "oeDEBUG :: TextDocument_ctor_2 " + buffer.GetHashCode() + " " + this.VsTextDocument.GetHashCode() );
 			this.Initialize();
 		}
 
 		public static TextDocument CreateImmutableDocument (string text, bool suppressHighlighting = true)
 		{
+// TODO when called, what used for???
+Console.WriteLine( "oeDEBUG :: TextDocument.CreateImmutableDocument" );
 			return new TextDocument (text) {
 				SuppressHighlightUpdate = suppressHighlighting,
 				Text = text,

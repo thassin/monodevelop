@@ -64,9 +64,8 @@ Console.Out.Flush();
 		[Import]
         internal ITextDocumentFactoryService TextDocumentFactoryService { get; private set; }
 
-// oe NOT IMPLEMENTED...
-//oe	[Import]
-//oe	internal ITextEditorFactoryService TextEditorFactoryService { get; private set; }
+	[Import]
+	internal ITextEditorFactoryService TextEditorFactoryService { get; private set; }
 
         [Import]
         internal IMimeToContentTypeRegistryService MimeToContentTypeRegistryService { get; private set; }
@@ -77,10 +76,8 @@ Console.Out.Flush();
         [Import]
         internal IBufferTagAggregatorFactoryService BufferTagAggregatorFactoryService { get; private set; }
 
-// oe NOT IMPLEMENTED...
-//oe	[Import]
-//oe	internal IClassifierAggregatorService ClassifierAggregatorService { get; private set; }
-
+	[Import]
+	internal IClassifierAggregatorService ClassifierAggregatorService { get; private set; }
     }
 
     public interface IMimeToContentTypeRegistryService

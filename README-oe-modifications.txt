@@ -21,13 +21,18 @@ main/Directory.Build.props
 main/Main.sln
 main/msbuild/ReferencesVSEditor.props
 main/src/addins/MonoDevelop.SourceEditor2/VSEditor/TagBasedSyntaxHighlighting.cs
+main/src/addins/MonoDevelop.SourceEditor2/VSEditor/TextEditorFactoryService.cs
 main/src/addins/MonoDevelop.SourceEditor2/VSEditor/TextView.cs
 main/src/addins/MonoDevelop.UnitTesting.NUnit/NUnit3Runner/NUnit3Runner.csproj
 main/src/addins/MonoDevelop.UnitTesting.NUnit/NUnitRunner/NUnitRunner.csproj
+main/src/core/Mono.TextEditor.Shared/Mono.TextEditor/Document/TextDocument.cs
+main/src/core/MonoDevelop.Core/MonoDevelop.Projects.MSBuild/MSBuildProjectService.cs
+main/src/core/MonoDevelop.Core/MonoDevelop.Projects.MSBuild/RemoteBuildEngineManager.cs
 main/src/core/MonoDevelop.Core/packages.config
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/CompositionManager.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/PlatformCatalog.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Composition/PlatformExtensions.cs
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/InternalExtensionAPI/ITextEditorImpl.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/TextEditor.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.TypeSystem/MonoDevelopWorkspace.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.csproj
@@ -61,10 +66,10 @@ $ ./configure
 $ make clean 
 $ make 
 
-//		IF NEEDED, make copies of the following files with fixed filenames:
-//	$ cp ./main/external/fsharpbinding/packages/FSharp.Core/fsharp.core.4.1.0.2.nupkg ./main/external/fsharpbinding/packages/FSharp.Core/FSharp.Core.4.1.0.2.nupkg
-//	$ cp ./main/external/fsharpbinding/packages/System.ValueTuple/system.valuetuple.4.4.0.nupkg ./main/external/fsharpbinding/packages/System.ValueTuple/System.ValueTuple.4.4.0.nupkg
-//		THEN re-try building ( make clean && make ).
+	IF NEEDED, make copies of the following files with fixed filenames:
+$ cp ./main/external/fsharpbinding/packages/FSharp.Core/fsharp.core.4.1.0.2.nupkg ./main/external/fsharpbinding/packages/FSharp.Core/FSharp.Core.4.1.0.2.nupkg
+$ cp ./main/external/fsharpbinding/packages/System.ValueTuple/system.valuetuple.4.4.0.nupkg ./main/external/fsharpbinding/packages/System.ValueTuple/System.ValueTuple.4.4.0.nupkg
+	THEN re-try building ( make clean && make ).
 
 	 how to run:
 	^^^^^^^^^^^^^

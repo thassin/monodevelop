@@ -39,8 +39,9 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
         [Import]
         internal IContentTypeRegistryService ContentTypeRegistryService { get; set; }
 
-        [Import]
-        internal IEditorOperationsFactoryService EditorOperationsProvider { get; set; }
+// oe NOT IMPLEMENTED...
+//oe	[Import]
+//oe	internal IEditorOperationsFactoryService EditorOperationsProvider { get; set; }
 
         [Import]
         internal ITextBufferFactoryService TextBufferFactoryService { get; set; }
@@ -51,15 +52,16 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
         [Import]
         internal IBufferGraphFactoryService BufferGraphFactoryService { get; set; }
 
-        [Import]
-        internal IClassificationTypeRegistryService ClassificationTypeRegistryService { get; set; }
+// oe NOT IMPLEMENTED...
+//oe	[Import]
+//oe	internal IClassificationTypeRegistryService ClassificationTypeRegistryService { get; set; }
 
         [Import]
         internal IEditorOptionsFactoryService EditorOptionsFactoryService { get; set; }
 
-
-        [Import]
-        internal ITextSearchService2 TextSearchService { get; set; }
+// oe NOT IMPLEMENTED...
+//oe	[Import]
+//oe	internal ITextSearchService2 TextSearchService { get; set; }
 
         [Import]
         internal ITextStructureNavigatorSelectorService TextStructureNavigatorSelectorService { get; set; }
@@ -77,8 +79,9 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
         [Import(AllowDefault=true)]
         internal IOutliningManagerService OutliningManagerService { get; set; }
 
-        [Import]
-        internal ITextUndoHistoryRegistry UndoHistoryRegistry { get; set; }
+// oe NOT IMPLEMENTED...
+//oe	[Import]
+//oe	internal ITextUndoHistoryRegistry UndoHistoryRegistry { get; set; }
 
         public event EventHandler<TextViewCreatedEventArgs> TextViewCreated;
 
