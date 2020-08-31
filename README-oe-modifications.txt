@@ -5,8 +5,8 @@ this version is based on:
 	*) dated 2018-04-06 
 
 some package versions:
-	Microsoft.CodeAnalysis.*	2.7.0
-	Microsoft.VisualStudio.*	15.6.27740
+	Microsoft.CodeAnalysis.*	"2.7.0"
+	Microsoft.VisualStudio.*	removed (from vs-editor-api)
 
 modifications:
 
