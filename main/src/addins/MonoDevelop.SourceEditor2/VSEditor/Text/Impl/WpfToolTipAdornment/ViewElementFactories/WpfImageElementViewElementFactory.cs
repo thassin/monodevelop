@@ -4,7 +4,7 @@ namespace Microsoft.VisualStudio.Text.AdornmentLibrary.ToolTip.Implementation
     using System.ComponentModel.Composition;
     using System.Windows;
     using Microsoft.VisualStudio.Core.Imaging;
-    using Microsoft.VisualStudio.Imaging;
+//  using Microsoft.VisualStudio.Imaging; // oe not implemented...
     using Microsoft.VisualStudio.Text.Adornments;
     using Microsoft.VisualStudio.Text.Editor;
     using Microsoft.VisualStudio.Utilities;

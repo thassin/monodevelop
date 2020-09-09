@@ -463,6 +463,10 @@ namespace MonoDevelop.Projects.MSBuild
 
 			var dirId = Process.GetCurrentProcess ().Id.ToString () + "_" + runtime.InternalId;
 			var exesDir = UserProfile.Current.CacheDir.Combine ("MSBuild").Combine (dirId);
+
+Console.WriteLine( "oeDEBUG GetLocalMSBuildExeLocation :: exesDir " + exesDir );
+// Error MSB4019: The imported project "/home/xx/.cache/MonoDevelop/7.0/MSBuild/24869_1//Microsoft.CSharp.Core.targets" was not found.
+
 			var originalExe = GetExeLocationInBundle (MSBuildProjectService.ToolsVersion);
 			var originalExeConfig = originalExe + ".config";
 			var destinationExe = exesDir.Combine (Path.GetFileName (originalExe));
@@ -581,6 +585,9 @@ namespace MonoDevelop.Projects.MSBuild
 
 		static void SetMSBuildConfigProperty (XElement elem, string name, string value, bool append = false, bool insertBefore = false)
 		{
+
+Console.WriteLine( "oeDEBUG RBEM.SetMSBuildConfigProperty :: " + name + " => " + value );
+
 			var prop = elem.Elements ("property").FirstOrDefault (p => p.Attribute ("name")?.Value == name);
 			if (prop != null) {
 				var val = prop.Attribute ("value")?.Value;

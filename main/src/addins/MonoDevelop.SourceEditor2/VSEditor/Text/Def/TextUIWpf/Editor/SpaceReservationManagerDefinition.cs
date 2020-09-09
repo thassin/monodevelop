@@ -5,7 +5,7 @@
 namespace Microsoft.VisualStudio.Text.Editor
 {
     /// <summary>
-    /// Represents metadata for an <see cref="ISpaceReservationManager"/>.  
+    /// Represents metadata for an <see cref="IMDSpaceReservationManager"/>.  
     /// </summary>
     /// <remarks> 
     /// Because you cannot subclass this type, you can simply use the [Export] attribute.
@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.Text.Editor
     ///     { other components }
     /// }
     /// </example>
-    public sealed class SpaceReservationManagerDefinition
+    public sealed class MDSpaceReservationManagerDefinition
     {
     }
 }

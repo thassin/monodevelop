@@ -58,6 +58,7 @@ namespace MonoDevelop.Projects.MSBuild
 		public const string DefaultFormat = "MSBuild12";
 
 		internal const string ToolsVersion = "15.0";
+	//oe	internal const string ToolsVersion = "14.0";	// Microsoft.CodeAnalysis.Elfie LIMITS THIS TO 14.0 MAX! not an effective setting?
 
 		static DataContext dataContext;
 

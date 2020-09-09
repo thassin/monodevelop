@@ -12,16 +12,16 @@ namespace Microsoft.VisualStudio.Text.Editor
     /// <summary>
     /// Manages space reservation adornments.
     /// </summary>
-    public interface ISpaceReservationManager
+    public interface IMDSpaceReservationManager
     {
         /// <summary>
-        /// Creates a default implementation of an <see cref="ISpaceReservationAgent"/> that displays <paramref name="content"/> in a popup window.
+        /// Creates a default implementation of an <see cref="IMDSpaceReservationAgent"/> that displays <paramref name="content"/> in a popup window.
         /// </summary>
         /// <param name="visualSpan">The span of text associated with the tip.</param>
         /// <param name="style">The style options for displaying the tip.</param>
         /// <param name="content">The UI element to be displayed in the tip.</param>
-        /// <returns>An <see cref="ISpaceReservationAgent"/> that will display the desired content in a popup window.</returns>
-        ISpaceReservationAgent CreatePopupAgent(ITrackingSpan visualSpan, PopupStyles style, Xwt.Widget content);
+        /// <returns>An <see cref="IMDSpaceReservationAgent"/> that will display the desired content in a popup window.</returns>
+        IMDSpaceReservationAgent CreatePopupAgent(ITrackingSpan visualSpan, PopupStyles style, Xwt.Widget content);
 
         /// <summary>
         /// Updates <paramref name="agent"/> with the <paramref name="visualSpan"/>.
@@ -29,32 +29,32 @@ namespace Microsoft.VisualStudio.Text.Editor
         /// </summary>
         /// <param name="agent">The agent to add.</param>
         /// <param name="visualSpan">The agent's new visual span.</param>
-        void UpdatePopupAgent(ISpaceReservationAgent agent, ITrackingSpan visualSpan, PopupStyles styles);
+        void UpdatePopupAgent(IMDSpaceReservationAgent agent, ITrackingSpan visualSpan, PopupStyles styles);
 
         /// <summary>
         /// Adds <paramref name="agent"/> to the list of agents managed by this manager.
         /// </summary>
         /// <param name="agent">The agent to add.</param>
-        void AddAgent(ISpaceReservationAgent agent);
+        void AddAgent(IMDSpaceReservationAgent agent);
 
         /// <summary>
         /// Removes <paramref name="agent"/> from the list of agents managed by this manager.
         /// </summary>
         /// <param name="agent">The agent to remove.</param>
         /// <returns><c>true</c> if the agent was in the list of agents to remove.</returns>
-        bool RemoveAgent(ISpaceReservationAgent agent);
+        bool RemoveAgent(IMDSpaceReservationAgent agent);
 
         /// <summary>
         /// Gets the list of agents managed by this manager.
         /// </summary>
-        /// <remarks>Any implementation of aa <see cref="ISpaceReservationAgent"/> can be used for this method.</remarks>
-        ReadOnlyCollection<ISpaceReservationAgent> Agents { get; }
+        /// <remarks>Any implementation of aa <see cref="IMDSpaceReservationAgent"/> can be used for this method.</remarks>
+        ReadOnlyCollection<IMDSpaceReservationAgent> Agents { get; }
 
         /// <summary>
         /// Occurs when the agent is changed.
         /// </summary>
         /// <remarks></remarks>
-        event EventHandler<SpaceReservationAgentChangedEventArgs> AgentChanged;
+        event EventHandler<MDSpaceReservationAgentChangedEventArgs> AgentChanged;
 
         /// <summary>
         /// Determines whether the mouse is over an agent managed by this manager.

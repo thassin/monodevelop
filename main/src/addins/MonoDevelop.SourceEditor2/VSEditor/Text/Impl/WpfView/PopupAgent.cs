@@ -22,11 +22,13 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
     using Mono.TextEditor;
     using MonoDevelop.Components;
     using Rect = Xwt.Rectangle;
+    using Point = Xwt.Point;
+    using Size = Xwt.Size;
 
-    internal class PopupAgent : ISpaceReservationAgent
+    internal class PopupAgent : IMDSpaceReservationAgent
     {
 		internal readonly Mono.TextEditor.MonoTextEditor _textView;
-        internal readonly ISpaceReservationManager _manager;
+        internal readonly IMDSpaceReservationManager _manager;
         internal ITrackingSpan _visualSpan;
         internal PopupStyles _style;
         internal Widget _mouseContainer;
@@ -34,7 +36,7 @@ namespace Microsoft.VisualStudio.Text.Editor.Implementation
         private const int MaxPopupCacheSize = 10;
         private const double BelowTheLineBufferHint = 3.0;
 
-		public PopupAgent(Mono.TextEditor.MonoTextEditor textView, ISpaceReservationManager manager, ITrackingSpan visualSpan, PopupStyles style, Widget content)
+		public PopupAgent(Mono.TextEditor.MonoTextEditor textView, IMDSpaceReservationManager manager, ITrackingSpan visualSpan, PopupStyles style, Widget content)
         {
             if (textView == null)
                 throw new ArgumentNullException("textView");

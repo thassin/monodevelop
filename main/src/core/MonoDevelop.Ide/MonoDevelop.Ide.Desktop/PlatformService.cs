@@ -109,9 +109,10 @@ namespace MonoDevelop.Ide.Desktop
 		public string GetMimeTypeForUri (string uri)
 		{
 			if (!String.IsNullOrEmpty (uri)) {
+			/* oe NOT IMPLEMENTED...
 				MimeTypeNode mt = FindMimeTypeForFile (uri);
 				if (mt != null)
-					return mt.Id;
+					return mt.Id;	*/
 			}
 			var mime = OnGetMimeTypeForUri (uri);
 			if (mime != null) {
@@ -256,10 +257,11 @@ namespace MonoDevelop.Ide.Desktop
 
 		string GetIconIdForFile (string fileName)
 		{
+			/* oe NOT IMPLEMENTED...
 			MimeTypeNode mt = FindMimeTypeForFile (fileName);
 			if (mt != null)
 				return mt.Icon;
-			else
+			else	*/
 				return OnGetIconIdForFile (fileName);
 		}
 
@@ -304,6 +306,7 @@ namespace MonoDevelop.Ide.Desktop
 			}
 		}
 
+	/* oe NOT IMPLEMENTED...
 		static Lazy<IFilePathRegistryService> filePathRegistryService = CompositionManager.GetExport<IFilePathRegistryService> ();
 		MimeTypeNode FindMimeTypeForFile (string fileName)
 		{
@@ -327,7 +330,7 @@ namespace MonoDevelop.Ide.Desktop
 					return mt;
 			}
 			return null;
-		}
+		}	*/
 
 		MimeTypeNode FindMimeType (string type)
 		{

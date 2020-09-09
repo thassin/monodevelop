@@ -23,8 +23,8 @@ namespace Microsoft.VisualStudio.Text.AdornmentLibrary.ToolTip.Implementation
     {
         #region Private Members
         private readonly IMdTextView _textView;
-        internal readonly ISpaceReservationManager _spaceReservationManager;
-        internal ISpaceReservationAgent _agent;
+        internal readonly IMDSpaceReservationManager _spaceReservationManager;
+        internal IMDSpaceReservationAgent _agent;
         #endregion
 
         internal ToolTipProvider(IMdTextView textView)
@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.Text.AdornmentLibrary.ToolTip.Implementation
             _spaceReservationManager.AgentChanged += OnAgentChanged;
         }
 
-        void OnAgentChanged(object sender, SpaceReservationAgentChangedEventArgs e)
+        void OnAgentChanged(object sender, MDSpaceReservationAgentChangedEventArgs e)
         {
             if (_agent == e.OldAgent)
                 _agent = null;
@@ -74,8 +74,10 @@ namespace Microsoft.VisualStudio.Text.AdornmentLibrary.ToolTip.Implementation
             }
 
             this.ClearToolTip();
-            _agent = _spaceReservationManager.CreatePopupAgent(span, style, element);
-            _spaceReservationManager.AddAgent(_agent);
+Console.WriteLine( "oe FIXME :: ToolTipProvider.ShowToolTip()" );
+//VSEditor/Text/Impl/WpfToolTipAdornment/Legacy/ToolTipProvider.cs(77,77): error CS1503: Argument 3: cannot convert from 'MonoDevelop.Components.Control' to 'System.Windows.UIElement'
+            //_agent = _spaceReservationManager.CreatePopupAgent(span, style, element);
+            //_spaceReservationManager.AddAgent(_agent);
         }
 
         public void ShowToolTip(ITrackingSpan span, object toolTipContent)

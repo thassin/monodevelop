@@ -19,7 +19,7 @@ using Point = Xwt.Point;
 
 namespace Microsoft.VisualStudio.Language.Intellisense.Implementation
 {
-    internal class CurrentLineSpaceReservationAgent : ISpaceReservationAgent
+    internal class CurrentLineSpaceReservationAgent : IMDSpaceReservationAgent
     {
         internal const string CurrentLineSRManagerName = "currentline";
 
@@ -122,7 +122,7 @@ namespace Microsoft.VisualStudio.Language.Intellisense.Implementation
             }
         }
 
-        private void OnSRManager_AgentChanged(object sender, SpaceReservationAgentChangedEventArgs e)
+        private void OnSRManager_AgentChanged(object sender, MDSpaceReservationAgentChangedEventArgs e)
         {
             if (_isAttached && (e.OldAgent == this))
             {
@@ -203,8 +203,8 @@ namespace Microsoft.VisualStudio.Language.Intellisense.Implementation
             }
         }
 
-        private ISpaceReservationManager _currentLineSRManager;
-        private ISpaceReservationManager CurrentLineSRManager
+        private IMDSpaceReservationManager _currentLineSRManager;
+        private IMDSpaceReservationManager CurrentLineSRManager
         {
             get
             {

@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.Text.AdornmentLibrary.ToolTip.Implementation
     using Microsoft.VisualStudio.Text.Formatting;
 	using Xwt;
 	using Rect = Xwt.Rectangle;
+	using Point = Xwt.Point;
 	using System.Windows.Input;
 	using MonoDevelop.Components;
 
@@ -159,7 +160,9 @@ namespace Microsoft.VisualStudio.Text.AdornmentLibrary.ToolTip.Implementation
             //}
             //else
             //{
-                mousePoint = Mouse.GetPosition(view.VisualElement);
+                //mousePoint = Mouse.GetPosition(view.VisualElement);
+            view.VisualElement.GetPointer(out var x, out var y);
+            mousePoint = new Point(x, y);
             //}
 
             mousePoint.X += view.ViewportLeft;

@@ -51,10 +51,10 @@ namespace Microsoft.VisualStudio.Language.Intellisense.Implementation
         private IMdTextView _textView;
         private StackList<IIntellisenseSession> _sessions = new StackList<IIntellisenseSession>();
         private ReadOnlyObservableCollection<IIntellisenseSession> _readOnlySessions;
-        private Dictionary<IIntellisenseSession, ISpaceReservationAgent> _reservationAgentIndex =
-            new Dictionary<IIntellisenseSession, ISpaceReservationAgent>();
-        private Dictionary<ISpaceReservationAgent, ISpaceReservationManager> _reservationManagerIndex =
-            new Dictionary<ISpaceReservationAgent, ISpaceReservationManager>();
+        private Dictionary<IIntellisenseSession, IMDSpaceReservationAgent> _reservationAgentIndex =
+            new Dictionary<IIntellisenseSession, IMDSpaceReservationAgent>();
+        private Dictionary<IMDSpaceReservationAgent, IMDSpaceReservationManager> _reservationManagerIndex =
+            new Dictionary<IMDSpaceReservationAgent, IMDSpaceReservationManager>();
         private IIntellisenseSession _keyboardSession;
         private IIntellisenseSession _sessionBeingRehosted;
 
@@ -205,7 +205,7 @@ namespace Microsoft.VisualStudio.Language.Intellisense.Implementation
             return false;
         }
 
-        private void OnSpaceReservationManager_AgentChanged(object sender, SpaceReservationAgentChangedEventArgs e)
+        private void OnSpaceReservationManager_AgentChanged(object sender, MDSpaceReservationAgentChangedEventArgs e)
         {
             if (e.NewAgent == null)
             {
@@ -412,7 +412,7 @@ namespace Microsoft.VisualStudio.Language.Intellisense.Implementation
             if (popupPresenter.SurfaceElement == null)
             { return; }
 
-            ISpaceReservationManager manager = _textView.GetSpaceReservationManager(popupPresenter.SpaceReservationManagerName);
+            IMDSpaceReservationManager manager = _textView.GetSpaceReservationManager(popupPresenter.SpaceReservationManagerName);
             if (manager != null)
             {
                 // If this is the first time we've seen this manager, subscribe to its AgentChanged event.
@@ -422,7 +422,7 @@ namespace Microsoft.VisualStudio.Language.Intellisense.Implementation
                     manager.AgentChanged += this.OnSpaceReservationManager_AgentChanged;
                 }
 
-                ISpaceReservationAgent agent = manager.CreatePopupAgent(popupPresenter.PresentationSpan,
+                IMDSpaceReservationAgent agent = manager.CreatePopupAgent(popupPresenter.PresentationSpan,
                     popupPresenter.PopupStyles,
                     popupPresenter.SurfaceElement);
 
@@ -463,10 +463,10 @@ namespace Microsoft.VisualStudio.Language.Intellisense.Implementation
 
             try
             {
-                ISpaceReservationAgent oldAgent = null;
+                IMDSpaceReservationAgent oldAgent = null;
                 if ((_reservationAgentIndex.TryGetValue(session, out oldAgent)) && (oldAgent != null))
                 {
-                    ISpaceReservationManager manager = null;
+                    IMDSpaceReservationManager manager = null;
                     if ((_reservationManagerIndex.TryGetValue(oldAgent, out manager)) && (manager != null))
                     {
                         manager.UpdatePopupAgent(oldAgent, popupPresenter.PresentationSpan, popupPresenter.PopupStyles);
@@ -509,10 +509,10 @@ namespace Microsoft.VisualStudio.Language.Intellisense.Implementation
                 // Now, see if we have a popup agent for this presenter.  If so, let's get rid of it.  This is what will "hide" the
                 // popup.
 
-                ISpaceReservationAgent agent;
+                IMDSpaceReservationAgent agent;
                 if ((_reservationAgentIndex.TryGetValue(session, out agent)) && (agent != null))
                 {
-                    ISpaceReservationManager manager;
+                    IMDSpaceReservationManager manager;
                     if ((_reservationManagerIndex.TryGetValue(agent, out manager)) && (manager != null))
                     {
                         manager.RemoveAgent(agent);

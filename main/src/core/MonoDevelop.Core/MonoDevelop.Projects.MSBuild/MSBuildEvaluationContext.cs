@@ -123,7 +123,10 @@ namespace MonoDevelop.Projects.MSBuild
 		static void InitEngineProperties (Core.Assemblies.TargetRuntime runtime, Dictionary<string, string> properties, out List<ImportSearchPathExtensionNode> searchPaths)
 		{
 			// This MSBuild loader is v15.0
+
 			string toolsVersion = "15.0";
+		//oe	string toolsVersion = "14.0";	// Microsoft.CodeAnalysis.Elfie LIMITS THIS TO 14.0 MAX! not an effective setting?
+
 			properties.Add ("MSBuildAssemblyVersion", toolsVersion);
 
 			//VisualStudioVersion is a property set by MSBuild itself

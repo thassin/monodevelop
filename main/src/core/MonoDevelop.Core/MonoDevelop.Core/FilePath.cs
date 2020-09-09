@@ -47,6 +47,13 @@ namespace MonoDevelop.Core
 
 		public FilePath (string name)
 		{
+
+/*oe	if ( name != null ) {
+// Error MSB4019: The imported project "/home/xx/.cache/MonoDevelop/7.0/MSBuild/24869_1//Microsoft.CSharp.Core.targets" was not found.
+// -> tried to find badly generated paths like above, but found none -> the bad paths are generated elsewhere.
+		Console.WriteLine( "oeDEBUG FILEPATH :: " + name );
+	}	*/
+
 			if (name != null && name.Length > 6 && name[0] == 'f' && name.StartsWith ("file://", StringComparison.Ordinal))
 				name = new Uri (name).LocalPath;
 

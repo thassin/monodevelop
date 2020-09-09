@@ -98,7 +98,7 @@ namespace Mono.TextEditor
 			this.roles = roles;
 			this.factoryService = factoryService;
             GuardedOperations = this.factoryService.GuardedOperations;
-            _spaceReservationStack = new SpaceReservationStack(this.factoryService.OrderedSpaceReservationManagerDefinitions, this);
+            _spaceReservationStack = new MDSpaceReservationStack(this.factoryService.OrderedSpaceReservationManagerDefinitions, this);
 
 			this.TextDataModel = textViewModel.DataModel;
 			this.TextViewModel = textViewModel;
@@ -144,7 +144,8 @@ namespace Mono.TextEditor
 			//			this.Loaded += OnLoaded;
 
 			// TODO: *Someone* needs to call this to execute UndoHistoryRegistry.RegisterHistory -- VS does this via the ShimCompletionControllerFactory.
-			factoryService.EditorOperationsProvider.GetEditorOperations (this);
+		// oe REMOVED :: 'TextEditorFactoryService' does not contain a definition for 'EditorOperationsProvider'
+		//oe	factoryService.EditorOperationsProvider.GetEditorOperations (this);
 
 			connectionManager = new ConnectionManager (this, factoryService.TextViewConnectionListeners, factoryService.GuardedOperations);
 
@@ -501,9 +502,14 @@ namespace Mono.TextEditor
 		}
 
 		public IGuardedOperations GuardedOperations;
-		internal SpaceReservationStack _spaceReservationStack;
+		internal MDSpaceReservationStack _spaceReservationStack;
 
-		public ISpaceReservationManager GetSpaceReservationManager (string name)
+//#if MAC
+		// on Mac ITextView has the extra member GetSpaceReservationManager that isn't there on Windows
+		ISpaceReservationManager ITextView.GetSpaceReservationManager (string name) => throw new NotImplementedException();
+//#endif
+
+		public IMDSpaceReservationManager GetSpaceReservationManager (string name)
 		{
 			if (name == null)
 				throw new ArgumentNullException ("name");

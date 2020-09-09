@@ -13,26 +13,26 @@ namespace Microsoft.VisualStudio.Language.Intellisense.Implementation
         [Export]
         [Name(CurrentLineSpaceReservationAgent.CurrentLineSRManagerName)]
         [Order(Before = IntellisenseSpaceReservationManagerNames.SmartTagSpaceReservationManagerName)]
-        internal SpaceReservationManagerDefinition currentLineManager;
+        internal MDSpaceReservationManagerDefinition currentLineManager;
 
         [Export]
         [Name(IntellisenseSpaceReservationManagerNames.SmartTagSpaceReservationManagerName)]
         [Order(Before = IntellisenseSpaceReservationManagerNames.QuickInfoSpaceReservationManagerName)]
-        internal SpaceReservationManagerDefinition smartTagManager;
+        internal MDSpaceReservationManagerDefinition smartTagManager;
 
         [Export]
         [Name(IntellisenseSpaceReservationManagerNames.QuickInfoSpaceReservationManagerName)]
         [Order(Before = IntellisenseSpaceReservationManagerNames.SignatureHelpSpaceReservationManagerName)]
-        internal SpaceReservationManagerDefinition quickInfoManager;
+        internal MDSpaceReservationManagerDefinition quickInfoManager;
 
         [Export]
         [Name(IntellisenseSpaceReservationManagerNames.SignatureHelpSpaceReservationManagerName)]
         [Order(Before = IntellisenseSpaceReservationManagerNames.CompletionSpaceReservationManagerName)]
-        internal SpaceReservationManagerDefinition signatureHelpManager;
+        internal MDSpaceReservationManagerDefinition signatureHelpManager;
 
         [Export]
         [Name(IntellisenseSpaceReservationManagerNames.CompletionSpaceReservationManagerName)]
         [Order()]
-        internal SpaceReservationManagerDefinition completionManager;
+        internal MDSpaceReservationManagerDefinition completionManager;
     }
 }

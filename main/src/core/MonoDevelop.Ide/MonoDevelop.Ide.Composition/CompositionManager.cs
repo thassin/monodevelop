@@ -128,10 +128,53 @@ namespace MonoDevelop.Ide.Composition
 			var assemblies = ReadAssembliesFromAddins ();
 			var caching = new Caching (assemblies);
 
-			// Try to use cached MEF data
-			if (caching.CanUse ()) {
-				RuntimeComposition = await TryCreateRuntimeCompositionFromCache (caching);
+			string[] extraLibraries = new [] {
+
+				"MonoDevelop.Ide",	// PlaformCatalog
+
+			// TODO all of these needed???
+
+				"Microsoft.VisualStudio.CoreUtility",
+				"Microsoft.VisualStudio.CoreUtilityImplementation",
+				"Microsoft.VisualStudio.Language.Implementation",
+				"Microsoft.VisualStudio.Logic.Text.Classification.Aggregator.Implementation",
+				"Microsoft.VisualStudio.Logic.Text.Navigation.Implementation",
+				"Microsoft.VisualStudio.Logic.Text.Tagging.Aggregator.Implementation",
+				"Microsoft.VisualStudio.Text.BraceCompletion.Implementation",
+				"Microsoft.VisualStudio.Text.Data.Utilities",
+				"Microsoft.VisualStudio.Text.Differencing.Implementation",
+				"Microsoft.VisualStudio.Text.EditorOptions.Implementation",
+				"Microsoft.VisualStudio.Text.Model.Implementation",
+				"Microsoft.VisualStudio.Text.MultiCaret.Implementation",
+				"Microsoft.VisualStudio.Text.UI.Utilities",
+				"Microsoft.VisualStudio.UI.Text.Commanding.Implementation"
+
+			};
+
+			foreach (var asmName in extraLibraries) {
+
+Console.WriteLine( "oeDEBUG :: CompositionManager :: INIT-1 " + asmName );
+
+				try {
+					var asm = Assembly.Load (asmName);
+					if (asm == null)
+						continue;
+
+//	foreach ( Type t in asm.GetTypes() ) {
+//		Console.WriteLine( "oeDEBUG :: CompositionManager :: I1-type " + t.Name );
+//	}
+
+					assemblies.Add (asm);
+				} catch (Exception ex) {
+					LoggingService.LogError ("Error - can't load extra assembly: " + asmName, ex);
+				}
 			}
+
+		// oe TODO caching not tested...
+		//oe	// Try to use cached MEF data
+		//oe	if (caching.CanUse ()) {
+		//oe		RuntimeComposition = await TryCreateRuntimeCompositionFromCache (caching);
+		//oe	}
 
 			// Otherwise fallback to runtime discovery.
 			if (RuntimeComposition == null) {
@@ -193,6 +236,18 @@ namespace MonoDevelop.Ide.Composition
 
 					// For now while we're still transitioning to VSMEF it's useful to work
 					// even if the composition has some errors. TODO: re-enable this.
+
+var _errors = configuration.CompositionErrors.ToArray ();
+var _messages = _errors.SelectMany (e => e).Select (e => e.Message);
+var _text = string.Join (Environment.NewLine, _messages);
+Console.WriteLine( "" );
+Console.WriteLine( "" );
+Console.WriteLine( "oeDEBUG :: SOME MEF PROBLEMS:" );
+Console.WriteLine( _text );
+Console.WriteLine( "" );
+Console.WriteLine( "" );
+
+					// oe NOTICE : un-comment this to stop on any errors:
 					//configuration.ThrowOnErrors ();
 				}
 
@@ -207,14 +262,19 @@ namespace MonoDevelop.Ide.Composition
 		{
 			using (var timer = Counters.CompositionAddinLoad.BeginTiming ()) {
 				var assemblies = new HashSet<Assembly> ();
+Console.WriteLine( "oeDEBUG :: CompositionManager :: INIT-addins-start" );
 				ReadAssemblies (assemblies, "/MonoDevelop/Ide/TypeService/PlatformMefHostServices", timer);
 				ReadAssemblies (assemblies, "/MonoDevelop/Ide/TypeService/MefHostServices", timer);
 				ReadAssemblies (assemblies, "/MonoDevelop/Ide/Composition", timer);
+Console.WriteLine( "oeDEBUG :: CompositionManager :: INIT-addins-completed" );
 				return assemblies;
 			}
 
 			void ReadAssemblies (HashSet<Assembly> assemblies, string extensionPath, ITimeTracker timer)
 			{
+
+Console.WriteLine( "oeDEBUG :: ReadAssembliesFromAddins : from extensionPath " + extensionPath );
+
 				foreach (var node in AddinManager.GetExtensionNodes (extensionPath)) {
 					if (node is AssemblyExtensionNode assemblyNode) {
 						try {
@@ -226,6 +286,9 @@ namespace MonoDevelop.Ide.Composition
 							AddinManager.LoadAddin (null, id);
 
 							var assemblyFilePath = assemblyNode.Addin.GetFilePath (assemblyNode.FileName);
+
+Console.WriteLine( "oeDEBUG :: ReadAssembliesFromAddins " + assemblyFilePath );
+
 							var assembly = Runtime.LoadAssemblyFrom (assemblyFilePath);
 							assemblies.Add (assembly);
 

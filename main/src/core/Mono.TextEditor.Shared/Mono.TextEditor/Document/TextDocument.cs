@@ -81,6 +81,7 @@ namespace Mono.TextEditor
 
 		private static Microsoft.VisualStudio.Utilities.IContentType GetContentTypeFromMimeType(string filePath, string mimeType)
 		{
+		/* oe NOT IMPLEMENTED...
 			if (filePath != null)
 			{
 				IFilePathRegistryService filePathRegistryService = CompositionManager.GetExportedValue<IFilePathRegistryService> ();
@@ -90,7 +91,7 @@ namespace Mono.TextEditor
 				{
 					return contentTypeFromPath;
 				}
-			}
+			}	*/
 
 			IContentType contentType = PlatformCatalog.Instance.MimeToContentTypeRegistryService.GetContentType (mimeType);
 			if (contentType == null)
@@ -230,7 +231,7 @@ namespace Mono.TextEditor
 
 			this.TextBuffer.Properties.AddProperty(typeof(ITextDocument), this);
 			this.TextBuffer.Changed += this.OnTextBufferChanged;
-			(this.TextBuffer as Microsoft.VisualStudio.Text.Implementation.BaseBuffer).ChangedImmediate += OnTextBufferChangedImmediate;
+		//oe	(this.TextBuffer as Microsoft.VisualStudio.Text.Implementation.BaseBuffer).ChangedImmediate += OnTextBufferChangedImmediate;
 			this.TextBuffer.ContentTypeChanged += this.OnTextBufferContentTypeChanged;
 
 			this.VsTextDocument.FileActionOccurred += this.OnTextDocumentFileActionOccurred;
@@ -241,29 +242,12 @@ namespace Mono.TextEditor
 
 		public void Dispose()
 		{
-			(this.TextBuffer as Microsoft.VisualStudio.Text.Implementation.BaseBuffer).ChangedImmediate -= OnTextBufferChangedImmediate;
+		//oe	(this.TextBuffer as Microsoft.VisualStudio.Text.Implementation.BaseBuffer).ChangedImmediate -= OnTextBufferChangedImmediate;
 			this.TextBuffer.Changed -= this.OnTextBufferChanged;
 			this.TextBuffer.ContentTypeChanged -= this.OnTextBufferContentTypeChanged;
 			this.TextBuffer.Properties.RemoveProperty(typeof(ITextDocument));
 			this.VsTextDocument.FileActionOccurred -= this.OnTextDocumentFileActionOccurred;
 			SyntaxMode = null;
-		}
-
-		private void OnTextBufferChangedImmediate (object sender, Microsoft.VisualStudio.Text.TextContentChangedEventArgs args)
-		{
-			if (args.Changes == null)
-				return;
-			var changes = new List<TextChange> ();
-			foreach (var change in args.Changes) {
-				changes.Add (new TextChange (change.OldPosition, change.NewPosition, change.OldText, change.NewText));
-				EnsureSegmentIsUnfolded(change.OldPosition, change.NewLength);
-			}
-			var textChange = new TextChangeEventArgs(changes);
-
-			InterruptFoldWorker();
-			TextChanging?.Invoke(this, textChange);           
-			// After TextChanging notification has been sent, we can update the cached snapshot
-			this.currentSnapshot = args.After;
 		}
 
 		void OnTextBufferChanged(object sender, Microsoft.VisualStudio.Text.TextContentChangedEventArgs args)
@@ -273,10 +257,19 @@ namespace Mono.TextEditor
 			var changes = new List<TextChange> ();
 			foreach (var change in args.Changes) {
 				changes.Add (new TextChange (change.OldPosition, change.NewPosition, change.OldText, change.NewText));
+
+				// oe ADDED...
+				EnsureSegmentIsUnfolded(change.OldPosition, change.NewLength);
 			}
 			bool endUndo = false;
 			UndoOperation operation = null;
 			var textChange = new TextChangeEventArgs(changes);
+
+			// oe ADDED...
+			InterruptFoldWorker();
+			TextChanging?.Invoke(this, textChange);           
+			// After TextChanging notification has been sent, we can update the cached snapshot
+			this.currentSnapshot = args.After;
 
 			if (!isInUndo) {
 				operation = new UndoOperation(args);
@@ -298,6 +291,24 @@ namespace Mono.TextEditor
 			if (endUndo)
 				OnEndUndo(new UndoOperationEventArgs(operation));
 		}
+
+	/* oe NOT IMPLEMENTED...
+		private void OnTextBufferChangedImmediate (object sender, Microsoft.VisualStudio.Text.TextContentChangedEventArgs args)
+		{
+			if (args.Changes == null)
+				return;
+			var changes = new List<TextChange> ();
+			foreach (var change in args.Changes) {
+				changes.Add (new TextChange (change.OldPosition, change.NewPosition, change.OldText, change.NewText));
+				EnsureSegmentIsUnfolded(change.OldPosition, change.NewLength);
+			}
+			var textChange = new TextChangeEventArgs(changes);
+
+			InterruptFoldWorker();
+			TextChanging?.Invoke(this, textChange);           
+			// After TextChanging notification has been sent, we can update the cached snapshot
+			this.currentSnapshot = args.After;
+		}	*/
 
 		void OnTextBufferContentTypeChanged(object sender, Microsoft.VisualStudio.Text.ContentTypeChangedEventArgs args)
 		{

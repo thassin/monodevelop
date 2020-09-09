@@ -68,7 +68,7 @@ namespace MonoDevelop.Ide.Completion.Presentation
 		XwtPopupWindowTheme Theme;
 
 		int selection = 0;
-		ISpaceReservationAgent agent;
+		IMDSpaceReservationAgent agent;
 
 		bool buttonPressed;
 		IList<CompletionItem> filteredItems = new List<CompletionItem> (0);

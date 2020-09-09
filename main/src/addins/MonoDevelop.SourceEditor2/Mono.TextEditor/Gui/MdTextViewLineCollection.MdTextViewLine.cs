@@ -227,6 +227,16 @@ namespace Mono.TextEditor
 			{
 				return lineSpan.IntersectsWith (bufferSpan);
 			}
+
+			// oe ADD THE MISSING STUFF (stubs):
+			//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+			public void SetChange(TextViewLineChange change) { }
+			public void SetTop(double top) { }
+			public void SetDeltaY(double deltaY) { }
+			public void SetSnapshot(ITextSnapshot x, ITextSnapshot y) { }
+			public void SetLineTransform(LineTransform t) { }
+			public void Dispose() { }
+
 		}
 	}
 }

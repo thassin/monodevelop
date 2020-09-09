@@ -48,7 +48,10 @@ namespace Microsoft.VisualStudio.Platform
 	internal sealed class TagBasedSyntaxHighlighting : ISyntaxHighlighting
 	{
 		private ITextView textView { get; }
-		private IAccurateClassifier classifier { get; set; }
+
+	// oe NOTICE not available from PlatformCatalog.Instance.ClassifierAggregatorService.
+	//oe	private IAccurateClassifier classifier { get; set; }
+
 		readonly Dictionary<string, ScopeStack> classificationMap;
 		Dictionary<IClassificationType, ScopeStack> classificationTypeToScopeCache = new Dictionary<IClassificationType, ScopeStack> ();
 		ScopeStack defaultScopeStack;
@@ -66,8 +69,10 @@ namespace Microsoft.VisualStudio.Platform
 
 		public Task<HighlightedLine> GetHighlightedLineAsync (IDocumentLine line, CancellationToken cancellationToken)
 		{
+Console.WriteLine( "oeDEBUG :: TagBasedSyntaxHighlighting.GetHighlightedLineAsync()" );
 			ITextSnapshotLine snapshotLine = (line as Mono.TextEditor.TextDocument.DocumentLineFromTextSnapshotLine)?.Line;
-			if ((this.classifier == null) || (snapshotLine == null)) {
+		//oe	if ((this.classifier == null) || (snapshotLine == null)) {
+			if ( /* (this.classifier == null) || */ (snapshotLine == null)) {
 				return Task.FromResult (new HighlightedLine (line, new [] { new ColoredSegment (0, line.Length, ScopeStack.Empty) }));
 			}
 			List<ColoredSegment> coloredSegments = new List<ColoredSegment> ();
@@ -76,11 +81,11 @@ namespace Microsoft.VisualStudio.Platform
 			int start = snapshotSpan.Start.Position;
 			int end = snapshotSpan.End.Position;
 
-			IList<ClassificationSpan> classifications = this.classifier.GetClassificationSpans (snapshotSpan);
+		//oe	IList<ClassificationSpan> classifications = this.classifier.GetClassificationSpans (snapshotSpan);
 
 			int lastClassifiedOffsetEnd = start;
 			ScopeStack scopeStack;
-			foreach (ClassificationSpan curSpan in classifications) {
+		/*oe	foreach (ClassificationSpan curSpan in classifications) {
 				if (curSpan.Span.Start > lastClassifiedOffsetEnd) {
 					scopeStack = defaultScopeStack;
 					ColoredSegment whitespaceSegment = new ColoredSegment (lastClassifiedOffsetEnd - start, curSpan.Span.Start - lastClassifiedOffsetEnd, scopeStack);
@@ -96,7 +101,7 @@ namespace Microsoft.VisualStudio.Platform
 				}
 
 				lastClassifiedOffsetEnd = curSpan.Span.End;
-			}
+			}	*/
 
 			if (end > lastClassifiedOffsetEnd) {
 				scopeStack = defaultScopeStack;
@@ -176,10 +181,11 @@ namespace Microsoft.VisualStudio.Platform
 					_highlightingStateChanged += value;
 				}
 
-				if (this.classifier == null) {
+Console.WriteLine( "oeDEBUG :: TagBasedSyntaxHighlighting.HighlightingStateChanged_add" );
+			/*oe	if (this.classifier == null) {
 					this.classifier = PlatformCatalog.Instance.ViewClassifierAggregatorService.GetClassifier (this.textView) as IAccurateClassifier;
 					this.classifier.ClassificationChanged += this.OnClassificationChanged;
-				}
+				}	*/
 			}
 
 			remove {
@@ -189,11 +195,12 @@ namespace Microsoft.VisualStudio.Platform
 					dispose = _highlightingStateChanged == null;
 				}
 
-				if (dispose && (this.classifier != null)) {
+Console.WriteLine( "oeDEBUG :: TagBasedSyntaxHighlighting.HighlightingStateChanged_remove" );
+			/*oe	if (dispose && (this.classifier != null)) {
 					this.classifier.ClassificationChanged -= this.OnClassificationChanged;
 					(this.classifier as IDisposable)?.Dispose ();
 					this.classifier = null;
-				}
+				}	*/
 			}
 		}
 

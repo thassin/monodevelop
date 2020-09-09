@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.Text.Editor
 		/// <remarks>
 		/// <para>Managers must be exported using <see cref="SpaceReservationManagerDefinition"/> component parts.</para>
 		/// </remarks>
-		ISpaceReservationManager GetSpaceReservationManager (string name);
+		IMDSpaceReservationManager GetSpaceReservationManager (string name);
 
 		Gtk.Container VisualElement
         {
