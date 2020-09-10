@@ -74,10 +74,10 @@ namespace Microsoft.VisualStudio.Text.AdornmentLibrary.ToolTip.Implementation
             }
 
             this.ClearToolTip();
-Console.WriteLine( "oe FIXME :: ToolTipProvider.ShowToolTip()" );
+Console.WriteLine( "oeDEBUG :: ToolTipProvider.ShowToolTip()" );
 //VSEditor/Text/Impl/WpfToolTipAdornment/Legacy/ToolTipProvider.cs(77,77): error CS1503: Argument 3: cannot convert from 'MonoDevelop.Components.Control' to 'System.Windows.UIElement'
-            //_agent = _spaceReservationManager.CreatePopupAgent(span, style, element);
-            //_spaceReservationManager.AddAgent(_agent);
+            _agent = _spaceReservationManager.CreatePopupAgent(span, style, element);
+            _spaceReservationManager.AddAgent(_agent);
         }
 
         public void ShowToolTip(ITrackingSpan span, object toolTipContent)

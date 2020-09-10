@@ -160,9 +160,9 @@ namespace Microsoft.VisualStudio.Text.AdornmentLibrary.ToolTip.Implementation
             //}
             //else
             //{
-                //mousePoint = Mouse.GetPosition(view.VisualElement);
-            view.VisualElement.GetPointer(out var x, out var y);
-            mousePoint = new Point(x, y);
+//oe            mousePoint = Mouse.GetPosition(view.VisualElement);
+		view.VisualElement.GetPointer(out var x, out var y);
+		mousePoint = new Point(x, y);
             //}
 
             mousePoint.X += view.ViewportLeft;
