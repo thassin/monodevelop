@@ -137,11 +137,15 @@ namespace MonoDevelop.Ide.Editor.Highlighting
 			int length = line.Length;
 			var span = new TextSpan (offset, length);
 
+//	Console.WriteLine( "oeDEBUG :: RCH.GetHighlightedLineAsync : line=" + line.LineNumber );
 
 			var classifications = Classifier.GetClassifiedSpans (await document.GetSemanticModelAsync ().ConfigureAwait (false), span, workspace, cancellationToken);
 
 			int lastClassifiedOffsetEnd = offset;
 			ScopeStack scopeStack;
+
+	int prevStart = -1;
+	int prevLength = -1;
 
 			foreach (var curSpan in classifications) {
 				if (curSpan.TextSpan.Start > lastClassifiedOffsetEnd) {
@@ -150,9 +154,28 @@ namespace MonoDevelop.Ide.Editor.Highlighting
 					coloredSegments.Add (whitespaceSegment);
 				}
 
-				scopeStack = GetStyleScopeStackFromClassificationType (curSpan.ClassificationType);
-				ColoredSegment curColoredSegment = new ColoredSegment (curSpan.TextSpan.Start - offset, curSpan.TextSpan.Length, scopeStack);
-				coloredSegments.Add (curColoredSegment);
+//	Console.WriteLine( "oeDEBUG :: RCH.GetHighlightedLineAsync : SPAN start=" + curSpan.TextSpan.Start + " length=" + curSpan.TextSpan.Length + " ClassificationType=" + curSpan.ClassificationType );
+
+// 20201006 : problem after loading/using a "bridge.net" nuget package, which replaces the normal standard/core library (System namespace etc) with an another.
+// as a consequence, the class names, method names etc appear as duplicated in the editor (like ConsoleConsole.WriteLineWriteLine(...)) while the actual file content is correct.
+// it seems that overlapping classifications are received here, with type "static symbol" and identical span with the previous classification => skip these segments.
+// NOTICE there may be valid classifications that span over multiple lines, for example in case of a multiline /* block comment */ ...
+
+				if ( curSpan.TextSpan.Start == prevStart && curSpan.TextSpan.Length == prevLength )
+				{
+	Console.WriteLine( "RCH.GetHighlightedLineAsync : SKIP overlapping SPAN start=" + curSpan.TextSpan.Start + " length=" + curSpan.TextSpan.Length + " ClassificationType='" + curSpan.ClassificationType + "'" );
+//	Console.WriteLine( "RCH.GetHighlightedLineAsync : SKIP overlapping SPAN start=" + curSpan.TextSpan.Start + " length=" + curSpan.TextSpan.Length + " ClassificationType='" + curSpan.ClassificationType + "' lastClassifiedOffsetEnd=" + lastClassifiedOffsetEnd );
+				}
+				else
+				{
+					scopeStack = GetStyleScopeStackFromClassificationType (curSpan.ClassificationType);
+					ColoredSegment curColoredSegment = new ColoredSegment (curSpan.TextSpan.Start - offset, curSpan.TextSpan.Length, scopeStack);
+					coloredSegments.Add (curColoredSegment);
+
+	prevStart = curSpan.TextSpan.Start;
+	prevLength = curSpan.TextSpan.Length;
+
+				}
 
 				lastClassifiedOffsetEnd = curSpan.TextSpan.End;
 			}

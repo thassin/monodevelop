@@ -426,6 +426,24 @@ namespace Mono.TextEditor
 
 		public void ReplaceText (int offset, int count, string value)
 		{
+
+/*
+Console.WriteLine();
+Console.WriteLine();
+Console.WriteLine( "oeDEBUG :: TextDocument.ReplaceText : offset=" + offset + " count=" + count + " value='" + value + "'" );
+
+//int debug_startpos = offset - 20;
+//if ( debug_startpos < 0 ) debug_startpos = 0;
+//string txt = GetTextBetween( debug_startpos, offset );
+//Console.WriteLine( "oeDEBUG :: TextDocument.ReplaceText : offset=" + offset + " count=" + count + " value='" + value + "' AFTER-20: '" + txt + "'" );
+
+Console.WriteLine( System.Environment.StackTrace );
+Console.WriteLine();
+Console.WriteLine();
+
+Console.WriteLine( "oeDEBUG :: TextDocument.ReplaceText : 111_length=" + this.Length );
+*/
+
 			if (offset < 0)
 				throw new ArgumentOutOfRangeException (nameof (offset), "must be > 0, was: " + offset);
 			if (offset > Length)
@@ -438,6 +456,12 @@ namespace Mono.TextEditor
 			if (value == null)
 				value = string.Empty;
 			this.TextBuffer.Replace(new Microsoft.VisualStudio.Text.Span(offset, count), value);
+
+/*
+// BaseBuffer.cs :: public ITextSnapshot Replace(Span replaceSpan, string replaceWith) apparently???
+Console.WriteLine( "oeDEBUG :: TextDocument.ReplaceText : 222_length=" + this.Length );
+*/
+
 		}
 
 		public void ApplyTextChanges (IEnumerable<Microsoft.CodeAnalysis.Text.TextChange> changes)
