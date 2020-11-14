@@ -19,6 +19,28 @@ main/src/addins/MonoDevelop.SourceEditor2/VSEditor/FakeWpf/Geometry.cs
 main/src/addins/MonoDevelop.SourceEditor2/VSEditor/TextEditorFactoryService.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor/ITextEditorFactoryService.cs
 
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/AbstractKeywordHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/AbstractAsyncHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/AsyncAnonymousMethodHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/AsyncMethodHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/AsyncParenthesizedLambdaHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/AsyncSimpleLambdaHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/AwaitHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/CheckedExpressionHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/CheckedStatementHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/ConditionalPreprocessorHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/IfStatementHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/LockStatementHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/LoopHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/RegionHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/ReturnStatementHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/SwitchStatementHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/TryStatementHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/UnsafeStatementHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/UsingStatementHighlighter.cs
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/KeywordHighlighters/YieldStatementHighlighter.cs
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Editor.Highlighting/RoslynClassificationHighlighting.cs
+
 	 modified:
 	^^^^^^^^^^^
 NuGet.config
@@ -83,6 +105,10 @@ main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.Gui.Dialogs/CommonAboutDialog.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.WelcomePage/WelcomePageService.cs
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.csproj
 main/src/core/MonoDevelop.Ide/MonoDevelop.Ide/IdeStartup.cs
+
+main/src/addins/CSharpBinding/CSharpBinding.csproj
+main/src/addins/CSharpBinding/MonoDevelop.CSharp.Highlighting/HighlightUsagesExtension.cs
+main/src/core/MonoDevelop.Ide/MonoDevelop.Ide.csproj
 
 	 moved/renamed:
 	^^^^^^^^^^^^^^^^
