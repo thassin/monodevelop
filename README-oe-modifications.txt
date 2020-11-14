@@ -12,7 +12,7 @@ modifications:
 
 	 added/reverted:
 	^^^^^^^^^^^^^^^^^
-##main/external/vs-editor-api		<new submodule>
+main/external/vs-editor-api			<new submodule>
 main/msbuild/ReferencesVSEditor.Gtk.props
 main/msbuild/RoslynVersion.props
 main/src/addins/MonoDevelop.SourceEditor2/VSEditor/FakeWpf/Geometry.cs
@@ -89,9 +89,9 @@ main/src/core/MonoDevelop.Ide/MonoDevelop.Ide/IdeStartup.cs
 
 	 deleted:
 	^^^^^^^^^^
-main/external/libgit-binary		<submodule>
-main/external/libgit2			<submodule>
-main/external/libgit2sharp		<submodule>
+main/external/libgit-binary			<submodule>
+main/external/libgit2				<submodule>
+main/external/libgit2sharp			<submodule>
 main/src/addins/VersionControl/MonoDevelop.VersionControl.Git	<directory>
 
 ##############################################################################################
