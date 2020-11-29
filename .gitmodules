@@ -52,3 +52,6 @@
 	path = main/external/xwt
 	url = git://github.com/mono/xwt
 	branch = d16-3
+[submodule "main/external/vs-editor-api"]
+	path = main/external/vs-editor-api
+	url = https://github.com/thassin/vs-editor-api.git
