@@ -24,7 +24,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-//
+
+// oe REVERTED from MD-8.3.
 
 using System;
 using System.Collections.Generic;
@@ -86,6 +87,7 @@ namespace MonoDevelop.SourceEditor
 			var ed = CompileErrorTooltipProvider.GetExtensibleTextEditor (editor);
 			if (ed == null)
 				return null;
+
 			string expression = null;
 			int startOffset;
 
